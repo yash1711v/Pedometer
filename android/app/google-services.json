@@ -1,0 +1,71 @@
+{
+  "project_info": {
+    "project_number": "808532346102",
+    "firebase_url": "https://pedometer-d8cdc-default-rtdb.firebaseio.com",
+    "project_id": "pedometer-d8cdc",
+    "storage_bucket": "pedometer-d8cdc.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:808532346102:android:76166709ba1596286dd8d7",
+        "android_client_info": {
+          "package_name": "com.pedometer.steptracker"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "808532346102-6nc99q1jkjs7pha3665d2qvu306s6265.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.pedometer.steptracker",
+            "certificate_hash": "0c35115d9bc136efff3bdc1393e6950de32705c1"
+          }
+        },
+        {
+          "client_id": "808532346102-pbiurgc8rmoitfsd2cmjbp6ou5eqfeas.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.pedometer.steptracker",
+            "certificate_hash": "0a3e9d347e894846dc8b4c3825558ae388c9e617"
+          }
+        },
+        {
+          "client_id": "808532346102-r8oo8da5q5qluuktbgaqohcqqif4ie2j.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.pedometer.steptracker",
+            "certificate_hash": "7d9e109656e5719c60227e60bfe81989dcd55fb8"
+          }
+        },
+        {
+          "client_id": "808532346102-e5r0g78lacebjnpnv6e164vstc5hk7td.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDulINDbeK5OtALK2YHEHUOJ-nNW6TSpx0"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "808532346102-e5r0g78lacebjnpnv6e164vstc5hk7td.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "808532346102-0jbvrssdb7etskug51stigbokrgtb6tt.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.example.steptracking"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
