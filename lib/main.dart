@@ -61,11 +61,11 @@ Future<void> main() async {
 //   BackgroundFetch.registerHeadlessTask(backgroundFetchHeadlessTask);
   tz.initializeTimeZones();
   tz.setLocalLocation(tz.getLocation('Asia/Kolkata'));
-      await AndroidAlarmManager.initialize();
-  final int helloAlarmID = 200;
-  await AndroidAlarmManager.periodic(
-      const Duration(seconds: 1), helloAlarmID, printHello);
-  await initializeService();
+      // await AndroidAlarmManager.initialize();
+  // final int helloAlarmID = 200;
+  // await AndroidAlarmManager.periodic(
+  //     const Duration(seconds: 1), helloAlarmID, printHello);
+
   runApp(const MyApp());
 }
 @pragma('vm:entry-point')

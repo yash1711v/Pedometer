@@ -29,6 +29,7 @@ import 'package:geolocator/geolocator.dart';
 import '../SharedPrefrences/SharedPref.dart';
 import '../main.dart';
 import '../widgets/BottomNavbar.dart';
+import 'Back_Service.dart';
 import 'NotificationServices.dart';
 import 'SignUpScreen.dart';
 SharedPreferences? prefs;
@@ -83,7 +84,7 @@ bool isDone=false;
     super.initState();
     AndroidAlarmManager.initialize();
     // port.listen((_) async => await _incrementCounter());
-   schedulePeriodicAlarm();
+   // schedulePeriodicAlarm();
     tz.initializeTimeZones();
     tz.setLocalLocation(tz.getLocation('Asia/Kolkata'));
     checkPendingNotifications();
@@ -628,6 +629,7 @@ bool isDone=false;
   }
 
   Future<void> getUserData() async {
+
     bool IntroDone=await SharedPref().getIntroScreenInfo();
     bool isstart=await SharedPref().getisStart();
     int TodaysSteps=await SharedPref().getTodaysSteps()??0;
@@ -665,6 +667,7 @@ bool isDone=false;
     print("Guest: after setting"+isGuest.toString());
     if(isstart){
       startListening(context);
+      await initializeService();
     }
 
   }
@@ -786,7 +789,12 @@ void checkisSingleDeviceloggedIn() async{
 }
   @override
   Widget build(BuildContext context) {
-    // Timer.periodic(Duration(minutes: 1), (timer) => checkisSingleDeviceloggedIn());
+    Timer.periodic(Duration(seconds: 60), (timer) async {
+      int steps=await SharedPref().getTodaysSteps()??0;
+      setState(() {
+        StepsCompleted=steps;
+      });
+    });
     return WillPopScope(
       onWillPop: () async {
         SystemNavigator.pop();
@@ -822,9 +830,12 @@ void checkisSingleDeviceloggedIn() async{
                 children: [
                   CircularPercentIndicator(
                     radius: 150.r,
+                    animation: true,
+                    animationDuration: 1000,
                     reverse: true,
+                    animateFromLastPercent: true,
                     circularStrokeCap: CircularStrokeCap.round,
-                    percent: indicatorProgress,
+                    percent: indicatorProgress<0?0:indicatorProgress,
                     lineWidth: 12.w,
                     progressColor: Color(0xFF9D79BC),
                     center:
@@ -1001,7 +1012,12 @@ void checkisSingleDeviceloggedIn() async{
                                               PermissionStatus status2=await Permission.location.request();
                                               PermissionStatus status3=await Permission.sensors.request();
                                               if(status1.isGranted && status2.isGranted){
-                                                startListening(context);
+                                                startListening(context).then((value) async {
+                                                Future.delayed(Duration(seconds: 5),() async {
+                                                  await initializeService();
+                                                });
+                                                });
+
                                                 // notificationServices.scheduleNotifications();
                                                 setState(() {
                                                   isStart = true;
