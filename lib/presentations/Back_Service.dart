@@ -118,7 +118,7 @@ void onStart(ServiceInstance service) async{
            Steps = total - LastdaysSteps;
            if (Steps < 0) {
              print("less zero");
-              LastdaysSteps=SharedPref().getfSwitchoffThenvalue();
+              LastdaysSteps=await SharedPref().getfSwitchoffThenvalue();
              Steps = LastdaysSteps + total;
              await SharedPref().setTodaysSteps(Steps);
              print("Steps After All calculations" + Steps.toString());
@@ -128,6 +128,7 @@ void onStart(ServiceInstance service) async{
              await SharedPref().setTodaysSteps(Steps);
              print("Steps After All calculations" + Steps.toString());
              sendStepsToFirebase(Steps);
+             SharedPref().setifSwitchoffThenvalue(Steps);
            }
          }
 
