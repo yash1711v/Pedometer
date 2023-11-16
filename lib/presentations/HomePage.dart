@@ -29,6 +29,7 @@ import 'package:geolocator/geolocator.dart';
 import '../SharedPrefrences/SharedPref.dart';
 import '../main.dart';
 import '../widgets/BottomNavbar.dart';
+import 'Back_Service.dart';
 import 'NotificationServices.dart';
 import 'SignUpScreen.dart';
 SharedPreferences? prefs;
@@ -82,211 +83,17 @@ bool isDone=false;
   void initState() {
     super.initState();
     AndroidAlarmManager.initialize();
-    // port.listen((_) async => await _incrementCounter());
-   schedulePeriodicAlarm();
+
+
     tz.initializeTimeZones();
     tz.setLocalLocation(tz.getLocation('Asia/Kolkata'));
-    checkPendingNotifications();
     notificationServices.initializeNotification() ;
-    getSpeed();
     _getLastResetDay();
     getUserData();
-    // schedulePeriodicAlarm();
-    // initNotifications();
-    // notificationServices.initializeNotification();
-    // scheduleNotification();
-    // notificationServices.scheduleNotifications();
-    Future.delayed(Duration(seconds: 2),(){
-      // scheduleNotifications();
-      firebaseData();
-     // isStart?startListening(context):null;
-    });
-    Future.delayed(Duration(seconds: 3),(){
-
-      // scheduleNotifications();
-      // firebaseData();
-     // checkisSingleDeviceloggedIn();
-      // isStart?startListening(context):null;
-    }).then((value) {
-      requestExactAlarmPermission();
-      Future.delayed(Duration(seconds: 5),(){
-
-      });
-        }
-    );
-
-  }
-  int _counter = 0;
-  Future<void> _incrementCounter() async {
-    print('Increment counter!');
-    // Ensure we've loaded the updated count from the background isolate.
-    await prefs?.reload();
-
-    setState(() {
-      _counter++;
-    });
-  }
-  static SendPort? uiSendPort;
-  Future<void> schedulePeriodicAlarm() async {
-    print("hello ");
-    const int alarmId = 5000; // Ensure this is unique for each alarm
-    await AndroidAlarmManager.periodic(
-      const Duration(seconds: 1), // Set the interval to every 15 minutes
-      alarmId,
-      periodicCallback, // Optional: Delay when to start the cycle// Wake up the device to fire the alarm
-    );
-  }
-  @pragma('vm:entry-point')
-  Future<void> periodicCallback() async {
-    print("Periodic Alarm Fired at: ${DateTime.now()}");
-    print("Periodic Alarm Fired at:");
-    startListening(context);
-    // Get the previous cached count and increment it.
-    final prefs = await SharedPreferences.getInstance();
-    final currentCount = prefs.getInt(countKey) ?? 0;
-    await prefs.setInt(countKey, currentCount + 1);
-
-    // This will be null if we're running in the background.
-    uiSendPort ??= IsolateNameServer.lookupPortByName(isolateName);
-    uiSendPort?.send(null);
-    // Perform your task here
-  }
-  void requestExactAlarmPermission() async {
-    var status = await Permission.manageExternalStorage.status;
-    if (!status.isGranted) {
-      Map<Permission, PermissionStatus> statuses = await [
-        Permission.manageExternalStorage,
-      ].request();
-      print(statuses[Permission.manageExternalStorage]);
-    }
-  }
-
-  Future<void> checkPendingNotifications() async {
-    List<PendingNotificationRequest> pendingNotifications = await flutterLocalNotificationsPlugin.pendingNotificationRequests();
-
-    // You can then iterate through the list to see the details of each pending notification
-    for (var notification in pendingNotifications) {
-      print('Notification ID: ${notification.id}');
-      print('Notification Title: ${notification.title}');
-      print('Notification Body: ${notification.body}');
-      // ... and so on for other details you may want to check
-    }
-
-    // If you want to check the number of pending notifications:
-    print('Number of pending notifications: ${pendingNotifications.length}');
-  }
-
-  void scheduleNotification() async {
-
-      flutterLocalNotificationsPlugin.cancelAll();
-
-
-      final tz.Location local = tz.getLocation('Asia/Kolkata');
-    final DateTime now = tz.TZDateTime.now(local);
-    final DateTime nextInstance = DateTime(now.year, now.month, now.day, 8, 0); // 8:00 AM
-    final DateTime nextInstance2 = DateTime(now.year, now.month, now.day, 20, 0); // 8:00 AM
-    print("location"+tz.local.toString());
-    final tz.TZDateTime scheduledDateTZ = nextInstance.isBefore(now)
-        ? tz.TZDateTime.from(nextInstance.add(Duration(days: 1)), tz.local)  // If 8:00 AM has already passed today, schedule for tomorrow
-        : tz.TZDateTime.from(nextInstance, tz.local);  // Otherwise, schedule for today
-
-    final tz.TZDateTime scheduledDateTZ2 = nextInstance2.isBefore(now)
-        ? tz.TZDateTime.from(nextInstance2.add(Duration(days: 1)), tz.local)  // If 8:00 AM has already passed today, schedule for tomorrow
-        : tz.TZDateTime.from(nextInstance2, tz.local);  // Otherwise, schedule for today
-
-    const AndroidNotificationDetails androidPlatformChannelSpecifics = AndroidNotificationDetails(
-        'Step Tracker', 'Step Tracker',
-        importance: Importance.max,
-        color: Colors.black,
-        icon: "small_logo",
-        priority: Priority.high,
-        showWhen: true);
-
-    const NotificationDetails platformChannelSpecifics = NotificationDetails(android: androidPlatformChannelSpecifics);
-
-    await flutterLocalNotificationsPlugin.zonedSchedule(
-        0,
-        'Morning walk reminder',
-        'Good morning! Start your day with a refreshing walk and boost your energy.',
-        scheduledDateTZ,
-        platformChannelSpecifics,
-        androidAllowWhileIdle: true,
-        uiLocalNotificationDateInterpretation: UILocalNotificationDateInterpretation.absoluteTime
-    ).then((value) { print(scheduledDateTZ);
-
-
-    });
-
-    await flutterLocalNotificationsPlugin.zonedSchedule(
-        5,
-          'Daily goal check',
-            'Have you reached your daily step goal? A little more effort can make it happen!',
-        scheduledDateTZ2,
-        platformChannelSpecifics,
-        androidAllowWhileIdle: true,
-        uiLocalNotificationDateInterpretation: UILocalNotificationDateInterpretation.absoluteTime
-    ).then((value) { print(scheduledDateTZ2);});
-
+    firebaseData();
 
   }
 
-
-
-
-
-  // final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin = FlutterLocalNotificationsPlugin();
-
-  // Future<void> initNotifications() async {
-  //   const AndroidInitializationSettings initializationSettingsAndroid = AndroidInitializationSettings(
-  //       'small_logo'); // Add your app icon here
-  //   final DarwinInitializationSettings initializationSettingsIOS = DarwinInitializationSettings(
-  //     requestSoundPermission: false,
-  //     requestBadgePermission: false,
-  //     requestAlertPermission: false,
-  //   );
-  //   final InitializationSettings initializationSettings = InitializationSettings(
-  //     android: initializationSettingsAndroid,
-  //     iOS: initializationSettingsIOS,
-  //   );
-  //   await flutterLocalNotificationsPlugin.initialize(initializationSettings);
-  // }
-  // Future<void> scheduleNotification() async {
-  //   tz.initializeTimeZones();
-  //   final now = tz.TZDateTime.now(tz.local);
-  //   tz.TZDateTime scheduledDate8AM = tz.TZDateTime(tz.local, now.year, now.month, now.day, 7,58);
-  //
-  //   // If the current time is at or after 8 AM, adjust the schedule for next day
-  //   if (now.isAtSameMomentAs(scheduledDate8AM) || now.isAfter(scheduledDate8AM)) {
-  //     scheduledDate8AM = scheduledDate8AM.add(Duration(days: 1));
-  //   }
-  //
-  //
-  //   NotificationDetails platformChannelSpecifics = NotificationDetails(android: AndroidNotificationDetails(
-  //     'Step Tracking',
-  //     'Step Tracker',
-  //     color: Colors.black,
-  //     importance: Importance.max,
-  //     priority: Priority.high,
-  //   ),);
-  //   await flutterLocalNotificationsPlugin.zonedSchedule(
-  //     6000000,
-  //     'Morning walk reminder',
-  //     'Good morning! Start your day with a refreshing walk and boost your energy.',
-  //     scheduledDate8AM,
-  //     platformChannelSpecifics,
-  //     androidAllowWhileIdle: true,
-  //     uiLocalNotificationDateInterpretation: UILocalNotificationDateInterpretation.absoluteTime,
-  //   ).then((value) => print("notification scheduled for"+scheduledDate8AM.toString()));
-  //   // await flutterLocalNotificationsPlugin.zonedSchedule(
-  //   //   600000000,
-  //   //   'Daily goal check',
-  //   //   'Have you reached your daily step goal? A little more effort can make it happen!',
-  //   //   scheduledDate2,
-  //   //   platformChannelSpecifics,
-  //   //   androidAllowWhileIdle: true,
-  //   //   uiLocalNotificationDateInterpretation: UILocalNotificationDateInterpretation.absoluteTime,
-  //   // );
-  // }
 
   void listenNotification(){
    NotificationServices.onNotifications.stream.listen(onClickedNotification);
@@ -322,7 +129,7 @@ bool isDone=false;
   }
   Future<void> firebaseData() async {
     if(isGuest==true){
-      print("In Guest");
+      print("In fire base if Guest is ");
       SharedPref().setStepsTarget(StepsTarget);
       indicatorProgress = (StepsCompleted / StepsTarget) as double;
       if (indicatorProgress >= 1) {
@@ -346,7 +153,7 @@ bool isDone=false;
         databaseReference.onValue.listen((event) {
           print("sixinxs: "+event.snapshot.value.toString());
           setState(() {
-            isGuest?null:StepsTarget = int.parse(event.snapshot.value.toString());
+           StepsTarget = int.parse(event.snapshot.value.toString());
             // isGuest?null:SharedPref().setStepsTarget(StepsTarget);
             indicatorProgress = (StepsCompleted / StepsTarget) as double;
             if (indicatorProgress >= 1) {
@@ -435,10 +242,6 @@ bool isDone=false;
      }
   }
   Future<int> startListening(BuildContext context) async {
-    getSpeed();
-
-    print("current Speed--------------------------------------------->"+currentSpeed.toString());
-    print("Walking Threshold------------------------------------------>"+walkingSpeedThreshold.toString());
 
     print("startListening()");
 
@@ -452,100 +255,75 @@ bool isDone=false;
         }
 
         _subscription = Pedometer.stepCountStream.listen(
-              (StepCount event) {
+              (StepCount event) async {
                 getSpeed();
-            if(event.steps==0){
-              SharedPref().setifSwitchoffThenvalue(StepsCompleted);
-            }
-                Future.delayed(Duration(seconds: 2),(){
-                  if(event.steps<StepsCompleted  && _lastResetDay == DateTime.now().day){
-                    print("in isSwitchoff if");
-                    Switchoffmethod();
-                    Future.delayed(Duration(seconds: 2),(){
-                      print("old Steps:----------------------------------------->"+Switchoff.toString());
-                      print("new  steps: ------------->"+event.steps.toString());
-                      int newSteps=Switchoff+event.steps;
+                if(event.steps==0){
+                  SharedPref().setifSwitchoffThenvalue(StepsCompleted);
+                }
+                if( introdone==false){
+                  print("in Intro Done");
+                  firstTimeInstalled(event.steps);
+                }
+                else if(DateTime.now().day!=_lastResetDay){
+                  print("in not equals to last day");
+                  _resetStepCount(event.steps);
+                }else {
+                  print("steps " + StepsCompleted.toString() + "Last Day Steps " +
+                      (LastDaySteps).toString());
+                  StepsCompleted = event.steps - LastDaySteps;
+                  if (StepsCompleted < 0) {
+                    print("less zero in home");
+                    Switchoff = await SharedPref().getfSwitchoffThenvalue();
+                    // Switchoffmethod();
+                    // int laststeps=await SharedPref().getfSwitchoffThenvalue();
+                    // setState(() {
+                    //   LastDaySteps = laststeps;
+                    // });
+                    print("new Last steps "+Switchoff.toString());
                       setState(() {
-                        newsteps=newSteps;
-                        if(newsteps>StepsCompleted){
-                          StepsCompleted=newsteps;
-                          if(isGuest){
-                            SharedPref().setTodaysSteps(StepsCompleted);
-                          }else{
-                            sendStepsToFirebase(StepsCompleted);
-                            SharedPref().setTodaysSteps(StepsCompleted);}
-                        }
+                        StepsCompleted = Switchoff + event.steps;
                       });
-                      print("newStep Variable Data------------------------------------------------------------>"+newSteps.toString());
-                      print("old Steps:------------------------------------------------------------------------>"+ StepsCompleted.toString());
-                    });
-                  }
-                  else
-                  if(introdone==false){
-                    firstTimeInstalled(event.steps);
-                    SharedPref().setextraSteps(0);
-                  }
-                  else  if ( newday
-                  ) {
-                    SharedPref().setextraSteps(0);
-                    print("in 2nd if of start listening");
-                    _resetStepCount(event.steps);
-                  }else{
-                    setState(() {
-                      print("s " + StepsCompleted.toString() + "Last Day Steps "+(LastDaySteps).toString());
-                      print("inside more");
-                      if(currentSpeed>=walkingSpeedThreshold){
-                        print("inside if speef is greater than walking threshHold");
-                        int newWithwalkingandcar =event.steps-LastDaySteps;
-                        ExtraSteps=newWithwalkingandcar-StepsCompleted;
-                        SharedPref().setextraSteps(ExtraSteps);
-
-                      }else{
-                        print("inside else speed is smaller  than walking threshHold");
-                        StepsCompleted = event.steps - (LastDaySteps + ExtraSteps);
-                        if(StepsCompleted==StepsTarget){
-                          notificationServices.showStepGoalNotification();
-                          setState(() {
-                            isDone=true;
-                          });
-                          showCompletionDialog(context);
-                          // checkStepsUpdated(context);
-                        }
-                        indicatorProgress = (StepsCompleted / StepsTarget) as double;
-                        if (indicatorProgress >= 1) {
-                          setState(() {
-                            indicatorProgress = 1;
-                          });
-                        }
+                    print("Steps Newwww--------------------->"+ StepsCompleted.toString());
+                    Future.delayed(Duration(seconds: 2),()
+                    async {
+                      indicatorProgress = (StepsCompleted / StepsTarget) as double;
+                      if (indicatorProgress >= 1) {
+                        setState(() {
+                          indicatorProgress = 1;
+                        });
                       }
+                      await SharedPref().setTodaysSteps(StepsCompleted);
+                      print("Steps After All calculations" + StepsCompleted.toString());
+                    DateTime now = DateTime.now();
+                    String formattedDate = DateFormat('yyyy-MM-dd').format(now);
+                    updateStepCount(DateTime.parse(formattedDate), StepsCompleted);
+                    isGuest==false?sendStepsToFirebase(StepsCompleted):null;
+                    print("Map is ---------------------------------------------------->" + stepCounts.toString());
+                    SharedPref().saveStepsData(stepCounts);
                     });
-                    // StepsCompleted = event.steps ;
-                    if(isGuest){
-                      SharedPref().setTodaysSteps(StepsCompleted);
-                      print("s " + StepsCompleted.toString() + "Last Day Steps " + (LastDaySteps).toString());
-                      DateTime now = DateTime.now();
-                      String formattedDate = DateFormat('yyyy-MM-dd').format(now);
-                      updateStepCount(DateTime.parse(formattedDate), StepsCompleted);
-                      print("Map is ---------------------------------------------------->" + stepCounts.toString());
-                      SharedPref().saveStepsData(stepCounts);
+                  } else {
+                    setState(() {
+                      StepsCompleted = event.steps - LastDaySteps;
+                    });
+                    print("More zero in home");
+                    indicatorProgress = (StepsCompleted / StepsTarget) as double;
+                    if (indicatorProgress >= 1) {
+                      setState(() {
+                        indicatorProgress = 1;
+                      });
                     }
-                    else {
-                      sendStepsToFirebase(StepsCompleted);
-                      SharedPref().setTodaysSteps(StepsCompleted);
-                      print("s " + StepsCompleted.toString() + "Last Day Steps " +
-                          (LastDaySteps).toString());
-                      DateTime now = DateTime.now();
-                      String formattedDate = DateFormat('yyyy-MM-dd').format(now);
-                      updateStepCount(DateTime.parse(formattedDate), StepsCompleted);
-                      print("Map is ---------------------------------------------------->" + stepCounts.toString());
-                      SharedPref().saveStepsData(stepCounts);
-                    }
+                    await SharedPref().setTodaysSteps(StepsCompleted);
+                    print("Steps After All calculations" + StepsCompleted.toString());
+                    DateTime now = DateTime.now();
+                    String formattedDate = DateFormat('yyyy-MM-dd').format(now);
+                    updateStepCount(DateTime.parse(formattedDate), StepsCompleted);
+                    isGuest==false?sendStepsToFirebase(StepsCompleted):null;
+                    print("Map is ---------------------------------------------------->" + stepCounts.toString());
+                    SharedPref().saveStepsData(stepCounts);
+                    SharedPref().setifSwitchoffThenvalue(StepsCompleted);
+                    print("Steps Coming back from Set Switchoff"+await SharedPref().getfSwitchoffThenvalue().toString());
                   }
-
-
-
-
-                });
+                }
 
 
 
@@ -634,7 +412,6 @@ bool isDone=false;
     bool isguest=await SharedPref().getisguest();
     String _uid = await SharedPref().getUid();
     int target=await SharedPref().getStepsTarget();
-    String dviceid=await SharedPref().getDeviceid();
     bool isChecking=await SharedPref().getischecking();
       print("Target From shared Pref-------------------------->"+target.toString());
     // DateTime StartTi=await SharedPref().getStartTime()??DateTime.now();
@@ -647,7 +424,6 @@ bool isDone=false;
     int extra=await SharedPref().getextraSteps()??0;
     print("Uid in get userdata :  "+_uid);
     setState(() {
-      Deviceid=dviceid;
       Uid=_uid;
       ischecking=isChecking;
       introdone=IntroDone;
@@ -665,6 +441,7 @@ bool isDone=false;
     print("Guest: after setting"+isGuest.toString());
     if(isstart){
       startListening(context);
+      await initializeService();
     }
 
   }
@@ -786,7 +563,12 @@ void checkisSingleDeviceloggedIn() async{
 }
   @override
   Widget build(BuildContext context) {
-    // Timer.periodic(Duration(minutes: 1), (timer) => checkisSingleDeviceloggedIn());
+    // Timer.periodic(Duration(seconds: 60), (timer) async {
+    //   int steps=await SharedPref().getTodaysSteps()??0;
+    //   setState(() {
+    //     StepsCompleted=steps;
+    //   });
+    // });
     return WillPopScope(
       onWillPop: () async {
         SystemNavigator.pop();
@@ -815,16 +597,38 @@ void checkisSingleDeviceloggedIn() async{
                 ),
               ),
               SizedBox(
-                height: deviceHeight(context) < 900 ? 120.h : 150.h
+                  height: deviceHeight(context) < 900 ? 70.h : 50.h
+              ),
+              Visibility(
+                visible: isStart!=true,
+                child: Center(
+                  child: Text(
+                    'Press To Start Tracking Your Steps',
+                    style: TextStyle(
+                      color: Color(0xFFF3F3F3),
+                      fontSize: 25.sp,
+                      fontFamily: 'Teko',
+                      fontWeight: FontWeight.w600,
+                      letterSpacing: 1,
+                      height: 0,
+                    ),
+                  ),
+                ),
+              ),
+              SizedBox(
+                height: deviceHeight(context) < 900 ? 45.h : 100.h
               ),
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   CircularPercentIndicator(
                     radius: 150.r,
+                    animation: true,
+                    animationDuration: 1000,
+                    animateFromLastPercent: true,
                     reverse: true,
                     circularStrokeCap: CircularStrokeCap.round,
-                    percent: indicatorProgress,
+                    percent: indicatorProgress<0?0:indicatorProgress,
                     lineWidth: 12.w,
                     progressColor: Color(0xFF9D79BC),
                     center:
@@ -1001,7 +805,12 @@ void checkisSingleDeviceloggedIn() async{
                                               PermissionStatus status2=await Permission.location.request();
                                               PermissionStatus status3=await Permission.sensors.request();
                                               if(status1.isGranted && status2.isGranted){
-                                                startListening(context);
+                                                startListening(context).then((value) async {
+                                                Future.delayed(Duration(seconds: 10),() async {
+                                                      await initializeService();
+                                                     });
+                                                });
+
                                                 // notificationServices.scheduleNotifications();
                                                 setState(() {
                                                   isStart = true;

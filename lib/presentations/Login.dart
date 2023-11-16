@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:device_info/device_info.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
@@ -42,6 +43,7 @@ class _LoginState extends State<Login> {
   double deviceHeight(BuildContext context) =>
       MediaQuery.of(context).size.height;
  bool isguest=false;
+  FirebaseDatabase database = FirebaseDatabase.instance;
   double deviceWidth(BuildContext context) => MediaQuery.of(context).size.width;
  void initState(){
    super.initState();
@@ -597,7 +599,19 @@ class _LoginState extends State<Login> {
                                         backgroundColor: Colors.black,
                                       ));
                                       SharedPref().setisguest(false);
-                                      Get.offAll(()=>UserNameScreen());
+                                      DatabaseReference usersRef = database.ref().child('users').child(userObj.id);
+                                      usersRef.once().then((DatabaseEvent event) {
+                                        if (event.snapshot.exists) {
+                                          // The uid exists, perform your task here
+                                          print("UID exists in the database. Performing task...");
+                                          // Call your method here
+                                          Get.to(()=>HomePage());
+                                        } else {
+                                          // The uid does not exist
+                                          print("UID does not exist in the database.");
+                                          Get.to(()=>UserNameScreen());
+                                        }
+                                      });
                                     }).catchError((e){
                                       Navigator.of(context).pop();
                                       ScaffoldMessenger.of(context).showSnackBar(SnackBar(

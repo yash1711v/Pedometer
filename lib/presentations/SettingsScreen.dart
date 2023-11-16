@@ -59,7 +59,6 @@ class _SettingsScreenState extends State<SettingsScreen> {
   Future<void> getUserData() async {
     bool isMiles=await SharedPref().getisMiles();
     String useName = await SharedPref().getUsername();
-    String deviceid=await SharedPref().getDeviceid();
     print("user Name----------------------------------->"+useName);
     String _uid = await SharedPref().getUid();
     String email = await SharedPref().getEmail();
@@ -72,7 +71,6 @@ class _SettingsScreenState extends State<SettingsScreen> {
       isMIles=isMiles;
       StepsTarget=stepTar;
       isGuest=isguest;
-      Deviceid=deviceid;
     });
     print("isguest----------------------------------------------------->"+isguest.toString());
     if(isGuest){}else{
@@ -699,7 +697,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
             Align(
               alignment: Alignment.bottomCenter,
               child: Text(
-                'Version 1.0',
+                'Version 1.2',
                 style: TextStyle(
                   color: Colors.grey,
                   fontSize: 14.sp,

@@ -21,6 +21,37 @@ class SharedPref{
   int extraSteps=0;
   String Deviceid="";
   bool ischecking=true;
+  bool Firstrun=false;
+
+
+
+
+
+
+  setFirstrun(bool firstrun) async {
+    print("setFirstrun");
+    SharedPreferences pref = await SharedPreferences.getInstance();
+    pref.setBool("Firstrun", firstrun);
+    // print(username);
+  }
+
+  getFirstrun() async {
+    print("getFirstrun called");
+    SharedPreferences pref = await SharedPreferences.getInstance();
+    Firstrun = pref.getBool("Firstrun")??false;
+    return Firstrun;
+  }
+
+
+
+
+
+
+
+
+
+
+
 
 
   setischecking(bool ischecking) async {
@@ -145,17 +176,19 @@ class SharedPref{
 
 
 
-  setifSwitchoffThenvalue(int ifSwitchoffThenvalue) async {
+  setifSwitchoffThenvalue(int ifswitchoffThenvalue) async {
     print("setifSwitchoffThenvalue");
+    print("Value Coming in to set in SwitchOFF"+ifswitchoffThenvalue.toString());
     SharedPreferences pref = await SharedPreferences.getInstance();
-    pref.setInt("ifSwitchoffThenvalue", ifSwitchoffThenvalue);
+    pref.setInt("ifSwitchoffThenvalue", ifswitchoffThenvalue);
     // print(username);
   }
 
   getfSwitchoffThenvalue() async {
     print("getifSwitchoffThenvaluecalled");
     SharedPreferences pref = await SharedPreferences.getInstance();
-    ifSwitchoffThenvalue = pref.getInt("ifSwitchoffThenvalue")?? 0;
+    ifSwitchoffThenvalue = pref.getInt("ifSwitchoffThenvalue")!;
+    print("Switch off value stored in Shared Pref:- "+ifSwitchoffThenvalue.toString());
     return ifSwitchoffThenvalue;
   }
 

@@ -17,17 +17,12 @@ import 'DatabaseServices.dart';
 class AuthServices {
   final FirebaseAuth _auth = FirebaseAuth.instance;
   DatabaseServices services = DatabaseServices();
-
+  FirebaseDatabase database = FirebaseDatabase.instance;
   final _googleSignIn = GoogleSignIn();
   late GoogleSignInAccount userObj;
 
   signInWithGoogle(BuildContext context) async {
     print("lib / services / firebase_services.dart / signInWithGoogle() called");
-  //   final googleUser = await _googleSignIn.signIn();
-  //   final googleAuth = await googleUser?.authentication;
-  //   final credential = GoogleAuthProvider.credential(
-  //       accessToken: googleAuth?.accessToken, idToken: googleAuth?.idToken);
-  //   await FirebaseAuth.instance.signInWithCredential(credential);
 
           showDialog(
             context: context,
@@ -74,7 +69,19 @@ class AuthServices {
             backgroundColor: Colors.black,
           ));
           SharedPref().setisguest(false);
-          Get.offAll(()=>UserNameScreen());
+          DatabaseReference usersRef = database.ref().child('users').child(userObj.id);
+                usersRef.once().then((DatabaseEvent event) {
+                  if (event.snapshot.exists) {
+                    // The uid exists, perform your task here
+                    print("UID exists in the database. Performing task...");
+                    // Call your method here
+                   Get.to(()=>HomePage());
+                  } else {
+                    // The uid does not exist
+                    print("UID does not exist in the database.");
+                    Get.to(()=>UserNameScreen());
+                  }
+                });
         }).catchError((e){
           Navigator.of(context).pop();
           ScaffoldMessenger.of(context).showSnackBar(SnackBar(

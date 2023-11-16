@@ -65,64 +65,14 @@ Future<void> main() async {
   final int helloAlarmID = 200;
   await AndroidAlarmManager.periodic(
       const Duration(seconds: 1), helloAlarmID, printHello);
-  await initializeService();
+
   runApp(const MyApp());
 }
 @pragma('vm:entry-point')
 Future<void> printHello() async {
   print("Helllooo From Step Tracker top1");
-  SharedPreferences prefs = await SharedPreferences.getInstance();
-  StreamSubscription<StepCount>? _subscription;
-  StreamSubscription<PedestrianStatus>? _pedestrianStatusSubscription;
-  print("Helllooo From Step Tracker top2");
   tz.initializeTimeZones();
   tz.setLocalLocation(tz.getLocation('Asia/Kolkata'));
-  await Firebase.initializeApp(
-    options: DefaultFirebaseOptions.currentPlatform,
-  );
-  FirebaseAnalytics.instance.setAnalyticsCollectionEnabled(true);
-
- int?  _lastResetDay = prefs.getInt('lastResetDay')??DateTime.now().day;
-  print("--------------------------->last reset Day"+_lastResetDay.toString());
-  print("--------------------------->Today Day"+DateTime.now().day.toString());
-  if (_lastResetDay != DateTime.now().day){
-    print("--------------------------->in no equals to of last reset day");
-      SharedPref().setTodaysSteps(0);
-      SharedPref().saveDuration(Duration.zero);
-      // newday=true;
-    print("in else condition");
-
-  }else{
-   print("in else condition");
-  }
-  _subscription = Pedometer.stepCountStream.listen(
-          (StepCount event) async {
-            if(event.steps==0){
-              SharedPref().setifSwitchoffThenvalue( await SharedPref().getTodaysSteps());
-            }
-            print("in Strem"+event.steps.toString());
-              if(_lastResetDay != DateTime.now().day){
-                print("in Streamn");
-                SharedPref().setextraSteps(0);
-                SharedPreferences prefs = await SharedPreferences.getInstance();
-                await prefs.setInt('lastResetDay', DateTime.now().day);
-                await SharedPref().setLastDaySteps(event.steps);
-                SharedPref().setTodaysSteps(0);
-                SharedPref().saveDuration(Duration.zero);
-                print("in stream2");
-              }
-
-          }
-  );
-
-
-
-  print("out stream2");
-
-
-
-
-
 
   flutterLocalNotificationsPlugin.cancelAll();
   final tz.Location local = tz.getLocation('Asia/Kolkata');
