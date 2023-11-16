@@ -58,7 +58,7 @@ class _Mybargraph2State extends State<Mybargraph2> {
               topRight: Radius.circular(10.r),
           ),
               backDrawRodData: BackgroundBarChartRodData(
-                  show: true, toY: 25000, color: Colors.grey.shade800))
+                  show: true, toY: 10000, color: Colors.grey.shade800))
                     ],
         ))
             .toList(),

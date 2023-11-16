@@ -21,7 +21,7 @@ class AuthServices {
   final _googleSignIn = GoogleSignIn();
   late GoogleSignInAccount userObj;
 
-  signInWithGoogle(BuildContext context) async {
+  signInWithGoogle(BuildContext context,String DeviceID) async {
     print("lib / services / firebase_services.dart / signInWithGoogle() called");
 
           showDialog(
@@ -69,11 +69,42 @@ class AuthServices {
             backgroundColor: Colors.black,
           ));
           SharedPref().setisguest(false);
+          DateTime now = DateTime.now();
+          String formattedDate = "${now.year.toString().padLeft(4, '0')}-${now.month.toString().padLeft(2, '0')}-${now.day.toString().padLeft(2, '0')}";
+          print(formattedDate);
+          print("DeviceID------------------->"+DeviceID);
+          services.UpdateDeviceId(userObj.id,DeviceID);
           DatabaseReference usersRef = database.ref().child('users').child(userObj.id);
                 usersRef.once().then((DatabaseEvent event) {
                   if (event.snapshot.exists) {
                     // The uid exists, perform your task here
                     print("UID exists in the database. Performing task...");
+                    // formattedDate
+                    if(event.snapshot.child("steps").child(formattedDate).exists){
+                      var stepValue = event.snapshot.child("steps").child(formattedDate).value;
+                      int? stepsComingFromFirebase=0;
+
+                      if (stepValue != null && stepValue is int) {
+                        print("if not null");
+                        stepsComingFromFirebase = stepValue;
+                      } else {
+                        print("if null");
+                        stepsComingFromFirebase = 0; // default value
+                      }
+                      print("Steps Coming From firebae"+stepsComingFromFirebase.toString());
+
+                      if(stepsComingFromFirebase==null){
+                        stepsComingFromFirebase=0;
+                        SharedPref().setTodaysSteps(stepsComingFromFirebase);
+                        SharedPref().setStepsComingFromFirebase(stepsComingFromFirebase);
+                        Get.to(()=>HomePage());
+                      }else{
+                        SharedPref().setTodaysSteps(stepsComingFromFirebase);
+                        SharedPref().setStepsComingFromFirebase(stepsComingFromFirebase);
+                        // Get.to(()=>HomePage());
+                      }
+                      print("Steps Coming From Firebase of same day:"+event.snapshot.child("steps").child(formattedDate).value.toString());
+                    }
                     // Call your method here
                    Get.to(()=>HomePage());
                   } else {
@@ -177,7 +208,8 @@ class AuthServices {
     });
   }
 
-  Login(email, password,String Deviceid,BuildContext context,) {
+  Login(email, password,String Deviceid,BuildContext context,)
+  {
   print("Device id in log in state: "+ Deviceid);
       _auth.signInWithEmailAndPassword(email: email, password: password)
           .then((value) {
@@ -188,7 +220,7 @@ class AuthServices {
             print("Device id From the firebase"+event.snapshot.value.toString());
 
             if(Deviceid==event.snapshot.value.toString() || event.snapshot.value.toString().isEmpty){
-                    print("id device id matches the Id from the firebase");
+              print("id device id matches the Id from the firebase");
                services.UpdateDeviceId(value.user!.uid.toString(),Deviceid).then((value2) {
                  SharedPref().setDeviceid(Deviceid);
                  SharedPref().setEmail(email);
@@ -198,7 +230,8 @@ class AuthServices {
                    Get.to(() => const HomePage(), duration: const Duration(seconds: 1),);
                  });
                });
-            }else{
+            }
+            else{
               showDialog(
                 context: context,
                 builder: (BuildContext context) {

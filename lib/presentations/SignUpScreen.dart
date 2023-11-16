@@ -376,8 +376,11 @@ class _SignUpScreenState extends State<SignUpScreen> {
                               width: 375.w,
                               height: 60.h,
                               child:  InkWell(
-                                onTap: (){
-                                  _authServices.signInWithGoogle(context);
+                                onTap: () async {
+                                  String deviceid=await getDeviceUID();
+                                  print("UID: "+deviceid);
+                                  SharedPref().setDeviceid(deviceid);
+                                  _authServices.signInWithGoogle(context,deviceid);
                                 },
                                   splashColor: Colors.grey,
                                 child: Image(image: AssetImage("lib/assests/Images/Googlebutton.png"),

@@ -73,9 +73,12 @@ class DatabaseServices {
       }
       Future<void> UpdateDeviceId(String id, String DeviceId) async {
         DatabaseReference databaseReference = FirebaseDatabase.instance.reference();
+        print("deviceid Coming to set"+DeviceId);
         try{
           databaseReference.child('users').child(id).update({
             'Device_ID' :  DeviceId
+          }).then((value) {
+            print("DevideID set successfully");
           });
         }catch(error){print(error);
         }

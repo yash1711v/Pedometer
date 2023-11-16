@@ -22,8 +22,21 @@ class SharedPref{
   String Deviceid="";
   bool ischecking=true;
   bool Firstrun=false;
+ int StepsComingFromFirebase=0;
 
+  setStepsComingFromFirebase(int stepsComingFromFirebase) async {
+    print("setStepsComingFromFirebase");
+    SharedPreferences pref = await SharedPreferences.getInstance();
+    pref.setInt("stepsComingFromFirebase", stepsComingFromFirebase);
+    // print(username);
+  }
 
+  getStepsComingFromFirebase() async {
+    print("getStepsComingFromFirebase called");
+    SharedPreferences pref = await SharedPreferences.getInstance();
+    StepsComingFromFirebase = pref.getInt("stepsComingFromFirebase")??0;
+    return StepsComingFromFirebase;
+  }
 
 
 
@@ -187,7 +200,7 @@ class SharedPref{
   getfSwitchoffThenvalue() async {
     print("getifSwitchoffThenvaluecalled");
     SharedPreferences pref = await SharedPreferences.getInstance();
-    ifSwitchoffThenvalue = pref.getInt("ifSwitchoffThenvalue")!;
+    ifSwitchoffThenvalue = pref.getInt("ifSwitchoffThenvalue")??0;
     print("Switch off value stored in Shared Pref:- "+ifSwitchoffThenvalue.toString());
     return ifSwitchoffThenvalue;
   }

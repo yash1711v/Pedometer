@@ -80,6 +80,7 @@ class _HomePageState extends State<HomePage> {
   Timer? myTimer;
   bool ischecking=true;
 bool isDone=false;
+int StepscomingFromFirebase=0;
   void initState() {
     super.initState();
     AndroidAlarmManager.initialize();
@@ -224,28 +225,52 @@ bool isDone=false;
     print(" firstTimeInstalled");
     await SharedPref().setLastDaySteps(steps);
     await SharedPref().setIntroScreenInfo(true);
-    setState(() {
-      introdone=true;
-      LastDaySteps=steps;
-      StepsCompleted=steps-LastDaySteps;
-      ExtraSteps=0;
-      isStart=true;
-    });
-     if(isGuest){
-       print("first Time Called Guest");
-       SharedPref().setStepsTarget(StepsTarget);
-       SharedPref().setisStart(true);
-     }else{
-       print("first Time Called login");
-       sendStepsToFirebase(StepsCompleted);
-       SharedPref().setStepsTarget(StepsTarget);
-     }
+    await prefs?.setInt('lastResetDay', DateTime.now().day);
+    SharedPref().saveDuration(Duration.zero);
+    if(StepscomingFromFirebase>0){
+      setState(() {
+        introdone=true;
+        LastDaySteps=steps;
+        _lastResetDay=DateTime.now().day;
+        StepsCompleted=StepscomingFromFirebase;
+        ExtraSteps=0;
+        isStart=true;
+      });
+      if(isGuest){
+        print("first Time Called Guest");
+        SharedPref().setStepsTarget(StepsTarget);
+        SharedPref().setisStart(true);
+      }else{
+        print("first Time Called login");
+        sendStepsToFirebase(StepsCompleted);
+        SharedPref().setStepsTarget(StepsTarget);
+      }
+    }else{
+      setState(() {
+        introdone=true;
+        LastDaySteps=steps;
+        StepsCompleted=steps-LastDaySteps;
+        _lastResetDay=DateTime.now().day;
+        ExtraSteps=0;
+        isStart=true;
+      });
+      if(isGuest){
+        print("first Time Called Guest");
+        SharedPref().setStepsTarget(StepsTarget);
+        SharedPref().setisStart(true);
+      }else{
+        print("first Time Called login");
+        sendStepsToFirebase(StepsCompleted);
+        SharedPref().setStepsTarget(StepsTarget);
+      }
+    }
   }
   Future<int> startListening(BuildContext context) async {
 
     print("startListening()");
 
-        if(await Permission.activityRecognition.request().isGranted){
+        if(await Permission.activityRecognition.request().isGranted)
+        {
           int Switchoff=0;
         Future<void> Switchoffmethod() async {
           int Switch =await SharedPref().getfSwitchoffThenvalue()??0;
@@ -260,7 +285,7 @@ bool isDone=false;
                 if(event.steps==0){
                   SharedPref().setifSwitchoffThenvalue(StepsCompleted);
                 }
-                if( introdone==false){
+                if(introdone==false ){
                   print("in Intro Done");
                   firstTimeInstalled(event.steps);
                 }
@@ -271,18 +296,21 @@ bool isDone=false;
                   print("steps " + StepsCompleted.toString() + "Last Day Steps " +
                       (LastDaySteps).toString());
                   StepsCompleted = event.steps - LastDaySteps;
+                  print("Steps before adding: "+StepsCompleted.toString());
                   if (StepsCompleted < 0) {
                     print("less zero in home");
                     Switchoff = await SharedPref().getfSwitchoffThenvalue();
-                    // Switchoffmethod();
-                    // int laststeps=await SharedPref().getfSwitchoffThenvalue();
-                    // setState(() {
-                    //   LastDaySteps = laststeps;
-                    // });
+
                     print("new Last steps "+Switchoff.toString());
                       setState(() {
                         StepsCompleted = Switchoff + event.steps;
                       });
+                       if(StepscomingFromFirebase>0){
+                         setState(() {
+                           StepsCompleted=StepsCompleted+StepscomingFromFirebase;
+                         });
+                         print("if Firebase have steps of current day and it is switched off"+StepsCompleted.toString());
+                       }
                     print("Steps Newwww--------------------->"+ StepsCompleted.toString());
                     Future.delayed(Duration(seconds: 2),()
                     async {
@@ -301,27 +329,55 @@ bool isDone=false;
                     print("Map is ---------------------------------------------------->" + stepCounts.toString());
                     SharedPref().saveStepsData(stepCounts);
                     });
-                  } else {
+                  }
+                  else {
                     setState(() {
                       StepsCompleted = event.steps - LastDaySteps;
                     });
-                    print("More zero in home");
-                    indicatorProgress = (StepsCompleted / StepsTarget) as double;
-                    if (indicatorProgress >= 1) {
+                    print("Steps Coming from Firebase: "+StepscomingFromFirebase.toString());
+                    print("Steps After adding: "+StepsCompleted.toString());
+                    if(StepscomingFromFirebase>0){
                       setState(() {
-                        indicatorProgress = 1;
+                        StepsCompleted=StepsCompleted+StepscomingFromFirebase;
                       });
+                      print("More zero in home is coming steps is more");
+                      indicatorProgress = (StepsCompleted / StepsTarget) as double;
+                      if (indicatorProgress >= 1) {
+                        setState(() {
+                          indicatorProgress = 1;
+                        });
+                      }
+                      await SharedPref().setTodaysSteps(StepsCompleted);
+                      print("Steps After All calculations" + StepsCompleted.toString());
+                      DateTime now = DateTime.now();
+                      String formattedDate = DateFormat('yyyy-MM-dd').format(now);
+                      updateStepCount(DateTime.parse(formattedDate), StepsCompleted);
+                      isGuest==false?sendStepsToFirebase(StepsCompleted):null;
+                      print("Map is ---------------------------------------------------->" + stepCounts.toString());
+                      SharedPref().saveStepsData(stepCounts);
+                      SharedPref().setifSwitchoffThenvalue(StepsCompleted);
+                      print("Steps Coming back from Set Switchoff"+await SharedPref().getfSwitchoffThenvalue().toString());
+                      print("if Firebase have steps of current day and it is switched on not got offed"+StepsCompleted.toString());
+                    }else{
+                      print("More zero in home");
+                      indicatorProgress = (StepsCompleted / StepsTarget) as double;
+                      if (indicatorProgress >= 1) {
+                        setState(() {
+                          indicatorProgress = 1;
+                        });
+                      }
+                      await SharedPref().setTodaysSteps(StepsCompleted);
+                      print("Steps After All calculations" + StepsCompleted.toString());
+                      DateTime now = DateTime.now();
+                      String formattedDate = DateFormat('yyyy-MM-dd').format(now);
+                      updateStepCount(DateTime.parse(formattedDate), StepsCompleted);
+                      isGuest==false?sendStepsToFirebase(StepsCompleted):null;
+                      print("Map is ---------------------------------------------------->" + stepCounts.toString());
+                      SharedPref().saveStepsData(stepCounts);
+                      SharedPref().setifSwitchoffThenvalue(StepsCompleted);
+                      print("Steps Coming back from Set Switchoff"+await SharedPref().getfSwitchoffThenvalue().toString());
                     }
-                    await SharedPref().setTodaysSteps(StepsCompleted);
-                    print("Steps After All calculations" + StepsCompleted.toString());
-                    DateTime now = DateTime.now();
-                    String formattedDate = DateFormat('yyyy-MM-dd').format(now);
-                    updateStepCount(DateTime.parse(formattedDate), StepsCompleted);
-                    isGuest==false?sendStepsToFirebase(StepsCompleted):null;
-                    print("Map is ---------------------------------------------------->" + stepCounts.toString());
-                    SharedPref().saveStepsData(stepCounts);
-                    SharedPref().setifSwitchoffThenvalue(StepsCompleted);
-                    print("Steps Coming back from Set Switchoff"+await SharedPref().getfSwitchoffThenvalue().toString());
+
                   }
                 }
 
@@ -358,10 +414,12 @@ bool isDone=false;
     // SharedPref().setisStart(false);
     // SharedPref().setStartTime(DateTime.now().toString());
     SharedPref().saveDuration(Duration.zero);
+    SharedPref().setStepsComingFromFirebase(0);
     setState(() {
       _lastResetDay=DateTime.now().day;
       LastDaySteps=steps;
       StepsCompleted =0;
+      StepscomingFromFirebase=0;
       newday=false;
       ExtraSteps=0;
     });
@@ -408,6 +466,7 @@ bool isDone=false;
   Future<void> getUserData() async {
     bool IntroDone=await SharedPref().getIntroScreenInfo();
     bool isstart=await SharedPref().getisStart();
+    int stepscmingFromfirebase= await SharedPref().getStepsComingFromFirebase();
     int TodaysSteps=await SharedPref().getTodaysSteps()??0;
     bool isguest=await SharedPref().getisguest();
     String _uid = await SharedPref().getUid();
@@ -428,6 +487,7 @@ bool isDone=false;
       ischecking=isChecking;
       introdone=IntroDone;
       isGuest=isguest;
+      StepscomingFromFirebase=stepscmingFromfirebase;
       LastDaySteps=lastDayStep;
       StepsCompleted=TodaysSteps;
       isStart=isstart;
@@ -546,7 +606,7 @@ void checkisSingleDeviceloggedIn() async{
   }
     Future.delayed(Duration(seconds: 5),(){
       if(isGuest){}else{
-        if(Deviceid!=Firebaseid && Firebaseid!=null){
+        if(Deviceid!=Firebaseid && Firebaseid!=null ){
           print("in notEquals");
           // setState(() {
           //   ischecking=false;
@@ -802,16 +862,15 @@ void checkisSingleDeviceloggedIn() async{
                                               overlayColor: MaterialStateProperty.all<Color>(Colors.white.withOpacity(1)), // Adjust opacity as needed
                                             ),onPressed: () async {
                                               PermissionStatus status1=await Permission.activityRecognition.request();
-                                              PermissionStatus status2=await Permission.location.request();
-                                              PermissionStatus status3=await Permission.sensors.request();
+                                              PermissionStatus status2=await Permission.sensors.request();
                                               if(status1.isGranted && status2.isGranted){
-                                                startListening(context).then((value) async {
-                                                Future.delayed(Duration(seconds: 10),() async {
-                                                      await initializeService();
-                                                     });
+                                                startListening(context).then((value) {
+                                                  Future.delayed(Duration(seconds: 2),() async {
+                                                    await initializeService();
+                                                  });
                                                 });
 
-                                                // notificationServices.scheduleNotifications();
+
                                                 setState(() {
                                                   isStart = true;
                                                 });

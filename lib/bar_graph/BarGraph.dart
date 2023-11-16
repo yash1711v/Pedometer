@@ -63,7 +63,8 @@ class _MybargraphState extends State<Mybargraph> {
                       ),
 
                       backDrawRodData: BackgroundBarChartRodData(
-                          show: true, toY: 25000, color: Colors.grey.shade800))
+                          show: true, toY: 10000, color: Colors.grey.shade800)
+                  )
                 ]))
             .toList(),
           barTouchData: BarTouchData(

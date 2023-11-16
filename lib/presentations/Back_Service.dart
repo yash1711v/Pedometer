@@ -75,15 +75,13 @@ void onStart(ServiceInstance service) async{
     String _uid = await SharedPref().getUid();
     bool IntroDone=await SharedPref().getIntroScreenInfo();
     int newlast=await SharedPref().getfSwitchoffThenvalue();
+    int StepsComing=await SharedPref().getStepsComingFromFirebase();
+    print("Print Steps Coming"+StepsComing.toString());
     print("Last Day Steps"+LastdaysSteps.toString());
     _getLastResetDay().then((value) {
       newday=value;
     });
     print("Last reset Day"+_lastResetDay.toString());
-    // if(event.steps==0){
-    //   SharedPref().setifSwitchoffThenvalue(Steps);
-    // }
-    //if Phone Got Switched Off or Restarted
 
          if(DateTime.now().day!=_lastResetDay){
            print("in not equals to last day");
@@ -113,18 +111,38 @@ void onStart(ServiceInstance service) async{
           });
 
            } else {
-             print("More zero");
-             await SharedPref().setTodaysSteps(Steps);
-             print("Steps After All calculations" + Steps.toString());
-             sendStepsToFirebase(Steps);
-             DateTime now = DateTime.now();
-             String formattedDate = DateFormat('yyyy-MM-dd').format(now);
-             String formattedDatee = DateTime.parse(formattedDate).toIso8601String(); // Convert date to a string
-             stepCounts[formattedDatee] = Steps;
-             SharedPref().saveStepsData(stepCounts);
-             SharedPref().setifSwitchoffThenvalue(Steps);
-             print("Steps Coming back from Set Switchoff"+await SharedPref().getfSwitchoffThenvalue().toString());
+             if(StepsComing>0) {
+               Steps = Steps + StepsComing;
 
+               print("More zero");
+               await SharedPref().setTodaysSteps(Steps);
+               print("Steps After All calculations" + Steps.toString());
+               sendStepsToFirebase(Steps);
+               DateTime now = DateTime.now();
+               String formattedDate = DateFormat('yyyy-MM-dd').format(now);
+               String formattedDatee = DateTime.parse(formattedDate)
+                   .toIso8601String(); // Convert date to a string
+               stepCounts[formattedDatee] = Steps;
+               SharedPref().saveStepsData(stepCounts);
+               SharedPref().setifSwitchoffThenvalue(Steps);
+               print("Steps Coming back from Set Switchoff" +
+                   await SharedPref().getfSwitchoffThenvalue().toString());
+             }else{
+
+               print("More zero");
+               await SharedPref().setTodaysSteps(Steps);
+               print("Steps After All calculations" + Steps.toString());
+               sendStepsToFirebase(Steps);
+               DateTime now = DateTime.now();
+               String formattedDate = DateFormat('yyyy-MM-dd').format(now);
+               String formattedDatee = DateTime.parse(formattedDate)
+                   .toIso8601String(); // Convert date to a string
+               stepCounts[formattedDatee] = Steps;
+               SharedPref().saveStepsData(stepCounts);
+               SharedPref().setifSwitchoffThenvalue(Steps);
+               print("Steps Coming back from Set Switchoff" +
+                   await SharedPref().getfSwitchoffThenvalue().toString());
+             }
            }
          }
 
@@ -203,6 +221,7 @@ Future<bool>  onBackGround(ServiceInstance service) async{
   SharedPref().setTodaysSteps(0);
 
   SharedPref().saveDuration(Duration.zero);
+  SharedPref().setStepsComingFromFirebase(0);
   print("new Day in _reset last day------------------->"+ DateTime.now().day.toString());
   // startListening();
 }

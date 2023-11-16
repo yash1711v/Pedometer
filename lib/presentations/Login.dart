@@ -442,8 +442,9 @@ class _LoginState extends State<Login> {
                             height: 60.h,
                             child: OutlinedButton(
                               onPressed:
-                              _validateEmail(_email) &&
-                                  password.length>=8 ?
+                              _validateEmail(_email) ?
+                                  //&&
+                                  // password.length>=8 ?
                                   () async {
                                 showDialog(
                                   context: context,
@@ -579,7 +580,7 @@ class _LoginState extends State<Login> {
                                         accessToken: googleSignInAuthentication.accessToken,
                                         idToken: googleSignInAuthentication.idToken);
                                     print("Auth Credentials------------------------------------->"+ authCredential.toString() );
-                                    await _auth.signInWithCredential(authCredential).then((value) {
+                                    await _auth.signInWithCredential(authCredential).then((value) async {
                                       SharedPref().setisguest(false);
                                       Navigator.of(context).pop();
                                       ScaffoldMessenger.of(context).showSnackBar(SnackBar(
@@ -599,11 +600,44 @@ class _LoginState extends State<Login> {
                                         backgroundColor: Colors.black,
                                       ));
                                       SharedPref().setisguest(false);
+                                      String deviceid=await getDeviceUID();
+                                      print("UID: "+deviceid);
+                                      SharedPref().setDeviceid(deviceid);
+                                      DateTime now = DateTime.now();
+                                      String formattedDate = "${now.year.toString().padLeft(4, '0')}-${now.month.toString().padLeft(2, '0')}-${now.day.toString().padLeft(2, '0')}";
+                                      print(formattedDate);
+                                      services.UpdateDeviceId(userObj.id,deviceid);
                                       DatabaseReference usersRef = database.ref().child('users').child(userObj.id);
                                       usersRef.once().then((DatabaseEvent event) {
                                         if (event.snapshot.exists) {
                                           // The uid exists, perform your task here
                                           print("UID exists in the database. Performing task...");
+                                          // formattedDate
+                                          if(event.snapshot.child("steps").child(formattedDate).exists){
+                                            var stepValue = event.snapshot.child("steps").child(formattedDate).value;
+                                            int? stepsComingFromFirebase=0;
+
+                                            if (stepValue != null && stepValue is int) {
+                                              print("if not null");
+                                              stepsComingFromFirebase = stepValue;
+                                            } else {
+                                              print("if null");
+                                              stepsComingFromFirebase = 0; // default value
+                                            }
+                                            print("Steps Coming From firebae"+stepsComingFromFirebase.toString());
+
+                                            if(stepsComingFromFirebase==null){
+                                              stepsComingFromFirebase=0;
+                                              SharedPref().setTodaysSteps(stepsComingFromFirebase);
+                                              SharedPref().setStepsComingFromFirebase(stepsComingFromFirebase);
+                                              Get.to(()=>HomePage());
+                                            }else{
+                                              SharedPref().setTodaysSteps(stepsComingFromFirebase);
+                                              SharedPref().setStepsComingFromFirebase(stepsComingFromFirebase);
+                                              // Get.to(()=>HomePage());
+                                            }
+                                            print("Steps Coming From Firebase of same day:"+event.snapshot.child("steps").child(formattedDate).value.toString());
+                                          }
                                           // Call your method here
                                           Get.to(()=>HomePage());
                                         } else {
