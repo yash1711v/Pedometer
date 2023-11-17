@@ -260,7 +260,11 @@ class SharedPref{
 
 
 
-
+  Future<void> clearAllPreferences() async {
+    print("Clearing all shared preferences");
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    await prefs.clear();
+  }
 
 
 

@@ -83,15 +83,21 @@ bool isDone=false;
 int StepscomingFromFirebase=0;
   void initState() {
     super.initState();
-    AndroidAlarmManager.initialize();
+     checkifotherloggedin().then((value) {
+       if(value){
+         AuthServices services= AuthServices();
+         services.signout();
+       }else{
 
 
-    tz.initializeTimeZones();
-    tz.setLocalLocation(tz.getLocation('Asia/Kolkata'));
-    notificationServices.initializeNotification() ;
-    _getLastResetDay();
-    getUserData();
-    firebaseData();
+         tz.initializeTimeZones();
+         tz.setLocalLocation(tz.getLocation('Asia/Kolkata'));
+         notificationServices.initializeNotification() ;
+         _getLastResetDay();
+         getUserData();
+         firebaseData();
+       }
+     });
 
   }
 
@@ -281,7 +287,6 @@ int StepscomingFromFirebase=0;
 
         _subscription = Pedometer.stepCountStream.listen(
               (StepCount event) async {
-                getSpeed();
                 if(event.steps==0){
                   SharedPref().setifSwitchoffThenvalue(StepsCompleted);
                 }
@@ -462,7 +467,10 @@ int StepscomingFromFirebase=0;
 
     return caloriesBurnt;
   }
-
+Future<bool> checkifotherloggedin() async {
+    bool check=await SharedPref().getischecking();
+    return check;
+}
   Future<void> getUserData() async {
     bool IntroDone=await SharedPref().getIntroScreenInfo();
     bool isstart=await SharedPref().getisStart();
@@ -554,10 +562,6 @@ int StepscomingFromFirebase=0;
                         ),
                       ]
                     ),
-                    // Image(
-                    //   image: AssetImage("lib/assests/Images/twemoji_confetti-ball.png"),
-                    //   width: 50.w,
-                    // ),
 
                   // SizedBox(height: 5.h),  // Adjust this spacing as needed
                   Text(
@@ -588,47 +592,10 @@ int StepscomingFromFirebase=0;
     );
 
   }
-void checkisSingleDeviceloggedIn() async{
-    print("checkSingleDeviceLoggededIn calling after 1 sec");
-  AuthServices authServices2=AuthServices();
-    String Firebaseid="";
-    print("Uid:  "+  Uid);
-  DatabaseReference databaseReference = FirebaseDatabase.instance.reference().child('users').child(Uid).child('Device_ID');
-  try {
-    databaseReference.onValue.listen((event) async {
-      Firebaseid=event.snapshot.value.toString();
-      print("Firebase Devide Idddddddddd"+event.snapshot.value.toString());
-      print("Firebase Deviceid"+Firebaseid);
-      print("SharedPref Device ID:"+Deviceid);
-    });
-  } catch (e) {
-    print('Error: $e');
-  }
-    Future.delayed(Duration(seconds: 5),(){
-      if(isGuest){}else{
-        if(Deviceid!=Firebaseid && Firebaseid!=null ){
-          print("in notEquals");
-          // setState(() {
-          //   ischecking=false;
-          //
-          // });
-          SharedPref().setischecking(false);
-          authServices2.signout().then((value) => Get.offAll(()=>SignUpScreen()));
-        }
-        else{
-          print("in Equals");
-        }
-      }
-    });
-}
+
   @override
   Widget build(BuildContext context) {
-    // Timer.periodic(Duration(seconds: 60), (timer) async {
-    //   int steps=await SharedPref().getTodaysSteps()??0;
-    //   setState(() {
-    //     StepsCompleted=steps;
-    //   });
-    // });
+
     return WillPopScope(
       onWillPop: () async {
         SystemNavigator.pop();

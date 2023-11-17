@@ -9,13 +9,18 @@ import 'package:flutter_background_service/flutter_background_service.dart';
 import 'package:flutter_background_service_android/flutter_background_service_android.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:geolocator/geolocator.dart';
+import 'package:get/get.dart';
+import 'package:get/get_core/src/get_main.dart';
 import 'package:intl/intl.dart';
 import 'package:pedometer/pedometer.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:steptracking/main.dart';
 
+import '../Firebasefunctionalities/AuthServices.dart';
 import '../SharedPrefrences/SharedPref.dart';
 import '../firebase_options.dart';
+import 'SignUpScreen.dart';
+import 'package:connectivity_plus/connectivity_plus.dart';
 
 Future<void> initializeService() async {
   final service = FlutterBackgroundService();
@@ -64,7 +69,18 @@ void onStart(ServiceInstance service) async{
     service.stopSelf();
   });
   bool Indeterminate = false;
-
+  Connectivity().onConnectivityChanged.listen((ConnectivityResult result) async {
+    bool iGuest=await SharedPref().getisguest();
+    String uid = await SharedPref().getUid();
+    String Deviceid=await SharedPref().getDeviceid();
+    // Got a new connectivity status!
+    if (result == ConnectivityResult.mobile || result == ConnectivityResult.wifi) {
+      print("Connected to the internet");
+      checkisSingleDeviceloggedIn(uid, Deviceid, iGuest);
+    } else {
+      print("No internet connection");
+    }
+  });
   Pedometer.stepCountStream.listen((StepCount event) async {
     bool isGuest=await SharedPref().getisguest();
     bool newday=false;
@@ -78,6 +94,7 @@ void onStart(ServiceInstance service) async{
     int StepsComing=await SharedPref().getStepsComingFromFirebase();
     print("Print Steps Coming"+StepsComing.toString());
     print("Last Day Steps"+LastdaysSteps.toString());
+
     _getLastResetDay().then((value) {
       newday=value;
     });
@@ -147,39 +164,7 @@ void onStart(ServiceInstance service) async{
          }
 
   });
-  // int Progress=0;
-  // Timer.periodic(Duration(seconds: 2), (timer) async {
-  //   Progress= await SharedPref().getTodaysSteps();
-  //   isFirstRun==false?
-  //   flutterLocalNotificationsPlugin.show(
-  //       888,
-  //       "Step Tracking",
-  //       "Be Relax We are Tracking your steps",
-  //       NotificationDetails(android:
-  //       AndroidNotificationDetails(
-  //         'Step Tracking',
-  //         'Step Tracker',
-  //         channelShowBadge: false,
-  //         color: Colors.black,
-  //         enableLights: false,
-  //         enableVibration: false,
-  //         playSound: false,
-  //         icon: 'small_logo',
-  //         colorized: true,
-  //         showProgress: false,
-  //         largeIcon: DrawableResourceAndroidBitmap('ic_launcher'),
-  //         channelDescription: "This is Notification is to give  you alert to start and check your daily steps ",
-  //         importance: Importance.low,
-  //         ongoing: true,
-  //         indeterminate: Indeterminate,
-  //         maxProgress: await SharedPref().getStepsTarget(),
-  //         progress: Progress,
-  //       )
-  //       )
-  //     // After the first run, set this to false
-  //   ):null;
-  //   await SharedPref().setFirstrun(true);
-  // });
+
   flutterLocalNotificationsPlugin.show(
       888,
       "Step Tracking",
@@ -275,4 +260,35 @@ Future<bool>  _getLastResetDay() async {
   }else{
     return false;
   }
+}
+
+void checkisSingleDeviceloggedIn(String Uid,String Deviceid,bool isGuest) async{
+  print("checkSingleDeviceLoggededIn calling after 1 sec");
+  AuthServices authServices2=AuthServices();
+  String Firebaseid="";
+  print("Uid:  "+  Uid);
+  DatabaseReference databaseReference = FirebaseDatabase.instance.reference().child('users').child(Uid).child('Device_ID');
+  try {
+    databaseReference.onValue.listen((event) async {
+      Firebaseid=event.snapshot.value.toString();
+      print("Firebase Devide Idddddddddd"+event.snapshot.value.toString());
+      print("Firebase Deviceid"+Firebaseid);
+      print("SharedPref Device ID:"+Deviceid);
+    });
+  } catch (e) {
+    print('Error: $e');
+  }
+  Future.delayed(Duration(seconds: 5),(){
+    if(isGuest){}else{
+      if(Deviceid!=Firebaseid && Firebaseid!=null ){
+        print("in notEquals");
+
+        SharedPref().setischecking(true);
+      }
+      else{
+        print("in Equals");
+        SharedPref().setischecking(false);
+      }
+    }
+  });
 }

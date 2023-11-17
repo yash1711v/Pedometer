@@ -607,6 +607,7 @@ class _LoginState extends State<Login> {
                                       String formattedDate = "${now.year.toString().padLeft(4, '0')}-${now.month.toString().padLeft(2, '0')}-${now.day.toString().padLeft(2, '0')}";
                                       print(formattedDate);
                                       services.UpdateDeviceId(userObj.id,deviceid);
+                                      SharedPref().setDeviceid(deviceid);
                                       DatabaseReference usersRef = database.ref().child('users').child(userObj.id);
                                       usersRef.once().then((DatabaseEvent event) {
                                         if (event.snapshot.exists) {
@@ -620,6 +621,7 @@ class _LoginState extends State<Login> {
                                             if (stepValue != null && stepValue is int) {
                                               print("if not null");
                                               stepsComingFromFirebase = stepValue;
+                                              SharedPref().setisStart(true);
                                             } else {
                                               print("if null");
                                               stepsComingFromFirebase = 0; // default value
