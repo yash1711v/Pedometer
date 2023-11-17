@@ -8,6 +8,7 @@ import 'package:android_alarm_manager_plus/android_alarm_manager_plus.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/gestures.dart';
 import 'package:steptracking/Firebasefunctionalities/AuthServices.dart';
+import 'package:steptracking/appsflyer/appsflyerMethod.dart';
 import 'package:timezone/timezone.dart' as tz;
 import 'package:timezone/data/latest.dart' as tz;
 import 'package:get/get.dart';
@@ -840,7 +841,8 @@ void checkisSingleDeviceloggedIn() async{
                     progressColor: Color(0xFF9D79BC),
                     center:
 
-                    isStart?Text.rich(
+                    isStart?
+                    Text.rich(
                             TextSpan(
                               children: [
                                 TextSpan(
@@ -881,6 +883,7 @@ void checkisSingleDeviceloggedIn() async{
                       height: 10000.h,
                             width: 10000.w,
                             child: IconButton(onPressed: () async {
+                              clicked("started");
                               showDialog(
                                 builder: (BuildContext context) {
                                   return SizedBox(
@@ -1350,6 +1353,16 @@ void checkisSingleDeviceloggedIn() async{
         ),
       ),
     );
+  }
+  clicked(String value){
+    final Map<String, String> values = {
+      "time_stamp": DateTime.timestamp().toString(),
+      "time_zone": DateTime.timestamp().timeZoneName,
+      "package_name":"com.pedometer.steptracker",
+      "service_started":value,
+    };
+
+    afLogEvent(appsflyerSdk, "home_opened",values);
   }
 }
 

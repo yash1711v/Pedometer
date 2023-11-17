@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:isolate';
 import 'dart:ui';
+import 'package:appsflyer_sdk/appsflyer_sdk.dart';
 import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_database/firebase_database.dart';
@@ -17,6 +18,7 @@ import 'package:steptracking/presentations/Back_Service.dart';
 import 'package:steptracking/presentations/HomePage.dart';
 import 'package:steptracking/presentations/NotificationServices.dart';
 import 'SharedPrefrences/SharedPref.dart';
+import 'appsflyer/appsflyerMethod.dart';
 import 'firebase_options.dart';
 import 'presentations/SplashScreen.dart';
 import 'package:flutter/services.dart';
@@ -28,10 +30,14 @@ import 'package:android_alarm_manager_plus/android_alarm_manager_plus.dart';
 final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
     FlutterLocalNotificationsPlugin();
 
+
+late AppsflyerSdk appsflyerSdk;
+
 // import 'package:firebase_core/firebase_core.dart';
 Future<void> main() async {
 
   WidgetsFlutterBinding.ensureInitialized();
+  appsflyerSdk = initiateAppsflyer();
   IsolateNameServer.registerPortWithName(
     port.sendPort,
     isolateName,

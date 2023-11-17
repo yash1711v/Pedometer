@@ -11,6 +11,8 @@ import 'package:get/get.dart';
 import 'package:get/get_core/src/get_main.dart';
 import 'package:lottie/lottie.dart';
 import 'package:steptracking/Firebasefunctionalities/AuthServices.dart';
+import 'package:steptracking/appsflyer/appsflyerMethod.dart';
+import 'package:steptracking/main.dart';
 import '../SharedPrefrences/SharedPref.dart';
 import 'HomePage.dart';
 import 'Login.dart';
@@ -280,6 +282,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                                         );
                                   },
                                  );
+                                 clicked("signup $_email");
                                   _authServices.SignUp(_email,password,context);
                                   Future.delayed(Duration(seconds: 1),(){Navigator.pop(context);});
 
@@ -439,6 +442,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                                 ),
                                 recognizer: TapGestureRecognizer()
                                   ..onTap = () async {
+                                    clicked("skip");
                                     String deviceid=await getDeviceUID();
                                     print("UID: "+deviceid);
                                     SharedPref().setDeviceid(deviceid);
@@ -486,6 +490,16 @@ class _SignUpScreenState extends State<SignUpScreen> {
       return false;
     }
     return true;
+  }
+  clicked(String value){
+    final Map<String, String> values = {
+      "time_stamp": DateTime.timestamp().toString(),
+      "time_zone": DateTime.timestamp().timeZoneName,
+      "package_name":"com.pedometer.steptracker",
+      "login_type":value,
+    };
+
+    afLogEvent(appsflyerSdk, "signup_opened",values);
   }
 }
 
