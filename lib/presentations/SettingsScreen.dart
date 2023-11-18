@@ -8,6 +8,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:get/get_core/src/get_main.dart';
+import 'package:steptracking/presentations/Back_Service.dart';
 import 'package:steptracking/presentations/HomePage.dart';
 import 'package:steptracking/presentations/SignUpScreen.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -673,12 +674,18 @@ class _SettingsScreenState extends State<SettingsScreen> {
                onTap: () async =>{
                  _authServices.signout(),
                  print("logout clicked"),
+                 await SharedPref().clearAllPreferences(),
                await SharedPref().setIntroScreenInfo(false),
+                SharedPref().setStepsComingFromFirebase(0),
+                SharedPref().setEmail(""),
+                SharedPref().setPassword(""),
+                SharedPref().setUsername(""),
+                SharedPref().setisguest(true),
                await SharedPref().setisStart(false),
                  await SharedPref().setTodaysSteps(0),
                  await SharedPref().setStepsTarget(6000),
                  await SharedPref().setisMiles(false),
-                 await SharedPref().setischecking(true),
+                 await stopBackgroundService(),
                  services.UpdateDeviceId(Uid," ").then((value) =>  Get.to(()=>SignUpScreen())),
                },
                child: Text(

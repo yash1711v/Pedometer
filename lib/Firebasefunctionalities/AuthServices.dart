@@ -74,11 +74,15 @@ class AuthServices {
           String formattedDate = "${now.year.toString().padLeft(4, '0')}-${now.month.toString().padLeft(2, '0')}-${now.day.toString().padLeft(2, '0')}";
           print(formattedDate);
           print("DeviceID------------------->"+DeviceID);
+            SharedPref().setischecking(false);
           DatabaseReference usersRef = database.ref().child('users').child(userObj.id);
                 usersRef.once().then((DatabaseEvent event) {
                   if (event.snapshot.exists) {
                     // The uid exists, perform your task here
                     print("UID exists in the database. Performing task...");
+                    SharedPref().setUsername(event.snapshot.child("username").value.toString());
+                    SharedPref().setEmail(event.snapshot.child("email").value.toString());
+                    SharedPref().setPassword(event.snapshot.child("password").value.toString());
                     // formattedDate
                     if(event.snapshot.child("steps").child(formattedDate).exists){
                       var stepValue = event.snapshot.child("steps").child(formattedDate).value;
@@ -227,6 +231,9 @@ class AuthServices {
           if (event.snapshot.exists) {
             // The uid exists, perform your task here
             print("UID exists in the database. Performing task...");
+            SharedPref().setUsername(event.snapshot.child("username").value.toString());
+            SharedPref().setEmail(event.snapshot.child("email").value.toString());
+            SharedPref().setPassword(event.snapshot.child("password").value.toString());
             // formattedDate
             if(event.snapshot.child("steps").child(formattedDate).exists){
               var stepValue = event.snapshot.child("steps").child(formattedDate).value;
@@ -241,7 +248,7 @@ class AuthServices {
                 stepsComingFromFirebase = 0; // default value
               }
               print("Steps Coming From firebae"+stepsComingFromFirebase.toString());
-
+                SharedPref().setischecking(false);
               if(stepsComingFromFirebase==null){
                 stepsComingFromFirebase=0;
                 SharedPref().setTodaysSteps(stepsComingFromFirebase);
@@ -256,6 +263,8 @@ class AuthServices {
               print("Steps Coming From Firebase of same day:"+event.snapshot.child("steps").child(formattedDate).value.toString());
             }else{
               print("Date Doesn't exist");
+              SharedPref().setTodaysSteps(0);
+              SharedPref().setStepsComingFromFirebase(0);
               Get.to(()=>HomePage());
             }
           } else {

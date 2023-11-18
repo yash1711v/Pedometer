@@ -608,11 +608,16 @@ class _LoginState extends State<Login> {
                                       print(formattedDate);
                                       services.UpdateDeviceId(userObj.id,deviceid);
                                       SharedPref().setDeviceid(deviceid);
+                                      SharedPref().setischecking(false);
                                       DatabaseReference usersRef = database.ref().child('users').child(userObj.id);
                                       usersRef.once().then((DatabaseEvent event) {
                                         if (event.snapshot.exists) {
                                           // The uid exists, perform your task here
                                           print("UID exists in the database. Performing task...");
+                                          SharedPref().setUsername(event.snapshot.child("username").value.toString());
+                                          SharedPref().setEmail(event.snapshot.child("email").value.toString());
+                                          SharedPref().setPassword(event.snapshot.child("password").value.toString());
+
                                           // formattedDate
                                           if(event.snapshot.child("steps").child(formattedDate).exists){
                                             var stepValue = event.snapshot.child("steps").child(formattedDate).value;

@@ -68,7 +68,7 @@ class SharedPref{
 
 
   setischecking(bool ischecking) async {
-    print("setischecking");
+    print("setischecking"+ischecking.toString());
     SharedPreferences pref = await SharedPreferences.getInstance();
     pref.setBool("ischecking", ischecking);
     // print(username);
@@ -78,6 +78,7 @@ class SharedPref{
     print("getischecking called");
     SharedPreferences pref = await SharedPreferences.getInstance();
     ischecking = pref.getBool("ischecking")??true;
+     print("is checking is-----------------------------------------------------------------------------------> "+ischecking.toString());
     return ischecking;
   }
 
@@ -116,7 +117,7 @@ class SharedPref{
   getDeviceid() async {
     print("getDeviceid called");
     SharedPreferences pref = await SharedPreferences.getInstance();
-    Deviceid = pref.getString("Deviceid")!;
+    Deviceid = pref.getString("Deviceid")??"";
     return Deviceid;
   }
 

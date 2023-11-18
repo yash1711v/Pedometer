@@ -46,11 +46,25 @@ Future<void> initializeService() async {
       ));
   service.startService();
 }
+ Future<void> stopBackgroundService() async {
+final service = FlutterBackgroundService();
+// service.invoke('stopService');
+}
 @pragma('vm:entry-point')
 void onStart(ServiceInstance service) async{
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
+  String Uid=await SharedPref().getUid();
+  DatabaseReference databaseReference = FirebaseDatabase.instance.reference().child('users').child(Uid).child('Device_ID');
+  try {
+    databaseReference.onValue.listen((event) async {
+      print("on value change of device id in firebase");
+      // service.stopSelf();
+    });
+  } catch (e) {
+    print('Error: $e');
+  }
   bool isFirstRun = await SharedPref().getFirstrun();
   int maxSteps = await SharedPref().getStepsTarget();
   var Steps=0;
@@ -66,104 +80,120 @@ void onStart(ServiceInstance service) async{
     });
   }
   service.on('stopService').listen((event) {
+    print("invoked the stop service");
     service.stopSelf();
   });
   bool Indeterminate = false;
-  Connectivity().onConnectivityChanged.listen((ConnectivityResult result) async {
-    bool iGuest=await SharedPref().getisguest();
-    String uid = await SharedPref().getUid();
-    String Deviceid=await SharedPref().getDeviceid();
-    // Got a new connectivity status!
-    if (result == ConnectivityResult.mobile || result == ConnectivityResult.wifi) {
-      print("Connected to the internet");
-      checkisSingleDeviceloggedIn(uid, Deviceid, iGuest);
-    } else {
-      print("No internet connection");
-    }
-  });
+
   Pedometer.stepCountStream.listen((StepCount event) async {
-    bool isGuest=await SharedPref().getisguest();
-    bool newday=false;
-    int total=event.steps;
-    int? _lastResetDay=prefs.getInt('lastResetDay');
-    int LastdaysSteps=await SharedPref().getLastDaySteps();
-    int extra=await SharedPref().getextraSteps()??0;
-    String _uid = await SharedPref().getUid();
-    bool IntroDone=await SharedPref().getIntroScreenInfo();
-    int newlast=await SharedPref().getfSwitchoffThenvalue();
-    int StepsComing=await SharedPref().getStepsComingFromFirebase();
-    print("Print Steps Coming"+StepsComing.toString());
-    print("Last Day Steps"+LastdaysSteps.toString());
 
-    _getLastResetDay().then((value) {
-      newday=value;
-    });
-    print("Last reset Day"+_lastResetDay.toString());
+       bool isGuest=await SharedPref().getisguest();
+       bool newday=false;
+       int total=event.steps;
+       int? _lastResetDay=prefs.getInt('lastResetDay');
+       int LastdaysSteps=await SharedPref().getLastDaySteps();
+       int extra=await SharedPref().getextraSteps()??0;
+       String _uid = await SharedPref().getUid();
+       bool IntroDone=await SharedPref().getIntroScreenInfo();
+       int newlast=await SharedPref().getfSwitchoffThenvalue();
+       int StepsComing=await SharedPref().getStepsComingFromFirebase();
+       print("Print Steps Coming"+StepsComing.toString());
+       print("Last Day Steps"+LastdaysSteps.toString());
 
-         if(DateTime.now().day!=_lastResetDay){
-           print("in not equals to last day");
-           _resetStepCount(event.steps);
-         }else {
-           print("steps " + Steps.toString() + "Last Day Steps " +
-               (LastdaysSteps).toString());
-           Steps = total - LastdaysSteps;
-           if (Steps < 0) {
-             print("less zero");
-              newlast = await SharedPref().getfSwitchoffThenvalue();
-            print("newLast"+newlast.toString());
 
-            Steps = newlast + event.steps;
-            print("Steps Newwww--------------------->"+Steps.toString());
-          Future.delayed(Duration(seconds: 2),()
-          async {
-            await SharedPref().setTodaysSteps(Steps);
-            print("Steps After All calculations" + Steps.toString());
-            print("laste Day steps"+LastdaysSteps.toString());
+       _getLastResetDay().then((value) {
+         newday=value;
+       });
+       print("Last reset Day"+_lastResetDay.toString());
+
+       if(DateTime.now().day!=_lastResetDay){
+         print("in not equals to last day");
+         _resetStepCount(event.steps);
+       }else {
+         print("steps " + Steps.toString() + "Last Day Steps " +
+             (LastdaysSteps).toString());
+         Steps = total - LastdaysSteps;
+         if (Steps < 0) {
+           print("less zero");
+           newlast = await SharedPref().getfSwitchoffThenvalue();
+           print("newLast"+newlast.toString());
+
+           Steps = newlast + event.steps;
+           print("Steps Newwww--------------------->"+Steps.toString());
+           Future.delayed(Duration(seconds: 2),()
+           async {
+             await SharedPref().setTodaysSteps(Steps);
+             print("Steps After All calculations" + Steps.toString());
+             print("laste Day steps"+LastdaysSteps.toString());
              sendStepsToFirebase(Steps);
              DateTime now = DateTime.now();
              String formattedDate = DateFormat('yyyy-MM-dd').format(now);
              String formattedDatee = DateTime.parse(formattedDate).toIso8601String(); // Convert date to a string
              stepCounts[formattedDatee] = Steps;
              SharedPref().saveStepsData(stepCounts);
-          });
+           });
 
-           } else {
-             if(StepsComing>0) {
-               Steps = Steps + StepsComing;
+         } else {
+           if(StepsComing>0) {
+             Steps = Steps + StepsComing;
 
-               print("More zero");
-               await SharedPref().setTodaysSteps(Steps);
-               print("Steps After All calculations" + Steps.toString());
-               sendStepsToFirebase(Steps);
-               DateTime now = DateTime.now();
-               String formattedDate = DateFormat('yyyy-MM-dd').format(now);
-               String formattedDatee = DateTime.parse(formattedDate)
-                   .toIso8601String(); // Convert date to a string
-               stepCounts[formattedDatee] = Steps;
-               SharedPref().saveStepsData(stepCounts);
-               SharedPref().setifSwitchoffThenvalue(Steps);
-               print("Steps Coming back from Set Switchoff" +
-                   await SharedPref().getfSwitchoffThenvalue().toString());
-             }else{
+             print("More zero");
+             await SharedPref().setTodaysSteps(Steps);
+             print("Steps After All calculations" + Steps.toString());
+             sendStepsToFirebase(Steps);
+             DateTime now = DateTime.now();
+             String formattedDate = DateFormat('yyyy-MM-dd').format(now);
+             String formattedDatee = DateTime.parse(formattedDate)
+                 .toIso8601String(); // Convert date to a string
+             stepCounts[formattedDatee] = Steps;
+             SharedPref().saveStepsData(stepCounts);
+             SharedPref().setifSwitchoffThenvalue(Steps);
+             print("Steps Coming back from Set Switchoff" +
+                 await SharedPref().getfSwitchoffThenvalue().toString());
+       }else{
 
-               print("More zero");
-               await SharedPref().setTodaysSteps(Steps);
-               print("Steps After All calculations" + Steps.toString());
-               sendStepsToFirebase(Steps);
-               DateTime now = DateTime.now();
-               String formattedDate = DateFormat('yyyy-MM-dd').format(now);
-               String formattedDatee = DateTime.parse(formattedDate)
-                   .toIso8601String(); // Convert date to a string
-               stepCounts[formattedDatee] = Steps;
-               SharedPref().saveStepsData(stepCounts);
-               SharedPref().setifSwitchoffThenvalue(Steps);
-               print("Steps Coming back from Set Switchoff" +
-                   await SharedPref().getfSwitchoffThenvalue().toString());
-             }
-           }
-         }
+       print("More zero");
+       await SharedPref().setTodaysSteps(Steps);
+       print("Steps After All calculations" + Steps.toString());
+       sendStepsToFirebase(Steps);
+       DateTime now = DateTime.now();
+       String formattedDate = DateFormat('yyyy-MM-dd').format(now);
+       String formattedDatee = DateTime.parse(formattedDate)
+           .toIso8601String(); // Convert date to a string
+       stepCounts[formattedDatee] = Steps;
+       SharedPref().saveStepsData(stepCounts);
+       SharedPref().setifSwitchoffThenvalue(Steps);
+       print("Steps Coming back from Set Switchoff" +
+       await SharedPref().getfSwitchoffThenvalue().toString());
+       }
+     }
+     }
+
 
   });
+Timer.periodic(Duration(seconds: 1), (timer) {   checkisSingleDeviceloggedIn().then((value) async {
+  String Uid=await SharedPref().getUid();
+  String deviceid=await SharedPref().getDeviceid();
+  print("Uid:  "+  Uid);
+  DatabaseReference databaseReference = FirebaseDatabase.instance.reference().child('users').child(Uid).child('Device_ID');
+  try {
+    databaseReference.onValue.listen((event) async {
+     print("on value change");
+     print("Device is stored in shared pre"+deviceid);
+     print("Device is stored in firebase"+event.snapshot.value.toString());
+     if(deviceid!=event.snapshot.value.toString() && event.snapshot.value.toString().isNotEmpty &&  event.snapshot.value.toString()!=null){
+       print("Id is diffrent from current device");
+       service.stopSelf();
+     }else{
+       print("Id is same ");
+     }
+    });
+  } catch (e) {
+    print('Error: $e');
+  }
+
+ });
+});
 
   flutterLocalNotificationsPlugin.show(
       888,
@@ -192,6 +222,7 @@ void onStart(ServiceInstance service) async{
       )
     // After the first run, set this to false
   );
+
 }
 @pragma('vm:entry-point')
 Future<bool>  onBackGround(ServiceInstance service) async{
@@ -262,10 +293,13 @@ Future<bool>  _getLastResetDay() async {
   }
 }
 
-void checkisSingleDeviceloggedIn(String Uid,String Deviceid,bool isGuest) async{
+Future<bool> checkisSingleDeviceloggedIn() async{
   print("checkSingleDeviceLoggededIn calling after 1 sec");
   AuthServices authServices2=AuthServices();
   String Firebaseid="";
+  String deviceid=await SharedPref().getDeviceid();
+  bool isGuest=await SharedPref().getisguest();
+  String Uid=await SharedPref().getUid();
   print("Uid:  "+  Uid);
   DatabaseReference databaseReference = FirebaseDatabase.instance.reference().child('users').child(Uid).child('Device_ID');
   try {
@@ -273,22 +307,26 @@ void checkisSingleDeviceloggedIn(String Uid,String Deviceid,bool isGuest) async{
       Firebaseid=event.snapshot.value.toString();
       print("Firebase Devide Idddddddddd"+event.snapshot.value.toString());
       print("Firebase Deviceid"+Firebaseid);
-      print("SharedPref Device ID:"+Deviceid);
+      print("SharedPref Device ID:"+deviceid);
     });
   } catch (e) {
     print('Error: $e');
   }
-  Future.delayed(Duration(seconds: 5),(){
+  Future.delayed(Duration(milliseconds: 15),() async {
     if(isGuest){}else{
-      if(Deviceid!=Firebaseid && Firebaseid!=null ){
-        print("in notEquals");
+      if(deviceid!=Firebaseid && Firebaseid!=null ){
+        print("------------------------------------------------------------------------------>in notEquals");
 
         SharedPref().setischecking(true);
+
+        return true;
       }
       else{
         print("in Equals");
         SharedPref().setischecking(false);
+        return false;
       }
     }
   });
+  return false;
 }

@@ -5,6 +5,7 @@ import 'dart:io';
 import 'dart:isolate';
 import 'dart:ui';
 import 'package:android_alarm_manager_plus/android_alarm_manager_plus.dart';
+import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/gestures.dart';
 import 'package:steptracking/Firebasefunctionalities/AuthServices.dart';
@@ -83,22 +84,63 @@ bool isDone=false;
 int StepscomingFromFirebase=0;
   void initState() {
     super.initState();
-     checkifotherloggedin().then((value) {
-       if(value){
-         AuthServices services= AuthServices();
-         services.signout();
-       }else{
+    tz.initializeTimeZones();
+    tz.setLocalLocation(tz.getLocation('Asia/Kolkata'));
+    notificationServices.initializeNotification() ;
+    _getLastResetDay();
+    getUserData();
+    firebaseData();
 
 
-         tz.initializeTimeZones();
-         tz.setLocalLocation(tz.getLocation('Asia/Kolkata'));
-         notificationServices.initializeNotification() ;
-         _getLastResetDay();
-         getUserData();
-         firebaseData();
-       }
-     });
-
+  }
+  void checkisSingleDeviceloggedIn(String Uid,String Deviceid,bool isGuest) async{
+    print("checkSingleDeviceLoggededIn calling after 1 sec");
+    AuthServices authServices2=AuthServices();
+    String Firebaseid="";
+    String deviceid=await SharedPref().getDeviceid();
+    print("Uid:  "+  Uid);
+    DatabaseReference databaseReference = FirebaseDatabase.instance.reference().child('users').child(Uid).child('Device_ID');
+    try {
+      databaseReference.onValue.listen((event) async {
+        Firebaseid=event.snapshot.value.toString();
+        print("Firebase Devide Idddddddddd"+event.snapshot.value.toString());
+        print("Firebase Deviceid"+Firebaseid);
+        print("SharedPref Device ID:"+Deviceid);
+      });
+    } catch (e) {
+      print('Error: $e');
+    }
+    Future.delayed(Duration(seconds: 5),() async {
+      if(isGuest){
+        await initializeService();
+      }else{
+        print("Firebase Deviceid"+Firebaseid);
+        print("SharedPref Device ID:"+deviceid);
+        if(deviceid!=Firebaseid){
+          print("in notEquals");
+          await SharedPref().clearAllPreferences();
+      await SharedPref().setIntroScreenInfo(false);
+      SharedPref().setStepsComingFromFirebase(0);
+      SharedPref().setEmail("");
+      SharedPref().setPassword("");
+      SharedPref().setUsername("");
+      SharedPref().setisguest(true);
+      await SharedPref().setisStart(false);
+      await SharedPref().setTodaysSteps(0);
+      await SharedPref().setStepsTarget(6000);
+      await SharedPref().setisMiles(false);
+      await stopBackgroundService();
+          SharedPref().setischecking(true);
+          await stopBackgroundService();
+          Get.to(()=>SignUpScreen());
+        }
+        else{
+          print("in Equals");
+          SharedPref().setischecking(false);
+          await initializeService();
+        }
+      }
+    });
   }
 
 
@@ -507,6 +549,7 @@ Future<bool> checkifotherloggedin() async {
       ExtraSteps=extra;
     });
     print("Guest: after setting"+isGuest.toString());
+    checkisSingleDeviceloggedIn( Uid, Deviceid, isGuest);
     if(isstart){
       startListening(context);
       await initializeService();
@@ -595,7 +638,20 @@ Future<bool> checkifotherloggedin() async {
 
   @override
   Widget build(BuildContext context) {
-
+    // Timer.periodic(Duration(seconds: 1), (timer) {
+    //   Connectivity().onConnectivityChanged.listen((ConnectivityResult result) async {
+    //     bool iGuest=await SharedPref().getisguest();
+    //     String uid = await SharedPref().getUid();
+    //     String Deviceid=await SharedPref().getDeviceid();
+    //     // Got a new connectivity status!
+    //     if (result == ConnectivityResult.mobile || result == ConnectivityResult.wifi) {
+    //       print("Connected to the internet");
+    //       checkisSingleDeviceloggedIn(uid, Deviceid, iGuest);
+    //     } else {
+    //       print("No internet connection");
+    //     }
+    //   });
+    // });
     return WillPopScope(
       onWillPop: () async {
         SystemNavigator.pop();
