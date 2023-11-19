@@ -9,6 +9,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:get/get_core/src/get_main.dart';
 import 'package:permission_handler/permission_handler.dart';
+import 'package:steptracking/appsflyer/appsflyerMethod.dart';
 import 'package:timezone/timezone.dart' as tz;
 import 'package:timezone/timezone.dart' as tz;
 import 'package:timezone/data/latest.dart' as tz;
@@ -191,6 +192,13 @@ class _SplashScreenState extends State<SplashScreen> {
     tz.initializeTimeZones();
     tz.setLocalLocation(tz.getLocation('Asia/Kolkata'));
     scheduleNotification();
+    final Map<String, String> values = {
+      "time_stamp": DateTime.timestamp().toString(),
+      "time_zone": DateTime.timestamp().timeZoneName,
+      "package_name":"com.pedometer.steptracker",
+    };
+
+    afLogEvent(appsflyerSdk, "application_opened",values);
     // analytics.setAnalyticsCollectionEnabled(true);
   checkifLoginAndIntro();
   Future.delayed(

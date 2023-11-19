@@ -8,6 +8,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:get/get_core/src/get_main.dart';
+import 'package:intl/intl.dart';
 import 'package:steptracking/presentations/Back_Service.dart';
 import 'package:steptracking/presentations/HomePage.dart';
 import 'package:steptracking/presentations/SignUpScreen.dart';
@@ -42,6 +43,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
   int StepsTarget = 0;
   bool isGuest=false;
   String Deviceid="";
+      String formattedDate = DateFormat('yyyy-MM-dd').format( DateTime.now());
+  DatabaseReference ref= FirebaseDatabase.instance.reference();
   final AuthServices _authServices=AuthServices();
   Future<String> getDeviceUID() async {
     DeviceInfoPlugin deviceInfo = DeviceInfoPlugin();
@@ -650,10 +653,21 @@ class _SettingsScreenState extends State<SettingsScreen> {
             SizedBox(height: 20.h,),
            GestureDetector(
              onTap: () async =>{
+
+
+                ref
+                .child('users')
+                .child(Uid)
+                .child('steps')
+                .child(formattedDate)
+                .set(0),
              await SharedPref().setIntroScreenInfo(false),
              await SharedPref().setisStart(false),
                await SharedPref().setisMiles(false),
                await SharedPref().setTodaysSteps(0),
+               await SharedPref().setStepsTarget(6000),
+               SharedPref().setStepsComingFromFirebase(0),
+               await stopBackgroundService(),
                Get.to(()=>HomePage()),
              },
              child: Text(
@@ -683,8 +697,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 SharedPref().setisguest(true),
                await SharedPref().setisStart(false),
                  await SharedPref().setTodaysSteps(0),
-                 await SharedPref().setStepsTarget(6000),
                  await SharedPref().setisMiles(false),
+                 await SharedPref().setStepsTarget(6000),
                  await stopBackgroundService(),
                  services.UpdateDeviceId(Uid," ").then((value) =>  Get.to(()=>SignUpScreen())),
                },

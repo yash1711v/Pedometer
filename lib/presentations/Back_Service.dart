@@ -48,7 +48,7 @@ Future<void> initializeService() async {
 }
  Future<void> stopBackgroundService() async {
 final service = FlutterBackgroundService();
-// service.invoke('stopService');
+service.invoke('stopService');
 }
 @pragma('vm:entry-point')
 void onStart(ServiceInstance service) async{
@@ -171,28 +171,39 @@ void onStart(ServiceInstance service) async{
 
 
   });
-Timer.periodic(Duration(seconds: 1), (timer) {   checkisSingleDeviceloggedIn().then((value) async {
+
+Timer.periodic(Duration(minutes: 1), (timer) async {
   String Uid=await SharedPref().getUid();
   String deviceid=await SharedPref().getDeviceid();
   print("Uid:  "+  Uid);
   DatabaseReference databaseReference = FirebaseDatabase.instance.reference().child('users').child(Uid).child('Device_ID');
   try {
     databaseReference.onValue.listen((event) async {
-     print("on value change");
-     print("Device is stored in shared pre"+deviceid);
-     print("Device is stored in firebase"+event.snapshot.value.toString());
-     if(deviceid!=event.snapshot.value.toString() && event.snapshot.value.toString().isNotEmpty &&  event.snapshot.value.toString()!=null){
-       print("Id is diffrent from current device");
-       service.stopSelf();
-     }else{
-       print("Id is same ");
-     }
+
+      print("Device is stored in shared pre"+deviceid);
+      print("Device is stored in firebase"+event.snapshot.value.toString());
+      if(deviceid!=event.snapshot.value.toString() && event.snapshot.value.toString().isNotEmpty &&  event.snapshot.value.toString()!=null){
+        print("Id is diffrent from current device");
+        print("on value change");
+        service.stopSelf();
+        await SharedPref().clearAllPreferences();
+      await SharedPref().setIntroScreenInfo(false);
+      SharedPref().setStepsComingFromFirebase(0);
+      SharedPref().setEmail("");
+      SharedPref().setPassword("");
+      SharedPref().setUsername("");
+      SharedPref().setisguest(true);
+      await SharedPref().setisStart(false);
+      await SharedPref().setTodaysSteps(0);
+      await SharedPref().setisMiles(false);
+      await SharedPref().setStepsTarget(6000);
+      }else{
+        print("Id is same ");
+      }
     });
   } catch (e) {
     print('Error: $e');
   }
-
- });
 });
 
   flutterLocalNotificationsPlugin.show(
