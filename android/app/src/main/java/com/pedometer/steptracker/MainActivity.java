@@ -18,7 +18,6 @@ public class MainActivity extends FlutterActivity {
 
     private void funToBeCalledFromFlutterSDK() {
         AnalyticsTracker.getInstance().start(getApplicationContext(), "EVJ5aBod18IUuAfZr6bK");
-//        AnalyticsTracker.getInstance().setDebugLog(true);
     }
 
 }
