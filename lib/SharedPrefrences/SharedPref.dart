@@ -267,13 +267,6 @@ class SharedPref{
     await prefs.clear();
   }
 
-
-
-
-
-
-
-
   setisStart(bool isstart) async {
     print("setisStart");
     SharedPreferences pref = await SharedPreferences.getInstance();
