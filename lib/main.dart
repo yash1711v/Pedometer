@@ -72,7 +72,7 @@ Future<void> main() async {
       await AndroidAlarmManager.initialize();
   final int helloAlarmID = 200;
   await AndroidAlarmManager.periodic(
-      const Duration(hours: 3), helloAlarmID, printHello);
+      const Duration(seconds: 3), helloAlarmID, printHello);
 
 
   runApp(const MyApp());
@@ -80,7 +80,14 @@ Future<void> main() async {
 @pragma('vm:entry-point')
 Future<void> printHello() async {
   bool check=await SharedPref().getischecking();
-
+  final isServiceRunning = await FlutterBackgroundService().isRunning();
+  bool start= await SharedPref().getisStart();
+  if (!isServiceRunning && start) {
+    print('Background service is not running. Restarting...');
+    await  initializeService();
+  }else{
+    print('Background service is running....');
+  }
   print("Helllooo From Step Tracker top1");
   tz.initializeTimeZones();
   tz.setLocalLocation(tz.getLocation('Asia/Kolkata'));
@@ -205,7 +212,6 @@ Future<void> printHello() async {
 
 }
 // }
-
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
 

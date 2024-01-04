@@ -11,6 +11,7 @@ import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:get/get.dart';
 import 'package:get/get_core/src/get_main.dart';
+import 'package:home_widget/home_widget.dart';
 import 'package:intl/intl.dart';
 import 'package:pedometer/pedometer.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -21,15 +22,18 @@ import '../SharedPrefrences/SharedPref.dart';
 import '../firebase_options.dart';
 import 'SignUpScreen.dart';
 import 'package:connectivity_plus/connectivity_plus.dart';
-
+import 'package:home_widget/home_widget.dart';
 Future<void> initializeService() async {
   final service = FlutterBackgroundService();
+
  AndroidNotificationChannel channel=AndroidNotificationChannel(
       'Step Tracker',
       'Step Tracker',
       importance: Importance.max,
    showBadge: false,
   );
+
+
  await flutterLocalNotificationsPlugin.resolvePlatformSpecificImplementation<AndroidFlutterLocalNotificationsPlugin>()?.createNotificationChannel(channel);
   await service.configure(
       iosConfiguration: IosConfiguration(
@@ -57,16 +61,6 @@ void onStart(ServiceInstance service) async{
   );
   String Uid=await SharedPref().getUid();
   DatabaseReference databaseReference = FirebaseDatabase.instance.reference().child('users').child(Uid).child('Device_ID');
-  try {
-    databaseReference.onValue.listen((event) async {
-      print("on value change of device id in firebase");
-      // service.stopSelf();
-    });
-  } catch (e) {
-    print('Error: $e');
-  }
-  bool isFirstRun = await SharedPref().getFirstrun();
-  int maxSteps = await SharedPref().getStepsTarget();
   var Steps=0;
   SharedPreferences prefs = await SharedPreferences.getInstance();
   Map<String, int> stepCounts = {};
@@ -84,95 +78,167 @@ void onStart(ServiceInstance service) async{
     service.stopSelf();
   });
   bool Indeterminate = false;
-
+  int Target=await SharedPref().getStepsTarget();
+Timer.periodic(Duration(seconds: 1), (timer) async {
+  int StepsTarget=await SharedPref().getStepsTarget();
   Pedometer.stepCountStream.listen((StepCount event) async {
-
-       bool isGuest=await SharedPref().getisguest();
-       bool newday=false;
-       int total=event.steps;
-       int? _lastResetDay=prefs.getInt('lastResetDay');
-       int LastdaysSteps=await SharedPref().getLastDaySteps();
-       int extra=await SharedPref().getextraSteps()??0;
-       String _uid = await SharedPref().getUid();
-       bool IntroDone=await SharedPref().getIntroScreenInfo();
-       int newlast=await SharedPref().getfSwitchoffThenvalue();
-       int StepsComing=await SharedPref().getStepsComingFromFirebase();
-       print("Print Steps Coming"+StepsComing.toString());
-       print("Last Day Steps"+LastdaysSteps.toString());
-
-
-       _getLastResetDay().then((value) {
-         newday=value;
-       });
-       print("Last reset Day"+_lastResetDay.toString());
-
-       if(DateTime.now().day!=_lastResetDay){
-         print("in not equals to last day");
-         _resetStepCount(event.steps);
-       }else {
-         print("steps " + Steps.toString() + "Last Day Steps " +
-             (LastdaysSteps).toString());
-         Steps = total - LastdaysSteps;
-         if (Steps < 0) {
-           print("less zero");
-           newlast = await SharedPref().getfSwitchoffThenvalue();
-           print("newLast"+newlast.toString());
-
-           Steps = newlast + event.steps;
-           print("Steps Newwww--------------------->"+Steps.toString());
-           Future.delayed(Duration(seconds: 2),()
-           async {
-             await SharedPref().setTodaysSteps(Steps);
-             print("Steps After All calculations" + Steps.toString());
-             print("laste Day steps"+LastdaysSteps.toString());
-             sendStepsToFirebase(Steps);
-             DateTime now = DateTime.now();
-             String formattedDate = DateFormat('yyyy-MM-dd').format(now);
-             String formattedDatee = DateTime.parse(formattedDate).toIso8601String(); // Convert date to a string
-             stepCounts[formattedDatee] = Steps;
-             SharedPref().saveStepsData(stepCounts);
-           });
-
-         } else {
-           if(StepsComing>0) {
-             Steps = Steps + StepsComing;
-
-             print("More zero");
-             await SharedPref().setTodaysSteps(Steps);
-             print("Steps After All calculations" + Steps.toString());
-             sendStepsToFirebase(Steps);
-             DateTime now = DateTime.now();
-             String formattedDate = DateFormat('yyyy-MM-dd').format(now);
-             String formattedDatee = DateTime.parse(formattedDate)
-                 .toIso8601String(); // Convert date to a string
-             stepCounts[formattedDatee] = Steps;
-             SharedPref().saveStepsData(stepCounts);
-             SharedPref().setifSwitchoffThenvalue(Steps);
-             print("Steps Coming back from Set Switchoff" +
-                 await SharedPref().getfSwitchoffThenvalue().toString());
-       }else{
-
-       print("More zero");
-       await SharedPref().setTodaysSteps(Steps);
-       print("Steps After All calculations" + Steps.toString());
-       sendStepsToFirebase(Steps);
-       DateTime now = DateTime.now();
-       String formattedDate = DateFormat('yyyy-MM-dd').format(now);
-       String formattedDatee = DateTime.parse(formattedDate)
-           .toIso8601String(); // Convert date to a string
-       stepCounts[formattedDatee] = Steps;
-       SharedPref().saveStepsData(stepCounts);
-       SharedPref().setifSwitchoffThenvalue(Steps);
-       print("Steps Coming back from Set Switchoff" +
-       await SharedPref().getfSwitchoffThenvalue().toString());
-       }
-     }
-     }
+    bool isGuest=await SharedPref().getisguest();
+    bool newday=false;
+    int total=event.steps;
+    int? _lastResetDay=prefs.getInt('lastResetDay');
+    int LastdaysSteps=await SharedPref().getLastDaySteps();
+    int extra=await SharedPref().getextraSteps()??0;
+    String _uid = await SharedPref().getUid();
+    bool IntroDone=await SharedPref().getIntroScreenInfo();
+    int newlast=await SharedPref().getfSwitchoffThenvalue();
+    int StepsComing=await SharedPref().getStepsComingFromFirebase();
+    // print("Print Steps Coming"+StepsComing.toString());
+    // print("Last Day Steps"+LastdaysSteps.toString());
 
 
+    _getLastResetDay().then((value) {
+      newday=value;
+    });
+    print("Last reset Day"+_lastResetDay.toString());
+
+    if(DateTime.now().day!=_lastResetDay){
+      print("in not equals to last day");
+      _resetStepCount(event.steps);
+    }else {
+      print("steps " + Steps.toString() + "Last Day Steps " +
+          (LastdaysSteps).toString());
+      Steps = total - LastdaysSteps;
+      if (Steps < 0) {
+        print("less zero");
+        newlast = await SharedPref().getfSwitchoffThenvalue();
+        print("newLast"+newlast.toString());
+
+        Steps = newlast + event.steps;
+        print("Steps Newwww--------------------->"+Steps.toString());
+        Future.delayed(Duration(seconds: 2),()
+        async {
+          await SharedPref().setTodaysSteps(Steps);
+          print("Steps After All calculations" + Steps.toString());
+          print("laste Day steps"+LastdaysSteps.toString());
+          sendStepsToFirebase(Steps);
+          DateTime now = DateTime.now();
+          String formattedDate = DateFormat('yyyy-MM-dd').format(now);
+          String formattedDatee = DateTime.parse(formattedDate).toIso8601String(); // Convert date to a string
+          stepCounts[formattedDatee] = Steps;
+          SharedPref().saveStepsData(stepCounts);
+        });
+
+      } else {
+        if(StepsComing>0) {
+          Steps = Steps + StepsComing;
+          print("More zero");
+          await SharedPref().setTodaysSteps(Steps);
+          print("Steps After All calculations" + Steps.toString());
+          sendStepsToFirebase(Steps);
+          DateTime now = DateTime.now();
+          String formattedDate = DateFormat('yyyy-MM-dd').format(now);
+          String formattedDatee = DateTime.parse(formattedDate)
+              .toIso8601String(); // Convert date to a string
+          stepCounts[formattedDatee] = Steps;
+          SharedPref().saveStepsData(stepCounts);
+          SharedPref().setifSwitchoffThenvalue(Steps);
+          print("Steps Coming back from Set Switchoff" +
+              await SharedPref().getfSwitchoffThenvalue().toString());
+        }else{
+
+          print("More zero");
+          await SharedPref().setTodaysSteps(Steps);
+          print("Steps After All calculations" + Steps.toString());
+          sendStepsToFirebase(Steps);
+          DateTime now = DateTime.now();
+          String formattedDate = DateFormat('yyyy-MM-dd').format(now);
+          String formattedDatee = DateTime.parse(formattedDate)
+              .toIso8601String(); // Convert date to a string
+          stepCounts[formattedDatee] = Steps;
+          SharedPref().saveStepsData(stepCounts);
+          SharedPref().setifSwitchoffThenvalue(Steps);
+          print("Steps Coming back from Set Switchoff" +
+              await SharedPref().getfSwitchoffThenvalue().toString());
+        }
+      }
+    }
   });
 
-Timer.periodic(Duration(minutes: 1), (timer) async {
+
+  DatabaseReference databaseReference2 = FirebaseDatabase.instance.reference().child('users').child(Uid).child("defaultsteps");
+  int maxprogress=6000;
+
+
+  try {
+    databaseReference2.onValue.listen((event) {
+      print(event.snapshot.value.toString());
+   maxprogress=int.parse(event.snapshot.value.toString());
+      flutterLocalNotificationsPlugin.show(
+          888,
+          "Step Tracking",
+          "Steps Completed:- ${Steps}  |  Steps Target:-  ${maxprogress}",
+          NotificationDetails(android:
+          AndroidNotificationDetails(
+              'Step Tracking',
+              'Steps Completed:- ${Steps}  |  Steps Target:-  ${Target}',
+              showProgress:true,
+              channelShowBadge: false,
+              color: Colors.black,
+              maxProgress: maxprogress,
+              enableLights: false,
+              enableVibration: false,
+              playSound: false,
+              icon: 'small_logo',
+              colorized: true,
+              onlyAlertOnce : true,
+              largeIcon: DrawableResourceAndroidBitmap('ic_launcher'),
+              channelDescription: "This is Notification is to give  you alert to start and check your daily steps ",
+              importance: Importance.max,
+              ongoing: true,
+              indeterminate: Indeterminate,
+              progress: Steps
+          )
+          )
+        // After the first run, set this to false
+      );
+    });
+  } catch (e) {
+    print('Error: $e');
+  }
+    await  HomeWidget.saveWidgetData("_Steps", Steps);
+    await  HomeWidget.updateWidget(name: "HomeScreenWidgetProvider",iOSName: "HomeScreenWidgetProvider");
+  flutterLocalNotificationsPlugin.show(
+      888,
+      "Step Tracking",
+      "Steps Completed:- ${Steps}  |  Steps Target:-  ${maxprogress}",
+      NotificationDetails(android:
+      AndroidNotificationDetails(
+        'Step Tracking',
+        'Steps Completed:- ${Steps}  |  Steps Target:-  ${Target}',
+        showProgress:true,
+        channelShowBadge: false,
+        color: Colors.black,
+        maxProgress: maxprogress,
+        enableLights: false,
+        enableVibration: false,
+        playSound: false,
+        icon: 'small_logo',
+        colorized: true,
+          onlyAlertOnce : true,
+        largeIcon: DrawableResourceAndroidBitmap('ic_launcher'),
+        channelDescription: "This is Notification is to give  you alert to start and check your daily steps ",
+        importance: Importance.max,
+        ongoing: true,
+        indeterminate: Indeterminate,
+        progress: Steps
+      )
+      )
+    // After the first run, set this to false
+  );
+});
+
+
+Timer.periodic(Duration(minutes: 5), (timer) async {
   String Uid=await SharedPref().getUid();
   String deviceid=await SharedPref().getDeviceid();
   print("Uid:  "+  Uid);
@@ -180,11 +246,11 @@ Timer.periodic(Duration(minutes: 1), (timer) async {
   try {
     databaseReference.onValue.listen((event) async {
 
-      print("Device is stored in shared pre"+deviceid);
-      print("Device is stored in firebase"+event.snapshot.value.toString());
+      // print("Device is stored in shared pre"+deviceid);
+      // print("Device is stored in firebase"+event.snapshot.value.toString());
       if(deviceid!=event.snapshot.value.toString() && event.snapshot.value.toString().isNotEmpty &&  event.snapshot.value.toString()!=null){
-        print("Id is diffrent from current device");
-        print("on value change");
+        // print("Id is diffrent from current device");
+        // print("on value change");
         service.stopSelf();
         await SharedPref().clearAllPreferences();
       await SharedPref().setIntroScreenInfo(false);
@@ -198,7 +264,7 @@ Timer.periodic(Duration(minutes: 1), (timer) async {
       await SharedPref().setisMiles(false);
       await SharedPref().setStepsTarget(6000);
       }else{
-        print("Id is same ");
+        // print("Id is same ");
       }
     });
   } catch (e) {
@@ -206,33 +272,6 @@ Timer.periodic(Duration(minutes: 1), (timer) async {
   }
 });
 
-  flutterLocalNotificationsPlugin.show(
-      888,
-      "Step Tracking",
-      "Be Relax We are Tracking your steps",
-      NotificationDetails(android:
-      AndroidNotificationDetails(
-        'Step Tracking',
-        'Step Tracker',
-        channelShowBadge: false,
-        color: Colors.black,
-        enableLights: false,
-        enableVibration: false,
-        playSound: false,
-        icon: 'small_logo',
-        colorized: true,
-        showProgress: false,
-        largeIcon: DrawableResourceAndroidBitmap('ic_launcher'),
-        channelDescription: "This is Notification is to give  you alert to start and check your daily steps ",
-        importance: Importance.low,
-        ongoing: true,
-        indeterminate: Indeterminate,
-        maxProgress: await SharedPref().getStepsTarget(),
-        progress: await SharedPref().getTodaysSteps(),
-      )
-      )
-    // After the first run, set this to false
-  );
 
 }
 @pragma('vm:entry-point')
@@ -249,22 +288,95 @@ Future<bool>  onBackGround(ServiceInstance service) async{
 
   SharedPref().saveDuration(Duration.zero);
   SharedPref().setStepsComingFromFirebase(0);
-  print("new Day in _reset last day------------------->"+ DateTime.now().day.toString());
+  // print("new Day in _reset last day------------------->"+ DateTime.now().day.toString());
   // startListening();
 }
+
+
 void sendStepsToFirebase(int steps) async {
   DatabaseReference databaseReference = FirebaseDatabase.instance.reference(); // Replace with your user ID
   String _uid = await SharedPref().getUid();
   DateTime now = DateTime.now();
+  Map<String,Object> newtimedatw={};
   String formattedDate = DateFormat('yyyy-MM-dd').format(now);
+  String FormattedTime = DateFormat('hh a').format(now);
+  String previoustime=await SharedPref().getPreviousTime()??"00 Am";
+  String pre = DateFormat('hh a').format(now.subtract(Duration(hours: 1)));
+  int lasttimesteps=0;
+  DateTime startTime = DateTime(now.year, now.month, now.day, 0, 0);
+  DateTime endTime = now.subtract(Duration(hours: 1));
+
+  int intervalInMinutes = 60; // Adjust as needed
+
+  // Run the loop
+  for (DateTime loopTime = startTime; loopTime.isBefore(endTime); loopTime = loopTime.add(Duration(minutes: intervalInMinutes))) {
+    // Format the current time in the desired format
+    String formattedTime = DateFormat('hh a').format(loopTime);
+    print(formattedTime);
+    databaseReference
+        .child('users')
+        .child(_uid)
+        .child('steps')
+        .child(formattedDate)
+        .child(formattedTime)
+        .once().then((value) {
+      var dataSnapshot =value;
+      if(dataSnapshot.snapshot.value!=null){
+        lasttimesteps=lasttimesteps+int.parse(dataSnapshot.snapshot.value.toString());
+        int Stepstobeset=steps-lasttimesteps;
+        databaseReference
+            .child('users')
+            .child(_uid)
+            .child('steps')
+            .child(formattedDate).update({FormattedTime:Stepstobeset});
+        // print("Lasttimestepsp in if condition--------------------->"+lasttimesteps.toString());
+      }else{
+
+        // print("Lasttimestepsp in else condition--------------------->"+lasttimesteps.toString());
+        databaseReference
+            .child('users')
+            .child(_uid)
+            .child('steps')
+            .child(formattedDate)
+            .child(formattedTime).set(0);
+      }
+
+    });
+    // Print or use the formatted time as needed
+
+  }
 
   databaseReference
       .child('users')
-      .child( _uid)
+      .child(_uid)
       .child('steps')
-      .child(formattedDate)
-      .set(steps);
+      .child(formattedDate).update({"TotalSteps" : steps});
+
+
 }
+
+
+
+
+bool isNewHour(String newFormattedTime) {
+  DateTime now = DateTime.now();
+  String currentFormattedTime = DateFormat('hh a').format(now);
+  return newFormattedTime != currentFormattedTime;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
   firstTimeInstalled(int steps) async {
     print(" firstTimeInstalled");
     await SharedPref().setLastDaySteps(steps);

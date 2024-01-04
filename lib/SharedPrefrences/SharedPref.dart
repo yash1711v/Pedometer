@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'package:intl/intl.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class SharedPref{
@@ -23,6 +24,51 @@ class SharedPref{
   bool ischecking=true;
   bool Firstrun=false;
  int StepsComingFromFirebase=0;
+
+ String PreviousTime="00 Am";
+int lasttimeSteps=0;
+
+
+  setlasttimeSteps(int LasttimeSteps) async {
+    print("lasttimeSteps");
+    SharedPreferences pref = await SharedPreferences.getInstance();
+    pref.setInt("slasttimeSteps", LasttimeSteps);
+    // print(username);
+  }
+
+  getlasttimeSteps() async {
+    print("lasttimeSteps");
+    SharedPreferences pref = await SharedPreferences.getInstance();
+    lasttimeSteps = pref.getInt("lasttimeSteps")??0;
+    return lasttimeSteps;
+  }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  setPreviousTime(String previousTime) async {
+    print("previousTime");
+    SharedPreferences pref = await SharedPreferences.getInstance();
+    pref.setString("PreviousTime", previousTime);
+    // print(username);
+  }
+  getPreviousTime() async {
+    print("PreviousTime called");
+    SharedPreferences pref = await SharedPreferences.getInstance();
+    PreviousTime = pref.getString("PreviousTime")??"00 Am";
+    return PreviousTime;
+  }
+
 
   setStepsComingFromFirebase(int stepsComingFromFirebase) async {
     print("setStepsComingFromFirebase");
@@ -343,7 +389,9 @@ class SharedPref{
   getTodaysSteps() async {
     print("getTodaysSteps called");
     SharedPreferences pref = await SharedPreferences.getInstance();
+    print("Todays before Steps ${TodaysSteps}");
     TodaysSteps = pref.getInt("TodaysSteps")?? 0;
+    print("Todays After Steps ${TodaysSteps}");
     return TodaysSteps;
   }
 

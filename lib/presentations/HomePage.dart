@@ -8,6 +8,7 @@ import 'package:android_alarm_manager_plus/android_alarm_manager_plus.dart';
 import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/gestures.dart';
+import 'package:optimize_battery/optimize_battery.dart';
 import 'package:steptracking/Firebasefunctionalities/AuthServices.dart';
 import 'package:timezone/timezone.dart' as tz;
 import 'package:timezone/data/latest.dart' as tz;
@@ -90,6 +91,19 @@ int StepscomingFromFirebase=0;
     _getLastResetDay();
     getUserData();
     firebaseData();
+    OptimizeBattery.isIgnoringBatteryOptimizations().then((onValue) {
+      setState(() {
+        if (onValue) {
+          // Igonring Battery Optimization
+          print("optimized");
+        } else {
+          // App is under battery optimization
+          OptimizeBattery.openBatteryOptimizationSettings();
+          OptimizeBattery.stopOptimizingBatteryUsage();
+
+        }
+      });
+    });
 
 
   }
@@ -556,18 +570,65 @@ Future<bool> checkifotherloggedin() async {
     }
 
   }
+
   void sendStepsToFirebase(int steps) async {
     DatabaseReference databaseReference = FirebaseDatabase.instance.reference(); // Replace with your user ID
     String _uid = await SharedPref().getUid();
     DateTime now = DateTime.now();
+    Map<String,Object> newtimedatw={};
     String formattedDate = DateFormat('yyyy-MM-dd').format(now);
+    String FormattedTime = DateFormat('hh a').format(now);
+    String previoustime=await SharedPref().getPreviousTime()??"00 Am";
+    String pre = DateFormat('hh a').format(now.subtract(Duration(hours: 1)));
+    int lasttimesteps=0;
+    DateTime startTime = DateTime(now.year, now.month, now.day, 0, 0);
+    DateTime endTime = now.subtract(Duration(hours: 1));
 
+    int intervalInMinutes = 60; // Adjust as needed
+
+    // Run the loop
+    for (DateTime loopTime = startTime; loopTime.isBefore(endTime); loopTime = loopTime.add(Duration(minutes: intervalInMinutes))) {
+      // Format the current time in the desired format
+      String formattedTime = DateFormat('hh a').format(loopTime);
+      print(formattedTime);
+      databaseReference
+          .child('users')
+          .child(_uid)
+          .child('steps')
+          .child(formattedDate)
+          .child(formattedTime)
+          .once().then((value) {
+        var dataSnapshot =value;
+        if(dataSnapshot.snapshot.value!=null){
+          lasttimesteps=lasttimesteps+int.parse(dataSnapshot.snapshot.value.toString());
+          int Stepstobeset=steps-lasttimesteps;
+          databaseReference
+              .child('users')
+              .child(_uid)
+              .child('steps')
+              .child(formattedDate).update({FormattedTime:Stepstobeset});
+          print("Lasttimestepsp in if condition--------------------->"+lasttimesteps.toString());
+        }else{
+
+          print("Lasttimestepsp in else condition--------------------->"+lasttimesteps.toString());
+          databaseReference
+              .child('users')
+              .child(_uid)
+              .child('steps')
+              .child(formattedDate)
+              .child(formattedTime).set(0);
+        }
+
+      });
+      // Print or use the formatted time as needed
+
+    }
     databaseReference
         .child('users')
-        .child( _uid)
+        .child(_uid)
         .child('steps')
-        .child(formattedDate)
-        .set(steps);
+        .child(formattedDate).update({"TotalSteps" : steps});
+
   }
   void showCompletionDialog(BuildContext context) {
     showDialog(
@@ -635,7 +696,11 @@ Future<bool> checkifotherloggedin() async {
     );
 
   }
-
+  bool isNewHour(String newFormattedTime) {
+    DateTime now = DateTime.now();
+    String currentFormattedTime = DateFormat('hh a').format(now);
+    return newFormattedTime != currentFormattedTime;
+  }
   @override
   Widget build(BuildContext context) {
     // Timer.periodic(Duration(seconds: 1), (timer) {
@@ -659,7 +724,6 @@ Future<bool> checkifotherloggedin() async {
       },
       child: Scaffold(
         extendBody: true,
-        backgroundColor: Color(0xFF2D2D2D),
         body: Padding(
           padding: EdgeInsets.symmetric(horizontal: 24.w,
           //70.h
@@ -886,10 +950,24 @@ Future<bool> checkifotherloggedin() async {
                                             ),onPressed: () async {
                                               PermissionStatus status1=await Permission.activityRecognition.request();
                                               PermissionStatus status2=await Permission.sensors.request();
+                                              // OptimizeBattery.isIgnoringBatteryOptimizations().then((onValue) {
+                                              //   setState(() {
+                                              //     if (onValue) {
+                                              //       // Igonring Battery Optimization
+                                              //       print("optimized");
+                                              //     } else {
+                                              //       // App is under battery optimization
+                                              //       OptimizeBattery.openBatteryOptimizationSettings();
+                                              //       OptimizeBattery.stopOptimizingBatteryUsage();
+                                              //
+                                              //     }
+                                              //   });
+                                              // });
                                               if(status1.isGranted && status2.isGranted){
                                                 startListening(context).then((value) {
-                                                  Future.delayed(Duration(seconds: 2),() async {
+                                                  Future.delayed(Duration(milliseconds: 26),() async {
                                                     await initializeService();
+
                                                   });
                                                 });
 

@@ -497,6 +497,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                                               setState(() {
                                                 StepsTarget = int.parse(value);
                                               });
+                                              SharedPref().setStepsTarget(StepsTarget);
                                             },
                                           ),
                                         ),
