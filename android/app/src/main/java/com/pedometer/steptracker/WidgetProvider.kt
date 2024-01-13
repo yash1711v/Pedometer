@@ -19,9 +19,10 @@ class HomeScreenWidgetProvider : HomeWidgetProvider() {
                 setOnClickPendingIntent(R.id.widget_root, pendingIntent)
 
                 val steps = widgetData.getInt("_Steps", 0)
-                val todaysSteps = "Your counter value is: $steps"
+                val todaysSteps = "$steps"
 
                 setTextViewText(R.id.Step_counter, todaysSteps)
+                setProgressBar(R.id.progress_bar, 100, 20, false)
                 val backgroundIntent=HomeWidgetBackgroundIntent.getBroadcast(context, Uri.parse("myAppWidget://updatesteps"))
 
             }

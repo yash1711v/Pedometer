@@ -5,8 +5,17 @@
     <uses-permission android:name="android.permission.ACTIVITY_RECOGNITION" />
 <!--    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />-->
     <uses-permission android:name="android.permission.SCHEDULE_EXACT_ALARM" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_HEALTH"
+        tools:ignore="SystemPermissionTypo" />
+    <uses-permission android:name="android.permission.BODY_SENSORS" />
+
+
 <!--    <uses-permission android:name="android.permission.USE_EXACT_ALARM"-->
 <!--        tools:ignore="ExactAlarm" />-->
+    <uses-permission android:name="android.permission.USE_EXACT_ALARM"
+        tools:ignore="ExactAlarm" />
+
     <uses-permission android:name="android.permission.WAKE_LOCK"/>
     <uses-permission android:name="android.permission.ACCESS_NOTIFICATION_POLICY"/>
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS"/>
@@ -19,6 +28,8 @@
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
     <uses-permission  android:name="android.permission.REQUEST_IGNORE_BATTERY_OPTIMIZATIONS"/>
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
+
 
     <application
         android:label="Step Tracker"
@@ -49,6 +60,11 @@
         </activity>
         <service  android:name="com.folk.localnotifications.services.LocalNotificationsService"
             android:exported="false" />
+        <service
+            android:name="id.flutter.flutter_background_service.BackgroundService"
+            android:foregroundServiceType="health"
+            />
+
         <!-- Don't delete the meta-data below.
              This is used by the Flutter tool to generate GeneratedPluginRegistrant.java -->
         <meta-data

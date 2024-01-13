@@ -43,8 +43,8 @@ void initializeNotification() async {
   }
   );
   tz.initializeTimeZones();
-  final locationName =  await FlutterTimezone.getLocalTimezone();
-  tz.setLocalLocation(tz.getLocation(locationName));
+  final String timeZoneName = 'Asia/Kolkata';
+  tz.setLocalLocation(tz.getLocation('Asia/Kolkata'));
  }
 Future scheduleNotifications() async {
     // Cancel existing notifications to prevent duplicates

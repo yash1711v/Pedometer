@@ -69,22 +69,22 @@ dependencies:
   appsflyer_sdk: ^6.12.2
   optimize_battery: ^0.0.4
   home_widget: ^0.4.1
+  flutter_foreground_task: ^6.1.2
+  flutter_svg: ^2.0.9
+  sqflite: ^2.3.0
+  objectbox: ^2.4.0
+  objectbox_flutter_libs: any
 
 
-#  flutter_native_timezone: ^1.1.0
 
-#  sensors_plus: ^3.0.3
 
 dev_dependencies:
   flutter_test:
     sdk: flutter
+  build_runner: ^2.4.7
 
-  # The "flutter_lints" package below contains a set of recommended lints to
-  # encourage good coding practices. The lint set provided by the package is
-  # activated in the `analysis_options.yaml` file located at the root of your
-  # package. See that file for information about deactivating specific lint
-  # rules and activating additional ones.
-  flutter_lints: ^3.0.0
+
+  objectbox_generator: any
 
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec
@@ -112,6 +112,7 @@ flutter:
     - lib/assests/Images/twemoji_confetti-ball.png
     - lib/assests/Images/Confetti_Animation.json
     - lib/assests/Images/DialogueboxLOgo.png
+    - lib/assests/NewImages/
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/assets-and-images/#resolution-aware

@@ -8,6 +8,7 @@ import 'package:android_alarm_manager_plus/android_alarm_manager_plus.dart';
 import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/gestures.dart';
+import 'package:flutter_svg/svg.dart';
 import 'package:optimize_battery/optimize_battery.dart';
 import 'package:steptracking/Firebasefunctionalities/AuthServices.dart';
 import 'package:timezone/timezone.dart' as tz;
@@ -28,10 +29,15 @@ import 'package:percent_indicator/percent_indicator.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:geolocator/geolocator.dart';
+import '../Firebasefunctionalities/DatabaseServices.dart';
+import '../LocalDataBaseForSteps/DatabaseHelper.dart';
+import '../LocalDataBaseForSteps/ObjectBox.dart';
 import '../SharedPrefrences/SharedPref.dart';
 import '../main.dart';
 import '../widgets/BottomNavbar.dart';
+import '../widgets/GradiantArchProgress.dart';
 import 'Back_Service.dart';
+import 'Linechart.dart';
 import 'NotificationServices.dart';
 import 'SignUpScreen.dart';
 SharedPreferences? prefs;
@@ -49,9 +55,11 @@ class HomePage extends StatefulWidget {
   State<HomePage> createState() => _HomePageState();
 }
 
-class _HomePageState extends State<HomePage> {
+class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin {
   int StepsTarget = 0;
   int StepsCompleted = 0;
+  late AnimationController _controller;
+  late Animation<double> _animation;
   String _pedestrianStatus = 'Stopped';
   double indicatorProgress = 0.0;
   bool isPause = false;
@@ -83,8 +91,13 @@ class _HomePageState extends State<HomePage> {
   bool ischecking=true;
 bool isDone=false;
 int StepscomingFromFirebase=0;
+DatabaseServices _services=DatabaseServices();
+  DatabaseHelper dbHelper = DatabaseHelper();
+ Map<String, dynamic> stepsData ={};
+
   void initState() {
     super.initState();
+    GetPermissions();
     tz.initializeTimeZones();
     tz.setLocalLocation(tz.getLocation('Asia/Kolkata'));
     notificationServices.initializeNotification() ;
@@ -95,7 +108,7 @@ int StepscomingFromFirebase=0;
       setState(() {
         if (onValue) {
           // Igonring Battery Optimization
-          print("optimized");
+          // print("optimized");
         } else {
           // App is under battery optimization
           OptimizeBattery.openBatteryOptimizationSettings();
@@ -105,21 +118,71 @@ int StepscomingFromFirebase=0;
       });
     });
 
+    _controller = AnimationController(
+      duration: Duration(seconds: 2),
+      vsync: this,
+    );
+
+    _animation = Tween<double>(begin: 0, end: 1).animate(_controller);
+
+    _controller.repeat(reverse: true);
+
 
   }
+  Future<void> GetPermissions() async {
+    PermissionStatus status1=await Permission.activityRecognition.request();
+    PermissionStatus status2=await Permission.sensors.request();
+    if(status1.isGranted && status2.isGranted){ startListening(context).then((value2) async {
+      await initializeService().then((value) {
+        print("Steps Completed--------jjjh------------>"+value2.toString());
+        // _storeSteps(value2);
+        // dbHelper.insertStep(value2);
+      });
+
+
+    });}
+  }
+
+  // void _storeSteps(int Steps) async {
+  //
+  //   ObjectBoxClass.instance.storeSteps(Steps).then((value) {
+  //     _getTotalYearlySteps();
+  //   });
+  //
+  //   // Optionally, you can add code here to update the UI or show a success message.
+  //
+  // }
+  //
+  //
+  // Future<void> _getTotalYearlySteps() async {
+  //   final Map<String, dynamic> stepsData = await ObjectBoxClass.instance.getStepsData();
+  //   print(stepsData.toString());
+  //   final now = DateTime.now();
+  //   final year = (now.year).toString();
+  //   final month = now.month<10?"0"+now.month.toString():now.month.toString(); // Use month number directly
+  //   final date = (now.day).toString();
+  //   final time = (DateFormat('h a').format(now)).toString();
+  //   print(year);
+  //   print(month);
+  //   print(date);
+  //   print(time);
+  //   print(now);
+  //   print('Steps Target is----------> ${stepsData['${year}']['${month}']['${date}']['${time}']}');
+  // }
+
   void checkisSingleDeviceloggedIn(String Uid,String Deviceid,bool isGuest) async{
-    print("checkSingleDeviceLoggededIn calling after 1 sec");
+    // print("checkSingleDeviceLoggededIn calling after 1 sec");
     AuthServices authServices2=AuthServices();
     String Firebaseid="";
     String deviceid=await SharedPref().getDeviceid();
-    print("Uid:  "+  Uid);
+    // print("Uid:  "+  Uid);
     DatabaseReference databaseReference = FirebaseDatabase.instance.reference().child('users').child(Uid).child('Device_ID');
     try {
       databaseReference.onValue.listen((event) async {
         Firebaseid=event.snapshot.value.toString();
-        print("Firebase Devide Idddddddddd"+event.snapshot.value.toString());
-        print("Firebase Deviceid"+Firebaseid);
-        print("SharedPref Device ID:"+Deviceid);
+        // print("Firebase Devide Idddddddddd"+event.snapshot.value.toString());
+        // print("Firebase Deviceid"+Firebaseid);
+        // print("SharedPref Device ID:"+Deviceid);
       });
     } catch (e) {
       print('Error: $e');
@@ -128,10 +191,10 @@ int StepscomingFromFirebase=0;
       if(isGuest){
         await initializeService();
       }else{
-        print("Firebase Deviceid"+Firebaseid);
-        print("SharedPref Device ID:"+deviceid);
+        // print("Firebase Deviceid"+Firebaseid);
+        // print("SharedPref Device ID:"+deviceid);
         if(deviceid!=Firebaseid){
-          print("in notEquals");
+          // print("in notEquals");
           await SharedPref().clearAllPreferences();
       await SharedPref().setIntroScreenInfo(false);
       SharedPref().setStepsComingFromFirebase(0);
@@ -149,7 +212,7 @@ int StepscomingFromFirebase=0;
           Get.to(()=>SignUpScreen());
         }
         else{
-          print("in Equals");
+          // print("in Equals");
           SharedPref().setischecking(false);
           await initializeService();
         }
@@ -176,7 +239,7 @@ int StepscomingFromFirebase=0;
     setState(() {
       currentSpeed=speed;
     });
-    print("this Speed is In get Speed Method------------------------------------------>"+currentSpeed.toString());
+    // print("this Speed is In get Speed Method------------------------------------------>"+currentSpeed.toString());
     return speed;
   }
 
@@ -204,8 +267,8 @@ int StepscomingFromFirebase=0;
       }
     }
     else{
-       print("infirebase data");
-       print("Print is guest in firebase "+isGuest.toString());
+       // print("infirebase data");
+       // print("Print is guest in firebase "+isGuest.toString());
       String _uid = await SharedPref().getUid();
       DatabaseReference databaseReference = FirebaseDatabase.instance
           .reference()
@@ -214,9 +277,12 @@ int StepscomingFromFirebase=0;
           .child('defaultsteps');
       try {
         databaseReference.onValue.listen((event) {
-          print("sixinxs: "+event.snapshot.value.toString());
+          // print("sixinxs: "+event.snapshot.value.toString());
           setState(() {
-           StepsTarget = int.parse(event.snapshot.value.toString());
+            if(event.snapshot.value!=null){
+              StepsTarget=int.parse(event.snapshot.value.toString());}else{
+              StepsTarget=6000;
+            }
             // isGuest?null:SharedPref().setStepsTarget(StepsTarget);
             indicatorProgress = (StepsCompleted / StepsTarget) as double;
             if (indicatorProgress >= 1) {
@@ -239,35 +305,61 @@ int StepscomingFromFirebase=0;
   double deviceHeight(BuildContext context) =>
       MediaQuery.of(context).size.height;
 
-  String StepstoKilometer(int steps) {
-    double StepsinKm = steps / 1312.33595801;
-    double totalTimeInHours = StepsinKm / speedInHours;
+  String StepsToDistance(int steps, bool isMiles) {
+    double stepsInKm = steps / 1312.33595801;
+    double totalDistance;
+    String unit;
+    double totalTimeInHours = stepsInKm / speedInHours;
     DateTime dateTime = DateTime(0, 0, 0, totalTimeInHours.toInt(), (totalTimeInHours % 1 * 60).toInt());
     String formattedTime = "${dateTime.hour.toString().padLeft(2, '0')}:${dateTime.minute.toString().padLeft(2, '0')}";
     List<String> timeParts = formattedTime.split(':');
     int hours = int.parse(timeParts[0]);
     int minutes = int.parse(timeParts[1]);
-    double inMils= StepsinKm* 0.62137;
-    print("in hours-------------------------------------->"+hours.toString());
-  print("in minutes-------------------------------------->"+minutes.toString());
     setState(() {
-    totalDuration= Duration(hours: hours, minutes: minutes);
-      inMiles=inMils;
+      totalDuration= Duration(hours: hours, minutes: minutes);
     });
     SharedPref().saveDuration( totalDuration);
-    return StepsinKm.toStringAsFixed(1);
+    if (isMiles) {
+      // Convert steps to miles
+      totalDistance = stepsInKm * 0.62137;
+      unit = " miles";
+    } else {
+      // Convert steps to meters
+      totalDistance = stepsInKm * 1000;
+      unit = " m";
+    }
+
+    if (totalDistance >= 1000) {
+      // If the total distance is 1 kilometer or more, return in kilometers
+      setState(() {
+        // totalDuration = Duration.zero; // or set it to the desired value
+        inMiles = isMiles ? totalDistance : totalDistance / 1609.34;
+      });
+      // SharedPref().saveDuration(totalDuration);
+      return "${isMiles ? totalDistance.toStringAsFixed(1) + unit : (totalDistance / 1000).toStringAsFixed(1)+ " Km" } ";
+    } else {
+      // If the total distance is less than 1 kilometer, return in meters
+      setState(() {
+        // totalDuration = Duration.zero; // or set it to the desired value
+        inMiles = isMiles ? totalDistance * 1609.34 : totalDistance;
+      });
+      // SharedPref().saveDuration(totalDuration);
+      return "${isMiles ? (totalDistance * 1609.34).toStringAsFixed(1) + unit : totalDistance.toStringAsFixed(1) + " m"} ";
+    }
   }
 
+
+
   void _getLastResetDay() async {
-    print("--------------------------->getlast reset Day");
+    // print("--------------------------->getlast reset Day");
     SharedPreferences prefs = await SharedPreferences.getInstance();
     setState(() {
       _lastResetDay = prefs.getInt('lastResetDay');
     });
-    print("--------------------------->last reset Day"+_lastResetDay.toString());
-    print("--------------------------->Today Day"+DateTime.now().day.toString());
+    // print("--------------------------->last reset Day"+_lastResetDay.toString());
+    // print("--------------------------->Today Day"+DateTime.now().day.toString());
     if (_lastResetDay != DateTime.now().day){
-      print("--------------------------->in no equals to of last reset day");
+      // print("--------------------------->in no equals to of last reset day");
       setState(() {
         totalDuration=Duration.zero;
         StepsCompleted=0;
@@ -284,7 +376,7 @@ int StepscomingFromFirebase=0;
     }
   }
   firstTimeInstalled(int steps) async {
-    print(" firstTimeInstalled");
+    // print(" firstTimeInstalled");
     await SharedPref().setLastDaySteps(steps);
     await SharedPref().setIntroScreenInfo(true);
     await prefs?.setInt('lastResetDay', DateTime.now().day);
@@ -299,12 +391,12 @@ int StepscomingFromFirebase=0;
         isStart=true;
       });
       if(isGuest){
-        print("first Time Called Guest");
+        // print("first Time Called Guest");
         SharedPref().setStepsTarget(StepsTarget);
         SharedPref().setisStart(true);
       }else{
-        print("first Time Called login");
-        sendStepsToFirebase(StepsCompleted);
+        // print("first Time Called login");
+        _services.sendStepsToFirebase(StepsCompleted);
         SharedPref().setStepsTarget(StepsTarget);
       }
     }else{
@@ -317,19 +409,19 @@ int StepscomingFromFirebase=0;
         isStart=true;
       });
       if(isGuest){
-        print("first Time Called Guest");
+        // print("first Time Called Guest");
         SharedPref().setStepsTarget(StepsTarget);
         SharedPref().setisStart(true);
       }else{
-        print("first Time Called login");
-        sendStepsToFirebase(StepsCompleted);
+        // print("first Time Called login");
+        _services.sendStepsToFirebase(StepsCompleted);
         SharedPref().setStepsTarget(StepsTarget);
       }
     }
   }
   Future<int> startListening(BuildContext context) async {
 
-    print("startListening()");
+    // print("startListening()");
 
         if(await Permission.activityRecognition.request().isGranted)
         {
@@ -347,22 +439,14 @@ int StepscomingFromFirebase=0;
                   SharedPref().setifSwitchoffThenvalue(StepsCompleted);
                 }
                 if(introdone==false ){
-                  print("in Intro Done");
                   firstTimeInstalled(event.steps);
                 }
                 else if(DateTime.now().day!=_lastResetDay){
-                  print("in not equals to last day");
                   _resetStepCount(event.steps);
                 }else {
-                  print("steps " + StepsCompleted.toString() + "Last Day Steps " +
-                      (LastDaySteps).toString());
                   StepsCompleted = event.steps - LastDaySteps;
-                  print("Steps before adding: "+StepsCompleted.toString());
                   if (StepsCompleted < 0) {
-                    print("less zero in home");
                     Switchoff = await SharedPref().getfSwitchoffThenvalue();
-
-                    print("new Last steps "+Switchoff.toString());
                       setState(() {
                         StepsCompleted = Switchoff + event.steps;
                       });
@@ -370,9 +454,7 @@ int StepscomingFromFirebase=0;
                          setState(() {
                            StepsCompleted=StepsCompleted+StepscomingFromFirebase;
                          });
-                         print("if Firebase have steps of current day and it is switched off"+StepsCompleted.toString());
                        }
-                    print("Steps Newwww--------------------->"+ StepsCompleted.toString());
                     Future.delayed(Duration(seconds: 2),()
                     async {
                       indicatorProgress = (StepsCompleted / StepsTarget) as double;
@@ -382,26 +464,25 @@ int StepscomingFromFirebase=0;
                         });
                       }
                       await SharedPref().setTodaysSteps(StepsCompleted);
-                      print("Steps After All calculations" + StepsCompleted.toString());
                     DateTime now = DateTime.now();
                     String formattedDate = DateFormat('yyyy-MM-dd').format(now);
                     updateStepCount(DateTime.parse(formattedDate), StepsCompleted);
-                    isGuest==false?sendStepsToFirebase(StepsCompleted):null;
-                    print("Map is ---------------------------------------------------->" + stepCounts.toString());
-                    SharedPref().saveStepsData(stepCounts);
+                    isGuest==false?_services.sendStepsToFirebase(StepsCompleted):null;
+                    // SharedPref().saveStepsData(stepCounts);
+                      SharedPref().setStepsData(StepsCompleted).then((value) async {
+                        Map<String, dynamic> StepsData= await SharedPref().getStepsData();
+                        // print("Steps-------------------------> ${StepsData}");
+                      });
                     });
                   }
                   else {
                     setState(() {
                       StepsCompleted = event.steps - LastDaySteps;
                     });
-                    print("Steps Coming from Firebase: "+StepscomingFromFirebase.toString());
-                    print("Steps After adding: "+StepsCompleted.toString());
                     if(StepscomingFromFirebase>0){
                       setState(() {
                         StepsCompleted=StepsCompleted+StepscomingFromFirebase;
                       });
-                      print("More zero in home is coming steps is more");
                       indicatorProgress = (StepsCompleted / StepsTarget) as double;
                       if (indicatorProgress >= 1) {
                         setState(() {
@@ -409,18 +490,17 @@ int StepscomingFromFirebase=0;
                         });
                       }
                       await SharedPref().setTodaysSteps(StepsCompleted);
-                      print("Steps After All calculations" + StepsCompleted.toString());
                       DateTime now = DateTime.now();
                       String formattedDate = DateFormat('yyyy-MM-dd').format(now);
                       updateStepCount(DateTime.parse(formattedDate), StepsCompleted);
-                      isGuest==false?sendStepsToFirebase(StepsCompleted):null;
-                      print("Map is ---------------------------------------------------->" + stepCounts.toString());
-                      SharedPref().saveStepsData(stepCounts);
+                      isGuest==false?_services.sendStepsToFirebase(StepsCompleted):null;
+                      // SharedPref().saveStepsData(stepCounts);
+                      SharedPref().setStepsData(StepsCompleted).then((value) async {
+                        Map<String, dynamic> StepsData= await SharedPref().getStepsData();
+                        // print("Steps-------------------------> ${StepsData}");
+                      });
                       SharedPref().setifSwitchoffThenvalue(StepsCompleted);
-                      print("Steps Coming back from Set Switchoff"+await SharedPref().getfSwitchoffThenvalue().toString());
-                      print("if Firebase have steps of current day and it is switched on not got offed"+StepsCompleted.toString());
                     }else{
-                      print("More zero in home");
                       indicatorProgress = (StepsCompleted / StepsTarget) as double;
                       if (indicatorProgress >= 1) {
                         setState(() {
@@ -428,15 +508,16 @@ int StepscomingFromFirebase=0;
                         });
                       }
                       await SharedPref().setTodaysSteps(StepsCompleted);
-                      print("Steps After All calculations" + StepsCompleted.toString());
                       DateTime now = DateTime.now();
                       String formattedDate = DateFormat('yyyy-MM-dd').format(now);
                       updateStepCount(DateTime.parse(formattedDate), StepsCompleted);
-                      isGuest==false?sendStepsToFirebase(StepsCompleted):null;
-                      print("Map is ---------------------------------------------------->" + stepCounts.toString());
-                      SharedPref().saveStepsData(stepCounts);
+                      isGuest==false?_services.sendStepsToFirebase(StepsCompleted):null;
+                      // SharedPref().saveStepsData(stepCounts);
+                      SharedPref().setStepsData(StepsCompleted).then((value) async {
+                        Map<String, dynamic> StepsData= await SharedPref().getStepsData();
+                        // print("Steps-------------------------> ${StepsData}");
+                      });
                       SharedPref().setifSwitchoffThenvalue(StepsCompleted);
-                      print("Steps Coming back from Set Switchoff"+await SharedPref().getfSwitchoffThenvalue().toString());
                     }
 
                   }
@@ -484,7 +565,7 @@ int StepscomingFromFirebase=0;
       newday=false;
       ExtraSteps=0;
     });
-    print("new Day in _reset last day------------------->"+newday.toString());
+    // print("new Day in _reset last day------------------->"+newday.toString());
     // startListening();
   }
   void stopListening() {
@@ -536,16 +617,12 @@ Future<bool> checkifotherloggedin() async {
     String _uid = await SharedPref().getUid();
     int target=await SharedPref().getStepsTarget();
     bool isChecking=await SharedPref().getischecking();
-      print("Target From shared Pref-------------------------->"+target.toString());
+    final Map<String, dynamic> stepsdata = await SharedPref().getStepsData();
     // DateTime StartTi=await SharedPref().getStartTime()??DateTime.now();
     Duration? Activity = await SharedPref().getSavedDuration();
     bool isMiles=await SharedPref().getisMiles();
-    print("intro done: "+IntroDone.toString());
-    print("Guest: before setting"+isGuest.toString());
-    // print(StartTi);
     int lastDayStep=await SharedPref().getLastDaySteps();
     int extra=await SharedPref().getextraSteps()??0;
-    print("Uid in get userdata :  "+_uid);
     setState(() {
       Uid=_uid;
       ischecking=isChecking;
@@ -561,162 +638,15 @@ Future<bool> checkifotherloggedin() async {
       // SharedPref().setIntroScreenInfo(true);
       isMils=isMiles;
       ExtraSteps=extra;
+      stepsData=stepsdata;
     });
-    print("Guest: after setting"+isGuest.toString());
     checkisSingleDeviceloggedIn( Uid, Deviceid, isGuest);
-    if(isstart){
-      startListening(context);
-      await initializeService();
-    }
+     print("------------------------------------------------------/-------------------------------${stepsdata}");
 
   }
 
-  void sendStepsToFirebase(int steps) async {
-    DatabaseReference databaseReference = FirebaseDatabase.instance.reference(); // Replace with your user ID
-    String _uid = await SharedPref().getUid();
-    DateTime now = DateTime.now();
-    Map<String,Object> newtimedatw={};
-    String formattedDate = DateFormat('yyyy-MM-dd').format(now);
-    String FormattedTime = DateFormat('hh a').format(now);
-    String previoustime=await SharedPref().getPreviousTime()??"00 Am";
-    String pre = DateFormat('hh a').format(now.subtract(Duration(hours: 1)));
-    int lasttimesteps=0;
-    DateTime startTime = DateTime(now.year, now.month, now.day, 0, 0);
-    DateTime endTime = now.subtract(Duration(hours: 1));
-
-    int intervalInMinutes = 60; // Adjust as needed
-
-    // Run the loop
-    for (DateTime loopTime = startTime; loopTime.isBefore(endTime); loopTime = loopTime.add(Duration(minutes: intervalInMinutes))) {
-      // Format the current time in the desired format
-      String formattedTime = DateFormat('hh a').format(loopTime);
-      print(formattedTime);
-      databaseReference
-          .child('users')
-          .child(_uid)
-          .child('steps')
-          .child(formattedDate)
-          .child(formattedTime)
-          .once().then((value) {
-        var dataSnapshot =value;
-        if(dataSnapshot.snapshot.value!=null){
-          lasttimesteps=lasttimesteps+int.parse(dataSnapshot.snapshot.value.toString());
-          int Stepstobeset=steps-lasttimesteps;
-          databaseReference
-              .child('users')
-              .child(_uid)
-              .child('steps')
-              .child(formattedDate).update({FormattedTime:Stepstobeset});
-          print("Lasttimestepsp in if condition--------------------->"+lasttimesteps.toString());
-        }else{
-
-          print("Lasttimestepsp in else condition--------------------->"+lasttimesteps.toString());
-          databaseReference
-              .child('users')
-              .child(_uid)
-              .child('steps')
-              .child(formattedDate)
-              .child(formattedTime).set(0);
-        }
-
-      });
-      // Print or use the formatted time as needed
-
-    }
-    databaseReference
-        .child('users')
-        .child(_uid)
-        .child('steps')
-        .child(formattedDate).update({"TotalSteps" : steps});
-
-  }
-  void showCompletionDialog(BuildContext context) {
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return Dialog(
-          backgroundColor: Colors.transparent,
-          insetPadding: EdgeInsets.all(0),
-          child: Container(
-            width: 300.w,
-            height: 250.h,
-            decoration: ShapeDecoration(
-              color: Color(0xFF2D2D2D),
-              shape: RoundedRectangleBorder(
-                side: BorderSide(width: 1, color: Color(0xFF9D79BC)),
-                borderRadius: BorderRadius.circular(9),
-              ),
-            ),
-            child: Padding(
-              padding:  EdgeInsets.symmetric(horizontal: 25.w),
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                crossAxisAlignment: CrossAxisAlignment.center,
-                children: <Widget>[
-                  // SizedBox(height: 10.h,),
-                   Stack(
-
-                      children: [Lottie.asset("lib/assests/Images/Confetti_Animation.json", width: 100.w,),
-                        Container(
-                          padding: EdgeInsets.symmetric(horizontal: 25.w,vertical: 25),
-                          child: Image(
-                            image: AssetImage("lib/assests/Images/twemoji_confetti-ball.png"),
-                            width: 50.w,
-                          ),
-                        ),
-                      ]
-                    ),
-
-                  // SizedBox(height: 5.h),  // Adjust this spacing as needed
-                  Text(
-                    'Voila! You have achieved your today’s goal of $StepsTarget steps.',
-                    textAlign: TextAlign.center,
-                    style: TextStyle(color: Colors.white), // Adjust text style as needed
-                  ),
-                  SizedBox(height: 5.h),  // Adjust this spacing as needed
-                  Center(
-                    child: ElevatedButton(
-                      style: ElevatedButton.styleFrom(
-                        primary: Colors.purple, // This is the primary color, i.e., the background color
-                        onPrimary: Colors.white, // This is the color of the text
-                        // Other styling properties can be added here too
-                      ),
-                      child: Text('OK'),
-                      onPressed: () {
-                        Navigator.of(context).pop(); // Closes the dialog
-                      },
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ),
-        );
-      },
-    );
-
-  }
-  bool isNewHour(String newFormattedTime) {
-    DateTime now = DateTime.now();
-    String currentFormattedTime = DateFormat('hh a').format(now);
-    return newFormattedTime != currentFormattedTime;
-  }
   @override
   Widget build(BuildContext context) {
-    // Timer.periodic(Duration(seconds: 1), (timer) {
-    //   Connectivity().onConnectivityChanged.listen((ConnectivityResult result) async {
-    //     bool iGuest=await SharedPref().getisguest();
-    //     String uid = await SharedPref().getUid();
-    //     String Deviceid=await SharedPref().getDeviceid();
-    //     // Got a new connectivity status!
-    //     if (result == ConnectivityResult.mobile || result == ConnectivityResult.wifi) {
-    //       print("Connected to the internet");
-    //       checkisSingleDeviceloggedIn(uid, Deviceid, iGuest);
-    //     } else {
-    //       print("No internet connection");
-    //     }
-    //   });
-    // });
     return WillPopScope(
       onWillPop: () async {
         SystemNavigator.pop();
@@ -724,694 +654,148 @@ Future<bool> checkifotherloggedin() async {
       },
       child: Scaffold(
         extendBody: true,
-        body: Padding(
-          padding: EdgeInsets.symmetric(horizontal: 24.w,
-          //70.h
-          ),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              SizedBox(height: 55.h,),
-
-              Text(
-                'TODAY’S STEPS',
-                style: TextStyle(
+        body: SingleChildScrollView(
+          scrollDirection: Axis.vertical,
+          child: Padding(
+            padding: EdgeInsets.symmetric(horizontal: 24.w,
+            //70.h
+            ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Padding(
+                  padding: EdgeInsets.only(top: 70),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Text(
+                        'Steps',
+                        style: TextStyle(
+                          color: Color(0xFFF3F3F3),
+                          fontSize: 54.sp,
+                          fontFamily: 'Teko',
+                          fontWeight: FontWeight.w600,
+                          height: 0,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                Padding(
+                  padding:  EdgeInsets.only(top: 10),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      SizedBox(
+                        width: MediaQuery.of(context).size.width*0.6,
+                        height: MediaQuery.of(context).size.width*0.6,
+                        child: CustomPaint(
+                          painter:  GradiantArchProgress(
+                              startColor: Color(0xFFFF8900),
+                              endColor: Color(0xD5CE00FF), StepsCompleted: StepsCompleted, StepsTarget: StepsTarget, width: 25.0),
+                        ),
+                      )
+                    ],
+                  ),
+                ),
+                SizedBox(
+                  height: 30,
+                ),
+                Text("Move",style: TextStyle(
                   color: Color(0xFFF3F3F3),
-                  fontSize: 54.sp,
+                  fontSize: 34.sp,
                   fontFamily: 'Teko',
                   fontWeight: FontWeight.w600,
                   height: 0,
-                ),
-              ),
-              SizedBox(
-                  height: deviceHeight(context) < 900 ? 70.h : 50.h
-              ),
-              Visibility(
-                visible: isStart!=true,
-                child: Center(
+                  letterSpacing: 1
+                ),),
+                ShaderMask(
+                  shaderCallback: (Rect bounds) {
+                    return LinearGradient(
+                      colors: [
+                        Color(0xFFFF8900),
+                        Color(0xFFCE00FF)
+                      ],  // Replace these colors with your desired gradient colors
+                      begin: Alignment.center,
+                      end: Alignment.bottomRight,
+                    ).createShader(bounds);
+                  },
                   child: Text(
-                    'Press To Start Tracking Your Steps',
+                    StepsCompleted.toString() +"/" +StepsTarget.toString()+" Steps",
                     style: TextStyle(
-                      color: Color(0xFFF3F3F3),
-                      fontSize: 25.sp,
+                      fontSize: 46.sp,
                       fontFamily: 'Teko',
                       fontWeight: FontWeight.w600,
-                      letterSpacing: 1,
-                      height: 0,
+                      letterSpacing: 1.5,
+                      color: Colors.white,  // Set the color to white since it will be masked by the gradient
                     ),
                   ),
                 ),
-              ),
-              SizedBox(
-                height: deviceHeight(context) < 900 ? 45.h : 100.h
-              ),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  CircularPercentIndicator(
-                    radius: 150.r,
-                    animation: true,
-                    animationDuration: 1000,
-                    animateFromLastPercent: true,
-                    reverse: true,
-                    circularStrokeCap: CircularStrokeCap.round,
-                    percent: indicatorProgress<0?0:indicatorProgress,
-                    lineWidth: 12.w,
-                    progressColor: Color(0xFF9D79BC),
-                    center:
-
-                    isStart?Text.rich(
-                            TextSpan(
-                              children: [
-                                TextSpan(
-                                  text: StepsCompleted.toString(),
-                                  style: TextStyle(
-                                    color: Color(0xFFF3F3F3),
-                                    fontSize: 75.sp,
-                                    fontFamily: 'Inter',
-                                    fontWeight: FontWeight.w600,
-                                    height: 0,
-                                  ),
-                                ),
-                                TextSpan(text: "  "),
-                                TextSpan(
-                                  text: '/',
-                                  style: TextStyle(
-                                    color: Color(0xFFF3F3F3),
-                                    fontSize: 25.sp,
-                                    fontFamily: 'Work Sans',
-                                    fontWeight: FontWeight.w400,
-                                    height: 0,
-                                  ),
-                                ),
-                                TextSpan(
-                                  text: "\n$StepsTarget ($_pedestrianStatus)",
-                                  style: TextStyle(
-                                    color: Color(0xFFF3F3F3),
-                                    fontSize: 20.sp,
-                                    fontFamily: 'Inter',
-                                    fontWeight: FontWeight.w400,
-                                    height: 0,
-                                  ),
-                                ),
-                              ],
-                            ),
-                            textAlign: TextAlign.center,
-                          ):Container(
-                      height: 10000.h,
-                            width: 10000.w,
-                            child: IconButton(onPressed: () async {
-                              showDialog(
-                                builder: (BuildContext context) {
-                                  return SizedBox(
-                                    child: Dialog(
-
-                                      shape: RoundedRectangleBorder(
-                                        borderRadius: BorderRadius.circular(9.r),
-                                        side: BorderSide(color: Color(0xFF9D79BC),width: 2,),
-
-                                      ),
-
-                                      child:
-                                      Container(
-                                        height:550.h,
-                                        width: 1000.w,
-                                        color: Colors.black,
-                                        child: Column(
-                                          mainAxisAlignment: MainAxisAlignment.start,
-                                          children: [
-                                            SizedBox(height: 35.h,),
-                                            Image.asset("lib/assests/Images/DialogueboxLOgo.png",
-                                            height: 75.h,
-                                            ),
-                                            SizedBox(height: 25.h,),
-                                            SizedBox(
-                                                width: 300.w,
-                                                child: Text(
-                                                  'Step tracker needs below Permissions to Function Properly.',
-                                                  textAlign: TextAlign.center,
-                                                  style: TextStyle(
-                                                    color: Colors.white,
-                                                    fontSize: 18.sp,
-                                                    fontFamily: 'Nunito',
-                                                    fontWeight: FontWeight.w700,
-                                                  ),
-                                                ),
-                                            ),
-                                            SizedBox(height: 15.h,),
-                                            Row(
-                                              mainAxisAlignment: MainAxisAlignment.center,
-                                              children: [
-                                                SizedBox(
-                                                  width:300.w,
-                                                  child: RichText(
-                                                    text:  TextSpan(
-                                                        text: '• "Physical Activity": ',
-                                                        style: TextStyle(
-                                                          color: Colors.white,
-                                                          fontSize: 16.sp,
-                                                          fontFamily: 'Nunito',
-                                                          fontWeight: FontWeight.bold,
-                                                          height: 0,
-                                                          letterSpacing: 0.16,
-                                                        ),
-                                                        children: <TextSpan>[
-                                                          TextSpan(
-                                                            text: 'This permission is\n  necessary for the app to accurately count\n  your steps. It enables the app to monitor\n  your physical movements and determine\n  when you'+'re walking.\n',
-                                                            style: TextStyle(
-                                                              color: Colors.white,
-                                                              fontFamily: 'Nunito',
-                                                              fontSize: 14.sp,
-                                                              fontWeight: FontWeight.w400,
-                                                              height: 1,
-                                                            ),
-                                                            // recognizer: TapGestureRecognizer()
-                                                            //   ..onTap = () {
-                                                            //     Loginpage();
-                                                            //   },
-                                                          ),
-                                                        ]),
-                                                  ),
-                                                ),
-                                              ],
-                                            ),
-                                            SizedBox(height: 2.h,),
-                                            Row(
-                                              mainAxisAlignment: MainAxisAlignment.center,
-                                              children: [
-                                                SizedBox(
-                                                  width:300.w,
-                                                  child: RichText(
-                                                    text:  TextSpan(
-                                                        text: '• "Location": ',
-                                                        style: TextStyle(
-                                                          color: Colors.white,
-                                                          fontSize: 16.sp,
-                                                          fontFamily: 'Nunito',
-                                                          fontWeight: FontWeight.bold,
-                                                          height: 0,
-                                                          letterSpacing: 0.16,
-                                                        ),
-                                                        children: <TextSpan>[
-                                                          TextSpan(
-                                                            text: 'The location permission is used\n   to distinguish whether you are walking or\n   using a vehicle. By checking your location,\n   the app can better determine your mode of\n   transportation, helping it provide you with\n   more precise step tracking information.',
-                                                            style: TextStyle(
-                                                              color: Colors.white,
-                                                              fontFamily: 'Nunito',
-                                                              fontSize: 14.sp,
-                                                              fontWeight: FontWeight.w400,
-                                                              height: 1,
-                                                            ),
-                                                            // recognizer: TapGestureRecognizer()
-                                                            //   ..onTap = () {
-                                                            //     Loginpage();
-                                                            //   },
-                                                          ),
-                                                        ]),
-                                                  ),
-                                                ),
-                                              ],
-                                            ),
-                                            SizedBox(height: 15.h,),
-                                            SizedBox(
-                                                width: 300.w,
-                                                child: Text("By granting these permissions, you allow the app to provide you with the most accurate step tracking experience possible.",
-                                                  style: TextStyle(
-                                                    color: Colors.white,
-                                                    fontSize: 14.sp,
-                                                    fontFamily: 'Nunito',
-                                                    fontWeight: FontWeight.w400,
-                                                  ),
-                                                )),
-                                            SizedBox(height: 20.h,),
-                                            ElevatedButton(style: ButtonStyle(
-                                              backgroundColor: MaterialStateProperty.all<Color>(Colors.white),
-                                              overlayColor: MaterialStateProperty.all<Color>(Colors.white.withOpacity(1)), // Adjust opacity as needed
-                                            ),onPressed: () async {
-                                              PermissionStatus status1=await Permission.activityRecognition.request();
-                                              PermissionStatus status2=await Permission.sensors.request();
-                                              // OptimizeBattery.isIgnoringBatteryOptimizations().then((onValue) {
-                                              //   setState(() {
-                                              //     if (onValue) {
-                                              //       // Igonring Battery Optimization
-                                              //       print("optimized");
-                                              //     } else {
-                                              //       // App is under battery optimization
-                                              //       OptimizeBattery.openBatteryOptimizationSettings();
-                                              //       OptimizeBattery.stopOptimizingBatteryUsage();
-                                              //
-                                              //     }
-                                              //   });
-                                              // });
-                                              if(status1.isGranted && status2.isGranted){
-                                                startListening(context).then((value) {
-                                                  Future.delayed(Duration(milliseconds: 26),() async {
-                                                    await initializeService();
-
-                                                  });
-                                                });
-
-
-                                                setState(() {
-                                                  isStart = true;
-                                                });
-                                                SharedPref().setisStart(true);
-                                              }else{
-                                                setState(() {
-                                                  isStart = false;
-                                                });
-                                                SharedPref().setisStart(false);
-                                                showDialog(
-                                                  builder: (BuildContext context) {
-                                                    return Dialog(
-
-                                                      shape: RoundedRectangleBorder(
-                                                        borderRadius: BorderRadius.circular(9.r),
-                                                        side: BorderSide(color: Color(0xFF9D79BC),width: 2,),
-
-                                                      ),
-
-                                                      child:
-                                                      Container(
-                                                        height:171.h,
-                                                        width: 362,
-                                                        color: Colors.black,
-                                                        child: Column(
-                                                          mainAxisAlignment: MainAxisAlignment.start,
-                                                          children: [
-                                                            SizedBox(height: 35.h,),
-                                                            Text(
-                                                              'Allow the permission',
-                                                              textAlign: TextAlign.center,
-                                                              style: TextStyle(
-                                                                color: Colors.white,
-                                                                fontSize: 20,
-                                                                fontFamily: 'Nunito',
-                                                                fontWeight: FontWeight.w400,
-                                                                height: 0.06,
-                                                              ),
-                                                            ),
-                                                            SizedBox(height: 20.h,),
-                                                            Image.asset("lib/assests/Images/Small_Logo.png",),
-                                                            SizedBox(height: 7.h,),
-                                                            ElevatedButton(style: ButtonStyle(
-                                                              backgroundColor: MaterialStateProperty.all<Color>(Colors.white),
-                                                              overlayColor: MaterialStateProperty.all<Color>(Colors.white.withOpacity(1)), // Adjust opacity as needed
-                                                            ),onPressed: () async {
-
-                                                              bool isOpened = await openAppSettings();
-                                                              print('App settings opened: $isOpened');
-                                                              Navigator.pop(context);
-
-                                                            }, child: Text("Allow",
-                                                              style: TextStyle(
-                                                                  color: Colors.black
-                                                              ),
-                                                            ))
-                                                          ],
-                                                        ),
-                                                      ),
-
-                                                    );
-                                                  },
-                                                  context: context,
-                                                );
-                                              }
-
-                                              Navigator.pop(context);
-
-                                            }, child: Text("Allow",
-                                              style: TextStyle(
-                                                  color: Colors.black
-                                              ),
-                                            ))
-                                          ],
-                                        ),
-                                      ),
-
-                                    ),
-                                  );
-                                },
-                                context: context,
-                              );
-                            }, icon: Icon(Icons.play_arrow_rounded,
-                              size: 200,
-                    ),),
-                          ),
-                  ),
-                ],
-              ),
-              SizedBox(
-                height: 155.h,
-              ),
-              Align(
-                alignment: Alignment.bottomCenter,
-                child: Row(
+                SizedBox(
+                  height: 20,
+                ),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    Container(
-                      width: 113.w,
-                      height: 84.h,
-                      // padding: const EdgeInsets.symmetric(horizontal: 10., vertical: 15),
-                      clipBehavior: Clip.antiAlias,
-                      decoration: ShapeDecoration(
-                        color: Color(0xFFE2C391),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(10),
-                        ),
-                      ),
-                      child: Padding(
-                        padding: EdgeInsets.symmetric(
-                            horizontal: 14.w, vertical: 13.h),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Opacity(
-                              opacity: 0.50,
-                              child: Text(
-                                'TIME',
-                                style: TextStyle(
-                                  color: Color(0xFF2D2D2D),
-                                  fontSize: 14.sp,
-                                  fontFamily: 'Inter',
-                                  fontWeight: FontWeight.w600,
-                                  height: 0,
-                                ),
-                              ),
-                            ),
-                            SizedBox(
-                              height: 8.h,
-                            ),
-                            Text.rich(
-                              TextSpan(
-                                children: [
-                                  TextSpan(
-                                    text: '${totalDuration.inHours.toString().padLeft(2, '0')}',
-                                    style: TextStyle(
-                                      color: Color(0xFF2D2D2D),
-                                      fontSize: 21.sp,
-                                      fontFamily: 'Inter',
-                                      fontWeight: FontWeight.w400,
-                                      height: 0,
-                                    ),
-                                  ),
-                                  TextSpan(
-                                    text: 'h',
-                                    style: TextStyle(
-                                      color: Color(0xFF2D2D2D),
-                                      fontSize: 12.sp,
-                                      fontFamily: 'Inter',
-                                      fontWeight: FontWeight.w400,
-                                      height: 0,
-                                    ),
-                                  ),
-                                  TextSpan(
-                                    text: ' ${(totalDuration.inMinutes % 60).toString().padLeft(2, '0')}',
-                                    style: TextStyle(
-                                      color: Color(0xFF2D2D2D),
-                                      fontSize: 21.sp,
-                                      fontFamily: 'Inter',
-                                      fontWeight: FontWeight.w400,
-                                      height: 0,
-                                    ),
-                                  ),
-                                  TextSpan(
-                                    text: 'm',
-                                    style: TextStyle(
-                                      color: Color(0xFF2D2D2D),
-                                      fontSize: 12.sp,
-                                      fontFamily: 'Inter',
-                                      fontWeight: FontWeight.w400,
-                                      height: 0,
-                                    ),
-                                  ),
-                                ],
-                              ),
-                              textAlign: TextAlign.center,
-                            ),
-                          ],
-                        ),
-                      ),
+                    Column(
+                      children: [
+                        SvgPicture.asset("lib/assests/NewImages/Kcal.svg"),
+                        SizedBox(height: 10,),
+                        Text(calculateCaloriesBurnt(StepsCompleted).toStringAsFixed(0)+" Kcal",
+                          style: TextStyle(
+                            color: Color(0xFFF3F3F3),
+                            fontSize: 24.sp,
+                            fontFamily: 'Teko',
+                            fontWeight: FontWeight.w300,
+                            height: 0,
+                          ),
+
+                        )
+                      ],
                     ),
-                    SizedBox(
-                      width: 20.w,
+                     Column(
+                      children: [
+                        SvgPicture.asset("lib/assests/NewImages/Distance.svg"),
+                        SizedBox(height: 10,),
+                        Text(StepsToDistance(StepsCompleted,isMils),
+                          style: TextStyle(
+                            color: Color(0xFFF3F3F3),
+                            fontSize: 24.sp,
+                            fontFamily: 'Teko',
+                            fontWeight: FontWeight.w300,
+                            height: 0,
+                          ),
+
+                        )
+                      ],
                     ),
-                    Container(
-                      width: 113.w,
-                      height: 84.h,
-                      // padding: const EdgeInsets.symmetric(horizontal: 10., vertical: 15),
-                      clipBehavior: Clip.antiAlias,
-                      decoration: ShapeDecoration(
-                        color: Color(0xFF9BBEC7),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(10),
-                        ),
-                      ),
-                      child: Padding(
-                        padding: EdgeInsets.symmetric(
-                            horizontal: 16.w, vertical: 13.h),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Opacity(
-                              opacity: 0.50,
-                              child: Text(
-                                'DISTANCE',
-                                style: TextStyle(
-                                  color: Color(0xFF2D2D2D),
-                                  fontSize: 14.sp,
-                                  fontFamily: 'Inter',
-                                  fontWeight: FontWeight.w600,
-                                  height: 0,
-                                ),
-                              ),
-                            ),
-                            SizedBox(
-                              height: 6.h,
-                            ),
-                            Center(
-                              child: Text.rich(
-                                TextSpan(
-                                  children: [
-                                    TextSpan(
-                                      text: isMils?inMiles.toString():StepstoKilometer(StepsCompleted),
-                                      style: TextStyle(
-                                        color: Color(0xFF2D2D2D),
-                                        fontSize: 22.sp,
-                                        fontFamily: 'Inter',
-                                        fontWeight: FontWeight.w400,
-                                        height: 0,
-                                      ),
-                                    ),
-                                    TextSpan(
-                                      text: isMils?"mi":'Km.',
-                                      style: TextStyle(
-                                        color: Color(0xFF2D2D2D),
-                                        fontSize: 12.sp,
-                                        fontFamily: 'Inter',
-                                        fontWeight: FontWeight.w400,
-                                        height: 0,
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                                textAlign: TextAlign.center,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
+                     Column(
+                      children: [
+                        SvgPicture.asset("lib/assests/NewImages/Time.svg"),
+                        SizedBox(height: 10,),
+                        Text("${totalDuration.inMinutes>60?totalDuration.inHours.toString().padLeft(2, '0') + " H": totalDuration.inMinutes.toString().padLeft(2, '0') + " m"}",
+                          style: TextStyle(
+                            color: Color(0xFFF3F3F3),
+                            fontSize: 24.sp,
+                            fontFamily: 'Teko',
+                            fontWeight: FontWeight.w300,
+                            height: 0,
+                          ),
+                        )
+                      ],
                     ),
-                    SizedBox(
-                      width: 20.w,
-                    ),
-                    Container(
-                      width: 113.w,
-                      height: 84.h,
-                      // padding: const EdgeInsets.symmetric(horizontal: 10., vertical: 15),
-                      clipBehavior: Clip.antiAlias,
-                      decoration: ShapeDecoration(
-                        color: Color(0xFFF6E27F),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(10),
-                        ),
-                      ),
-                      child: Padding(
-                        padding: EdgeInsets.symmetric(
-                            horizontal: 17.w, vertical: 13.h),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Opacity(
-                              opacity: 0.50,
-                              child: Text(
-                                'CALORIES',
-                                style: TextStyle(
-                                  color: Color(0xFF2D2D2D),
-                                  fontSize: 14.sp,
-                                  fontFamily: 'Inter',
-                                  fontWeight: FontWeight.w600,
-                                  height: 0,
-                                ),
-                              ),
-                            ),
-                            SizedBox(
-                              height: 6.h,
-                            ),
-                            Center(
-                              child: Text.rich(
-                                TextSpan(
-                                  children: [
-                                    TextSpan(
-                                      text: calculateCaloriesBurnt(
-                                              StepsCompleted)
-                                          .toStringAsFixed(0),
-                                      style: TextStyle(
-                                        color: Color(0xFF2D2D2D),
-                                        fontSize: 22.sp,
-                                        fontFamily: 'Inter',
-                                        fontWeight: FontWeight.w400,
-                                        height: 0,
-                                      ),
-                                    ),
-                                    TextSpan(
-                                      text: 'Kcal',
-                                      style: TextStyle(
-                                        color: Color(0xFF2D2D2D),
-                                        fontSize: 12.sp,
-                                        fontFamily: 'Inter',
-                                        fontWeight: FontWeight.w400,
-                                        height: 0,
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                                textAlign: TextAlign.center,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ),
+
                   ],
                 ),
-              )
-            ],
-          ),
-        ),
-        bottomNavigationBar: BottomNavbar(
-          currentIndex: 0,
-        ),
-      ),
-    );
-  }
-}
-
-class AskPermission extends StatefulWidget {
-  const AskPermission({super.key});
-
-  @override
-  State<AskPermission> createState() => _AskPermissionState();
-}
-
-class _AskPermissionState extends State<AskPermission> {
-  bool isCross = false;
-  Map<Permission, PermissionStatus> status = {};
-  String Status = "";
-  Future<void> requestLocationPermission(Permission permission) async {
-    final status = await permission.request();
-    print('Location Permission Status: $status');
-    setState(() {
-      Status = status.toString();
-    });
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Padding(
-      padding: EdgeInsets.symmetric(horizontal: 22.w),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.end,
-        children: [
-          !isCross
-              ? IconButton(
-                  onPressed: () {
-                    setState(() {
-                      isCross = true;
-                    });
-                  },
-                  icon: Icon(
-                    Icons.cancel_outlined,
-                    color: Colors.black,
-                  ))
-              : Container(),
-          SizedBox(
-            height: isCross ? 63.h : 13.h,
-          ),
-          SizedBox(
-            width: 383.w,
-            child: isCross
-                ? Text(
-                    'Without this permission the App will not work',
-                    textAlign: TextAlign.center,
-                    style: TextStyle(
-                      color: Colors.black,
-                      fontSize: 24,
-                      fontFamily: 'Inter',
-                      fontWeight: FontWeight.w500,
-                      height: 0,
-                    ),
-                  )
-                : Text(
-                    'This app requires permission to access your physical activity to track steps.',
-                    textAlign: TextAlign.center,
-                    style: TextStyle(
-                      color: Colors.black,
-                      fontSize: 24.sp,
-                      fontFamily: 'Inter',
-                      fontWeight: FontWeight.w500,
-                      height: 0,
-                    ),
-                  ),
-          ),
-          SizedBox(
-            height: 40.w,
-          ),
-          Container(
-            width: 381.w,
-            height: 62.h,
-            child: OutlinedButton(
-              onPressed: () async {
-                await Permission.activityRecognition.request();
-                if ( await Permission.activityRecognition.request().isGranted) {
-                  Navigator.of(context).pop();
-                }
-              },
-              style: ButtonStyle(
-                  side: MaterialStateProperty.all(
-                      BorderSide(width: 2.w, color: Colors.black)),
-                  shape: MaterialStateProperty.all<RoundedRectangleBorder>(
-                      RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(10.0.r)))),
-              child: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  children: [
-                    Text(
-                      'ALLOW',
-                      style: TextStyle(
-                        color: Color(0xFF2D2D2D),
-                        fontSize: 18.sp,
-                        fontFamily: 'Inter',
-                        fontWeight: FontWeight.w400,
-                        height: 0,
-                      ),
-                    ),
-                  ]),
+                SizedBox(height: 90,),
+                LineChartSample2("Day"),
+                SizedBox(height: 90,),
+              ],
             ),
-          )
-        ],
+          ),
+        ),
       ),
     );
   }
 }
+

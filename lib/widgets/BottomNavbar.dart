@@ -45,7 +45,8 @@ class _BottomNavbarState extends State<BottomNavbar> {
         );
       }
     }
-    return Container(
+    return
+      Container(
       height: 100.h,
       child: Padding(
         padding:  EdgeInsets.symmetric(horizontal: 68.w,vertical: 10.h),

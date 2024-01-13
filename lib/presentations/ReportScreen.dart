@@ -571,9 +571,9 @@ getData() async {
           ],
         ),
       ),
-      bottomNavigationBar: BottomNavbar(
-        currentIndex: 1,
-      ),
+      // bottomNavigationBar: BottomNavbar(
+      //   currentIndex: 1,
+      // ),
     );
   }
 }

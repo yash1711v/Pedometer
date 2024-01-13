@@ -18,6 +18,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:steptracking/presentations/Back_Service.dart';
 import 'package:steptracking/presentations/HomePage.dart';
 import 'package:steptracking/presentations/NotificationServices.dart';
+import 'LocalDataBaseForSteps/ObjectBox.dart';
 import 'SharedPrefrences/SharedPref.dart';
 import 'appsflyer/appsflyerMethod.dart';
 import 'firebase_options.dart';
@@ -39,6 +40,7 @@ Future<void> main() async {
 
   WidgetsFlutterBinding.ensureInitialized();
   appsflyerSdk = initiateAppsflyer();
+  await ObjectBoxClass.instance.init();
   IsolateNameServer.registerPortWithName(
     port.sendPort,
     isolateName,

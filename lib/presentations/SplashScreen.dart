@@ -8,15 +8,19 @@ import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:get/get_core/src/get_main.dart';
+import 'package:intl/intl.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:steptracking/appsflyer/appsflyerMethod.dart';
 import 'package:timezone/timezone.dart' as tz;
 import 'package:timezone/timezone.dart' as tz;
 import 'package:timezone/data/latest.dart' as tz;
+import '../LocalDataBaseForSteps/Model.dart';
+import '../LocalDataBaseForSteps/ObjectBox.dart';
 import '../SharedPrefrences/SharedPref.dart';
 import '../main.dart';
 import 'HomePage.dart';
 import 'IntroScreen.dart';
+import 'MainScreen.dart';
 import 'SignUpScreen.dart';
 // import 'package:toast/toast.dart';
 class SplashScreen extends StatefulWidget {
@@ -79,14 +83,6 @@ class _SplashScreenState extends State<SplashScreen> {
 //     print("[BackgroundFetch] TIMEOUT: $taskId");
 //     BackgroundFetch.finish(taskId);
 //   }
-
-  void _onBackgroundFetch(String taskId) async {
-    if(taskId == "6") {
-      print("[BackgroundFetch] Event received");
-      scheduleNotification();
-//TODO: perform your task like : call the API’s, call the DB and local notification.
-    }
-  }
   void scheduleNotification() async {
     flutterLocalNotificationsPlugin.cancelAll();
     final tz.Location local = tz.getLocation('Asia/Kolkata');
@@ -199,27 +195,15 @@ class _SplashScreenState extends State<SplashScreen> {
     };
 
     afLogEvent(appsflyerSdk, "application_opened",values);
-    // analytics.setAnalyticsCollectionEnabled(true);
+
   checkifLoginAndIntro();
   Future.delayed(
       const Duration(seconds: 3),
       () async => {
-      // await FirebaseAnalytics.instance
-      //     .logBeginCheckout(
-      // value: 10.0,
-      // currency: 'USD',
-      // items: [
-      // AnalyticsEventItem(
-      // itemName: 'Socks',
-      // itemId: 'xjw73ndnw',
-      // price: 10.0      ),
-      // ],
-      // coupon: '10PERCENTOFF'
-      // ),
         if( isOnboarding ){
       if(islogin || isGuest)
             {
-              Get.to(() =>  HomePage(),
+              Get.to(() =>  MainScreen(),
                   duration: const Duration(
                       milliseconds:
                           350),)
@@ -244,7 +228,9 @@ class _SplashScreenState extends State<SplashScreen> {
 
           });
 
+
   }
+
 
 
   @override
