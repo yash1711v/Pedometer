@@ -8,6 +8,7 @@ import 'package:android_alarm_manager_plus/android_alarm_manager_plus.dart';
 import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/gestures.dart';
+import 'dart:math' as math;
 import 'package:flutter_svg/svg.dart';
 import 'package:optimize_battery/optimize_battery.dart';
 import 'package:steptracking/Firebasefunctionalities/AuthServices.dart';
@@ -134,7 +135,7 @@ DatabaseServices _services=DatabaseServices();
     PermissionStatus status2=await Permission.sensors.request();
     if(status1.isGranted && status2.isGranted){ startListening(context).then((value2) async {
       await initializeService().then((value) {
-        print("Steps Completed--------jjjh------------>"+value2.toString());
+        // print("Steps Completed--------jjjh------------>"+value2.toString());
         // _storeSteps(value2);
         // dbHelper.insertStep(value2);
       });
@@ -644,7 +645,13 @@ Future<bool> checkifotherloggedin() async {
      print("------------------------------------------------------/-------------------------------${stepsdata}");
 
   }
+  void setstatecallback(){
+    setState(() {
 
+    });
+  }
+List<String> WhichGraoh=['Day','Week','Month'];
+  int indexofwhichGraph=0;
   @override
   Widget build(BuildContext context) {
     return WillPopScope(
@@ -788,7 +795,59 @@ Future<bool> checkifotherloggedin() async {
                   ],
                 ),
                 SizedBox(height: 90,),
-                LineChartSample2("Day"),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    IconButton(onPressed: (){
+                      setState(() {
+                        if(indexofwhichGraph!=0)
+                          indexofwhichGraph=indexofwhichGraph-1;
+                      });
+                    }, icon: Icon(Icons.arrow_back_ios,color: Colors.white,)),
+                    GestureDetector(
+                      onTap: (){
+                        if(indexofwhichGraph==2)
+                         _showCustomDialog(context,StepsTarget);
+                      },
+                      child: Container(
+                        height: 35,
+                        width: 70,
+                        decoration: BoxDecoration(
+                          gradient: LinearGradient(
+                            colors: [
+                              Color(0xFFFF8900),
+                              Color(0xD5CE00FF)], // Add your desired colors
+                            begin: Alignment.centerLeft,
+                            end: Alignment.centerRight,
+                          ),
+                          borderRadius: BorderRadius.circular(10.0),
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.black.withOpacity(0.3),
+                              spreadRadius: 2,
+                              blurRadius: 5,
+                              offset: Offset(0, 3),
+                            ),
+
+                          ],
+                        ),
+                        child: Center(child: Text(WhichGraoh[indexofwhichGraph],style: TextStyle(color: Colors.white,
+                          fontSize: 20,
+                          fontFamily: 'Teko',
+                          fontWeight: FontWeight.w300,
+                          height: 0,
+                        ),)),),
+                    ),
+                    IconButton(onPressed: (){
+                     setState(() {
+                       if(indexofwhichGraph!=2)
+                         indexofwhichGraph=indexofwhichGraph+1;
+                     });
+                    }, icon: Icon(Icons.arrow_forward_ios,color: Colors.white,))
+                  ],
+                ),
+                SizedBox(height: 30,),
+                LineChartSample2(WhichGraoh[indexofwhichGraph]),
                 SizedBox(height: 90,),
               ],
             ),
@@ -797,5 +856,289 @@ Future<bool> checkifotherloggedin() async {
       ),
     );
   }
+
+
+  void _showCustomDialog(BuildContext context,int stepstarget) {
+     PageController _pageController= PageController(initialPage: DateTime.now().month - 1);
+
+
+    showDialog(
+      context: context,
+      builder: (context) {
+        return Dialog(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(10.0),
+          ),
+          child: Custom(stepstarget: stepstarget,),
+        );
+      },
+    );
+  }
+}
+class Custom extends StatefulWidget {
+  final int stepstarget;
+  const Custom({super.key, required this.stepstarget});
+
+  @override
+  State<Custom> createState() => _CustomState();
 }
 
+class _CustomState extends State<Custom> {
+  late PageController _pageController;
+
+  int _currentPageIndex = DateTime.now().month - 1;
+  late  List<DayProgress> dailyProgress = [
+
+    // Add progress for other days
+  ];
+  // Start with the current month
+  @override
+  void initState() {
+    super.initState();
+    _pageController = PageController(initialPage: _currentPageIndex);
+  }
+  int daysInMonth(String Year, String Month) {
+    int year=int.parse(Year);
+    int month=int.parse(Month);
+    if (month == 2) {
+      // February
+      if ((year % 4 == 0 && year % 100 != 0) || (year % 400 == 0)) {
+        // Leap year
+        return 29;
+      } else {
+        // Non-leap year
+        return 28;
+      }
+    } else if ([04, 06, 09, 11].contains(month)) {
+      // April, June, September, November
+      return 30;
+    } else {
+      // All other months
+      return 31;
+    }
+  }
+
+  Future<List<DayProgress>> getDailyStepsForCurrentMonth(final Month) async {
+
+    final Map<String, dynamic> stepsData = await SharedPref().getStepsData();
+
+    final now = DateTime.now();
+    final year = now.year.toString();
+    final month = Month < 10 ? "0" + Month.toString() : Month.toString();
+
+    // Initialize a list to store daily steps for the current month
+    List<int> dailyStepsList = [];
+
+    Map<String, int> dailyStepsMap = {};
+    for (int i = 1; i <= daysInMonth(year, month); i++) {
+      String day = i < 10 ? "0$i" : "$i";
+      dailyStepsMap["$day"] = 0;
+    }
+    if (stepsData.containsKey(year) && stepsData[year].containsKey(month)) {
+      // Loop through each date in the current month
+      stepsData[year][month].forEach((dateKey, dateValue) {
+        // Calculate the total steps for the current date
+        print(dateKey);
+        int totalStepsForDate = dateValue.values.fold<dynamic>(
+          0,
+              (previousValue, element) => previousValue + (element is int ? element : 0),
+        );
+
+        // Add the total steps for the current date to the list
+        if (totalStepsForDate > 0) {
+          dailyStepsMap[dateKey] = totalStepsForDate;
+          setState(() {
+            dailyProgress.add(DayProgress(int.parse(dateKey), int.parse(month), totalStepsForDate/widget.stepstarget));
+          });
+        }
+      });
+    }else{
+      print("not exist------------------------------------------------------------------------------------------------------------------------------->");
+    }
+    // Check if the current month exists in the stepsData
+    return dailyProgress;
+  }
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: EdgeInsets.all(16.0),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Text(
+          DateFormat('MMMM yyyy').format(DateTime(DateTime.now().year, _currentPageIndex + 1, 1)),
+            style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+          ),
+          SizedBox(height: 16.0),
+          SizedBox(
+            height: 250,
+            child: PageView.builder(
+              controller: _pageController,
+              onPageChanged: (index) {
+                print("on change");
+                setState(() {
+                  _currentPageIndex = index;
+                });
+                // getDailyStepsForCurrentMonth(index+1).then((value) => {
+                //   setState(() {
+                //     dailyProgress=value;
+                //   })
+                // });
+              },
+              itemBuilder: (context, index) {
+
+                getDailyStepsForCurrentMonth(index+1).then((value) => {
+                setState(() {
+                    dailyProgress=value;
+                  })
+                });
+                return MonthCalendar(currentMonth: index + 1, StepsTarget: widget.stepstarget, dailyProgress: dailyProgress,);
+              },
+              itemCount: 12, // 12 months in a year
+
+            ),
+          ),
+          SizedBox(height: 16.0),
+          ElevatedButton(
+            onPressed: () {
+              Navigator.of(context).pop(); // Close the dialog
+            },
+            child: Text('Close'),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class DayProgress {
+  final int day;
+  final int month;
+  final double progress;
+
+  DayProgress(this.day, this.month ,this.progress , );
+}
+
+class MonthCalendar extends StatefulWidget {
+  final int currentMonth;
+final int StepsTarget;
+  final List<DayProgress> dailyProgress ;
+  MonthCalendar({required this.currentMonth, required this.StepsTarget, required this.dailyProgress});
+
+  @override
+  State<MonthCalendar> createState() => _MonthCalendarState();
+}
+
+class _MonthCalendarState extends State<MonthCalendar> {
+  //
+  // final List<DayProgress> dailyProgress = [
+  //
+  //   // Add progress for other days
+  // ];
+
+
+  // Rest of your existing code for DayTile, RingPainter, and DayProgress
+  @override
+  Widget build(BuildContext context) {
+    // print("Yash"+widget.currentMonth.toString());
+    // getDailyStepsForCurrentMonth();
+    // Timer.periodic(Duration(seconds: 1), (timer) {
+    //   getDailyStepsForCurrentMonth();
+    // });
+    return GridView.builder(
+      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+        crossAxisCount: 7,
+        mainAxisSpacing: 0.0,
+        crossAxisSpacing: 0.0,
+      ),
+      itemBuilder: (context, index) {
+        final day = index + 1;
+        // Adjust the logic for progress based on the month
+        final progress = widget.dailyProgress.firstWhere((dp) => dp.day == day && dp.month == widget.currentMonth, orElse: () => DayProgress(day, widget.currentMonth , 0.0)).progress;
+        return DayTile(day: day, progress: progress);
+      },
+      itemCount: DateTime(DateTime.now().year, widget.currentMonth + 1, 0).day, // Number of days in the month
+    );
+  }
+}
+class DayTile extends StatelessWidget {
+  final int day;
+  final double progress;
+
+  DayTile({required this.day, required this.progress});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      // decoration: BoxDecoration(
+      //   border: Border.all(color: Colors.grey),
+      // ),
+      child: Center(
+        child: CustomPaint(
+          painter: RingPainter(progress, Color(0xFFFF8900),
+            Color(0xD5CE00FF),),
+          child: Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: Text(
+              day.toString(),
+              style: TextStyle(fontSize: 10),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class RingPainter extends CustomPainter {
+  late final Color startColor;
+  late final Color endColor;
+  final double progress;
+
+  RingPainter(this.progress, this.startColor,this.endColor);
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final center = Offset(size.width / 2, size.height / 2);
+    final radius = 15.0;
+    final strokeWidth = 3.0;
+    final rect = new Rect.fromLTWH(0.0, 0.0, size.width, size.height);
+    final gradient=SweepGradient(
+      startAngle: 3*math.pi/2,
+      endAngle: 7*math.pi/2,
+      tileMode: TileMode.repeated,
+      colors: [
+        startColor,
+        endColor,
+        startColor,
+      ],
+    );
+    final ringPaint = Paint()
+      ..color = Colors.blue
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = strokeWidth;
+
+    final progressPaint = Paint()
+      ..strokeCap=StrokeCap.round
+      ..shader=gradient.createShader(rect)
+      ..style=PaintingStyle.stroke
+      ..strokeWidth=strokeWidth;
+
+    final backgroundPaint = Paint()
+      ..color = Colors.grey
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = strokeWidth;
+
+    // Draw background ring
+    canvas.drawCircle(center, radius, backgroundPaint);
+
+    // Draw progress ring
+    final progressAngle = 2 * 3.14 * progress;
+    canvas.drawArc(Rect.fromCircle(center: center, radius: radius), -3.14 / 2, progressAngle, false, progressPaint);
+  }
+
+  @override
+  bool shouldRepaint(covariant CustomPainter oldDelegate) {
+    return false;
+  }
+}

@@ -28,7 +28,7 @@ bool Greater=false;
     }else{
       progress=StepsCompleted/StepsTarget;
     }
-    print("Steps Completed---------->"+progress.toString());
+    // print("Steps Completed---------->"+progress.toString());
     // TODO: implement paint
     final rect = new Rect.fromLTWH(0.0, 0.0, size.width, size.height);
     final gradient=SweepGradient(

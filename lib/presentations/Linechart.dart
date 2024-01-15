@@ -19,32 +19,6 @@ class _LineChartSample2State extends State<LineChartSample2> {
     Color(0xD5CE00FF),
   ];
   List<int> StepsList = [];
-  // Future<List<int>> getHourlyStepsForCurrentDate() async {
-  //
-  //   final Map<String, dynamic> stepsData = await SharedPref().getStepsData();
-  //
-  //   final now = DateTime.now();
-  //     final year = (now.year).toString();
-  //     final month = now.month<10?"0"+now.month.toString():now.month.toString(); // Use month number directly
-  //     final date = (now.day).toString();
-  //
-  //   // Initialize a list to store hourly steps for the current date
-  //   List<int> hourlyStepsList = [];
-  //
-  //   // Check if the current date exists in the stepsData
-  //   if (stepsData.containsKey(year) &&
-  //       stepsData[year].containsKey(month) &&
-  //       stepsData[year][month].containsKey(date)) {
-  //     // Loop through each hour in the current date
-  //     stepsData[year][month][date].forEach((hourKey, hourValue) {
-  //       // Add the hourly step value to the list
-  //       hourlyStepsList.add(hourValue.toInt());
-  //     });
-  //   }
-  //  print(hourlyStepsList);
-  //   StepsList=hourlyStepsList;
-  //   return hourlyStepsList;
-  // }
   int daysInMonth(String Year, String Month) {
     int year=int.parse(Year);
     int month=int.parse(Month);
@@ -65,50 +39,85 @@ class _LineChartSample2State extends State<LineChartSample2> {
       return 31;
     }
   }
-  // Future<List<int>> getDailyStepsForCurrentMonth() async {
-  //
-  //   final Map<String, dynamic> stepsData = await SharedPref().getStepsData();
-  //
-  //   final now = DateTime.now();
-  //   final year = now.year.toString();
-  //   final month = now.month < 10 ? "0" + now.month.toString() : now.month.toString();
-  //
-  //   // Initialize a list to store daily steps for the current month
-  //   List<int> dailyStepsList = [];
-  //
-  //   Map<String, int> dailyStepsMap = {};
-  //   for (int i = 1; i <= daysInMonth(year, month); i++) {
-  //     String day = i < 10 ? "0$i" : "$i";
-  //     dailyStepsMap["$year${month.toString().padLeft(2, '0')}$day"] = 0;
-  //   }
-  //   // Check if the current month exists in the stepsData
-  //   if (stepsData.containsKey(year) && stepsData[year].containsKey(month)) {
-  //     // Loop through each date in the current month
-  //     stepsData[year][month].forEach((dateKey, dateValue) {
-  //       // Calculate the total steps for the current date
-  //       print(dateKey);
-  //       int totalStepsForDate = dateValue.values.fold<dynamic>(
-  //         0,
-  //             (previousValue, element) => previousValue + (element is int ? element : 0),
-  //       );
-  //
-  //       // Add the total steps for the current date to the list
-  //       if (totalStepsForDate > 0) {
-  //         dailyStepsMap[dateKey] = totalStepsForDate;
-  //       }
-  //     });
-  //   }
-  //   dailyStepsList=dailyStepsMap.values.toList();
-  //   print('-------------jg\n--------->${dailyStepsList}');
-  //  StepsList=dailyStepsList;
-  //   return dailyStepsList;
-  // }
+  Future<List<int>> getHourlyStepsForCurrentDate() async {
+
+    final Map<String, dynamic> stepsData = await SharedPref().getStepsData();
+
+    final now = DateTime.now();
+      final year = (now.year).toString();
+      final month = now.month<10?"0"+now.month.toString():now.month.toString(); // Use month number directly
+      final date = (now.day).toString();
+
+    // Initialize a list to store hourly steps for the current date
+    List<int> hourlyStepsList = [];
+
+    // Check if the current date exists in the stepsData
+    if (stepsData.containsKey(year) &&
+        stepsData[year].containsKey(month) &&
+        stepsData[year][month].containsKey(date)) {
+      // Loop through each hour in the current date
+      stepsData[year][month][date].forEach((hourKey, hourValue) {
+        // Add the hourly step value to the list
+        hourlyStepsList.add(hourValue.toInt());
+      });
+    }
+   print(hourlyStepsList);
+    setState(() {
+      StepsList=hourlyStepsList;
+    });
+
+    return hourlyStepsList;
+  }
+
+  Future<List<int>> getDailyStepsForCurrentMonth() async {
+
+    final Map<String, dynamic> stepsData = await SharedPref().getStepsData();
+
+    final now = DateTime.now();
+    final year = now.year.toString();
+    final month = now.month < 10 ? "0" + now.month.toString() : now.month.toString();
+
+    // Initialize a list to store daily steps for the current month
+    List<int> dailyStepsList = [];
+
+    Map<String, int> dailyStepsMap = {};
+    for (int i = 1; i <= daysInMonth(year, month); i++) {
+      String day = i < 10 ? "0$i" : "$i";
+      dailyStepsMap["$day"] = 0;
+    }
+    // Check if the current month exists in the stepsData
+    if (stepsData.containsKey(year) && stepsData[year].containsKey(month)) {
+      // Loop through each date in the current month
+      stepsData[year][month].forEach((dateKey, dateValue) {
+        // Calculate the total steps for the current date
+        print(dateKey);
+        int totalStepsForDate = dateValue.values.fold<dynamic>(
+          0,
+              (previousValue, element) => previousValue + (element is int ? element : 0),
+        );
+
+        // Add the total steps for the current date to the list
+        if (totalStepsForDate > 0) {
+          dailyStepsMap[dateKey] = totalStepsForDate;
+
+        }
+      });
+    }
+    // print("${dailyStepsMap}");
+    dailyStepsList=dailyStepsMap.values.toList();
+    // print('-------------jg\n--------->${dailyStepsList}');
+   setState(() {
+     StepsList=dailyStepsList;
+   });
+    return dailyStepsList;
+  }
 
 
   Future<Map<int, List<int>>> categorizeStepsByWeek() async {
        final Map<String, dynamic> stepsData = await SharedPref().getStepsData();
-
+     // print(stepsData);
       final now = DateTime.now();
+      // print(now);
       final year = now.year.toString();
       final month = now.month < 10 ? "0" + now.month.toString() : now.month.toString();
 
@@ -118,7 +127,7 @@ class _LineChartSample2State extends State<LineChartSample2> {
       Map<String, int> dailyStepsMap = {};
       for (int i = 1; i <= daysInMonth(year, month); i++) {
         String day = i < 10 ? "0$i" : "$i";
-        dailyStepsMap["$year${month.toString().padLeft(2, '0')}$day"] = 0;
+        dailyStepsMap["${day}"] = 0;
       }
       // Check if the current month exists in the stepsData
       if (stepsData.containsKey(year) && stepsData[year].containsKey(month)) {
@@ -137,6 +146,7 @@ class _LineChartSample2State extends State<LineChartSample2> {
           }
         });
       }
+      // print(dailyStepsMap);
     Map<int, List<int>> weeklyStepsMap = {};
 
     int currentWeekNumber = 1;
@@ -144,18 +154,13 @@ class _LineChartSample2State extends State<LineChartSample2> {
     int maxDaysInWeek = 7; // Assuming a Monday-to-Sunday week structure
 
     dailyStepsMap.forEach((date, steps) {
-      print(date);
-      int year = int.parse(date.substring(0, 4));
-      int month = int.parse(date.substring(4, 6))>10?int.parse(date.substring(4, 6)):int.parse("0${int.parse(date.substring(4, 6))}");
-      int day = int.parse(date.substring(6, 8));
 
-      print( now.day);
-      print(year);
-      print(month);
-      print(day);
-      DateTime currentDate = DateTime(year, month, day);
+      print(now.day);
+
+      String datee= "${now.year}-${now.month.toString().padLeft(2,"0")}-${date}";
+      DateTime currentDate = DateTime.parse(datee);
       int currentDayOfWeek = currentDate.weekday;
-
+     // print("ugvjhjhhjb ${currentDayOfWeek}");
       // Check if we need to move to the next week
       if (currentDayOfWeek == DateTime.monday && daysInCurrentWeek > 0) {
         currentWeekNumber++;
@@ -167,21 +172,32 @@ class _LineChartSample2State extends State<LineChartSample2> {
       weeklyStepsMap[currentWeekNumber]!.add(steps);
 
       daysInCurrentWeek++;
+      // print('-------------jg\n--------->${weeklyStepsMap}');
     });
-         print('-------------jg\n--------->${weeklyStepsMap}');
+         // print('-------------jg\n--------->${weeklyStepsMap}');
     return weeklyStepsMap;
   }
 
   bool showAvg = false;
 
+
+
   @override
   Widget build(BuildContext context) {
-    // print("-------------jgvhgvhgvhmvhm\n--------->"+getHourlyStepsForCurrentDate().toString());
+    if(widget.which=="Day"){
+   getHourlyStepsForCurrentDate().toString();
+    }else if(widget.which=="Month"){
+    getDailyStepsForCurrentMonth().toString();
+    }else{
+      categorizeStepsByWeek().toString();
+    }
+
     // print("-------------jgvhgvhgvhmvhm\n--------->"+getDailyStepsForCurrentMonth().toString());
-    print("-------------jgvhgvhgvhmvhm\n--------->"+categorizeStepsByWeek().toString());
+
     return Center(
       child: Stack(
         children: <Widget>[
+
           AspectRatio(
             aspectRatio: 1.75,
             child: Padding(
@@ -191,10 +207,11 @@ class _LineChartSample2State extends State<LineChartSample2> {
                 top: 24,
                 bottom: 12,
               ),
-              child: Container()
-              // LineChart(
-              //   showAvg ? avgData() : mainData(StepsList),
-              // ),
+              child:
+              // Container()
+              LineChart(
+                showAvg ? avgData() : mainData(StepsList),
+              ),
             ),
           ),
         ],
@@ -207,7 +224,7 @@ class _LineChartSample2State extends State<LineChartSample2> {
       fontWeight: FontWeight.bold,
       fontSize: 16,
     );
-    print("Value in bottom->"+value.toString());
+    // print("Value in bottom->"+value.toString());
     Widget text;
     switch (value.toInt()) {
       case 0:
@@ -296,7 +313,7 @@ class _LineChartSample2State extends State<LineChartSample2> {
       fontWeight: FontWeight.bold,
       fontSize: 15,
     );
-    print("Value----------------\n ${value}");
+    // print("Value----------------\n ${value}");
     String text=value.toString();
     // switch (value.toInt()) {
     //   case 1:
