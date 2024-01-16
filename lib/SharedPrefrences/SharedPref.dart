@@ -48,7 +48,7 @@ int lasttimeSteps=0;
    Future<void> setStepsData(int steps) async {
     final SharedPreferences prefs = await SharedPreferences.getInstance();
     final Map<String, dynamic> stepsData = await getStepsData();
-
+  // print("get in set Steps data ${stepsData}");
       final now = DateTime.now();
       final year = (now.year).toString();
       final month = now.month<10?"0"+now.month.toString():now.month.toString(); // Use month number directly
@@ -64,10 +64,23 @@ int lasttimeSteps=0;
     // Run the loop
     for (DateTime loopTime = startTime; loopTime.isBefore(endTime); loopTime = loopTime.add(Duration(minutes: intervalInMinutes))) {
       String formattedTime = DateFormat('hh a').format(loopTime);
-      print(formattedTime);
+      // print(formattedTime);
       if(stepsData.isNotEmpty && !stepsData.isNull){
         // print("not Null  ${stepsData}");
-     totalBeforeSteps =  int.parse((totalBeforeSteps! + stepsData['${year}']['${month}']['${date}'][formattedTime] ?? 0).toString());
+        if(stepsData['${year}']['${month}']['${date}'].containsKey(formattedTime)) {
+          totalBeforeSteps = int.parse((totalBeforeSteps! +
+                      stepsData['${year}']['${month}']['${date}']
+                          [formattedTime] ??
+                  0)
+              .toString());
+        }else{
+          stepsData['${year}']['${month}']['${date}'][formattedTime]=0;
+          totalBeforeSteps = int.parse((totalBeforeSteps! +
+              stepsData['${year}']['${month}']['${date}']
+              [formattedTime] ??
+              0)
+              .toString());
+        }
       }
     }
 
@@ -89,6 +102,51 @@ int lasttimeSteps=0;
     if (stepsData.isEmpty) {
       // Initialize with the current year, month, date, and set all hours to zero
       initializeStepsData(stepsData);
+    }else{
+        final now = DateTime.now();
+        final year = (now.year).toString();
+        final month = now.month<10?"0"+now.month.toString():now.month.toString(); // Use month number directly
+        final date = (now.day).toString();
+        if(stepsData.containsKey('$year')){
+
+        }else{
+          print("doestnotcontain Year");
+          stepsData['$year']={};
+        }
+        if(stepsData['$year']!.containsKey('$month')){
+
+        }else{
+          print("doestnotcontain Month");
+          stepsData['$year']!['$month']={};
+        }
+      if (stepsData['$year']!['$month']!.containsKey('$date')) {
+        // If the current date doesn't exist, add it with all hours initialized to zero
+
+      }
+      else{
+        print("doestnotcontain");
+        DateTime startTime = DateTime(now.year, now.month, now.day, 0, 0);
+        DateTime endTime = now.subtract(Duration(hours: 1));
+        int intervalInMinutes = 60;
+        final map={};
+        for (DateTime loopTime = startTime; loopTime.isBefore(endTime); loopTime = loopTime.add(Duration(minutes: intervalInMinutes))) {
+          String formattedTime = DateFormat('hh a').format(loopTime);
+           map.assign(formattedTime, 0);
+          // stepsData[year][month][date][formattedTime] = 0;
+
+        }
+        stepsData.update('$year', (yearValue) {
+          return {
+            ...yearValue,
+            '$month': {
+              ...yearValue?['$month'],
+              '$date': map,
+            },
+          };
+        });
+        print(stepsData);
+
+      }
     }
 
     return stepsData;

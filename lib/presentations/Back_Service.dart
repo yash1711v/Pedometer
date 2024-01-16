@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:convert';
 import 'dart:ui';
 
 import 'package:firebase_core/firebase_core.dart';
@@ -216,6 +217,7 @@ Timer.periodic(Duration(seconds: 1), (timer) async {
     await  HomeWidget.saveWidgetData("_Steps", Steps);
     await  HomeWidget.updateWidget(name: "HomeScreenWidgetProvider",iOSName: "HomeScreenWidgetProvider");
 // await  ObjectBoxClass.instance.storeSteps(Steps);
+  print(Steps);
  await  SharedPref().setStepsData(Steps);
 
   flutterLocalNotificationsPlugin.show(
@@ -307,61 +309,66 @@ Future<bool>  onBackGround(ServiceInstance service) async{
 void sendStepsToFirebase(int steps) async {
   DatabaseReference databaseReference = FirebaseDatabase.instance.reference(); // Replace with your user ID
   String _uid = await SharedPref().getUid();
-  DateTime now = DateTime.now();
-  Map<String,Object> newtimedatw={};
-  String formattedDate = DateFormat('yyyy-MM-dd').format(now);
-  String FormattedTime = DateFormat('hh a').format(now);
-  String previoustime=await SharedPref().getPreviousTime()??"00 Am";
-  String pre = DateFormat('hh a').format(now.subtract(Duration(hours: 1)));
-  int lasttimesteps=0;
-  DateTime startTime = DateTime(now.year, now.month, now.day, 0, 0);
-  DateTime endTime = now.subtract(Duration(hours: 1));
-
-  int intervalInMinutes = 60; // Adjust as needed
-
-  // Run the loop
-  for (DateTime loopTime = startTime; loopTime.isBefore(endTime); loopTime = loopTime.add(Duration(minutes: intervalInMinutes))) {
-    // Format the current time in the desired format
-    String formattedTime = DateFormat('hh a').format(loopTime);
-    print(formattedTime);
-    databaseReference
-        .child('users')
-        .child(_uid)
-        .child('steps')
-        .child(formattedDate)
-        .child(formattedTime)
-        .once().then((value) {
-      var dataSnapshot =value;
-      if(dataSnapshot.snapshot.value!=null){
-        lasttimesteps=lasttimesteps+int.parse(dataSnapshot.snapshot.value.toString());
-        int Stepstobeset=steps-lasttimesteps;
-        databaseReference
-            .child('users')
-            .child(_uid)
-            .child('steps')
-            .child(formattedDate).update({FormattedTime:Stepstobeset});
-        // print("Lasttimestepsp in if condition--------------------->"+lasttimesteps.toString());
-      }else{
-
-        // print("Lasttimestepsp in else condition--------------------->"+lasttimesteps.toString());
-        databaseReference
-            .child('users')
-            .child(_uid)
-            .child('steps')
-            .child(formattedDate)
-            .child(formattedTime).set(0);
-      }
-
-    });
-    // Print or use the formatted time as needed
-
-  }
-
+  final Map<String, dynamic> stepsData = await SharedPref().getStepsData();
+  String stepsDataJson = json.encode(stepsData);
   databaseReference
       .child('users')
       .child(_uid)
-      .child('steps')
-      .child(formattedDate).update({"TotalSteps" : steps});
+  // .child('steps')
+      .update({'steps': stepsDataJson});
+  // DateTime now = DateTime.now();
+  // Map<String,Object> newtimedatw={};
+  // String formattedDate = DateFormat('yyyy-MM-dd').format(now);
+  // String FormattedTime = DateFormat('hh a').format(now);
+  // String previoustime=await SharedPref().getPreviousTime()??"00 Am";
+  // String pre = DateFormat('hh a').format(now.subtract(Duration(hours: 1)));
+  // int lasttimesteps=0;
+  // DateTime startTime = DateTime(now.year, now.month, now.day, 0, 0);
+  // DateTime endTime = now.subtract(Duration(hours: 1));
+  // final year = (now.year).toString();
+  // final month = now.month<10?"0"+now.month.toString():now.month.toString(); // Use month number directly
+  // final date = (now.day).toString();
+  // int intervalInMinutes = 60; // Adjust as needed
+  //
+  // // Run the loop
+  // for (DateTime loopTime = startTime; loopTime.isBefore(endTime); loopTime = loopTime.add(Duration(minutes: intervalInMinutes))) {
+  //   // Format the current time in the desired format
+  //   String formattedTime = DateFormat('hh a').format(loopTime);
+  //   print(formattedTime);
+  //   databaseReference
+  //       .child('users')
+  //       .child(_uid)
+  //       .child('steps').child(year)
+  //       .child(month).child(date)
+  //       .child(formattedTime)
+  //       .once().then((value) {
+  //     var dataSnapshot =value;
+  //     if(dataSnapshot.snapshot.value!=null){
+  //       lasttimesteps=lasttimesteps+int.parse(dataSnapshot.snapshot.value.toString());
+  //       int Stepstobeset=steps-lasttimesteps;
+  //       databaseReference
+  //           .child('users')
+  //           .child(_uid)
+  //           .child('steps').child(year)
+  //           .child(month).child(date)
+  //           .child(formattedDate).update({FormattedTime:Stepstobeset});
+  //       // print("Lasttimestepsp in if condition--------------------->"+lasttimesteps.toString());
+  //     }else{
+  //
+  //       // print("Lasttimestepsp in else condition--------------------->"+lasttimesteps.toString());
+  //       databaseReference
+  //           .child('users')
+  //           .child(_uid)
+  //           .child('steps').child(year)
+  //           .child(month).child(date)
+  //           .child(formattedTime).set(0);
+  //     }
+  //
+  //   });
+  //   // Print or use the formatted time as needed
+  //
+  // }
+
 
 
 }

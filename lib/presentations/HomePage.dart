@@ -105,6 +105,7 @@ DatabaseServices _services=DatabaseServices();
     _getLastResetDay();
     getUserData();
     firebaseData();
+    _services.getStepsData();
     OptimizeBattery.isIgnoringBatteryOptimizations().then((onValue) {
       setState(() {
         if (onValue) {

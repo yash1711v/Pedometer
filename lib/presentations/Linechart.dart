@@ -42,7 +42,7 @@ class _LineChartSample2State extends State<LineChartSample2> {
   Future<List<int>> getHourlyStepsForCurrentDate() async {
 
     final Map<String, dynamic> stepsData = await SharedPref().getStepsData();
-
+     // print("this is in hourly graph "+stepsData.toString());
     final now = DateTime.now();
       final year = (now.year).toString();
       final month = now.month<10?"0"+now.month.toString():now.month.toString(); // Use month number directly
@@ -60,8 +60,13 @@ class _LineChartSample2State extends State<LineChartSample2> {
         // Add the hourly step value to the list
         hourlyStepsList.add(hourValue.toInt());
       });
+    }else{
+      // print(" Doesn't contain ${hourlyStepsList}");
+      // print("year ${stepsData.containsKey(year)}");
+      // print("month ${stepsData[year].containsKey(month)}");
+      // print("date ${stepsData[year][month].containsKey(date)}");
     }
-   print(hourlyStepsList);
+   // print(" this is in hourly graph  ${hourlyStepsList}");
     setState(() {
       StepsList=hourlyStepsList;
     });
@@ -72,7 +77,7 @@ class _LineChartSample2State extends State<LineChartSample2> {
   Future<List<int>> getDailyStepsForCurrentMonth() async {
 
     final Map<String, dynamic> stepsData = await SharedPref().getStepsData();
-
+// print("this is in monthly ${stepsData}");
     final now = DateTime.now();
     final year = now.year.toString();
     final month = now.month < 10 ? "0" + now.month.toString() : now.month.toString();
@@ -155,7 +160,7 @@ class _LineChartSample2State extends State<LineChartSample2> {
 
     dailyStepsMap.forEach((date, steps) {
 
-      print(now.day);
+      // print(now.day);
 
       String datee= "${now.year}-${now.month.toString().padLeft(2,"0")}-${date}";
       DateTime currentDate = DateTime.parse(datee);
@@ -373,7 +378,7 @@ class _LineChartSample2State extends State<LineChartSample2> {
           sideTitles: SideTitles(
             showTitles: true,
             reservedSize: 30,
-            interval: stepsList.length/2,
+            interval: stepsList.length/2!=0?stepsList.length/2:15,
             getTitlesWidget: bottomTitleWidgets,
           ),
         ),
