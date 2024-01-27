@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:ui';
 
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
@@ -43,6 +44,50 @@ int lasttimeSteps=0;
     lasttimeSteps = pref.getInt("lasttimeSteps")??0;
     return lasttimeSteps;
   }
+
+  List<String> convertColorListToStringList(List<Color> colorList) {
+    return colorList.map((color) => color.value.toRadixString(16)).toList();
+  }
+  List<Color> convertStringListToColorList(List<String> stringList) {
+    return stringList.map((hexColor) => Color(int.parse(hexColor, radix: 16))).toList();
+  }
+
+  Future<void> saveColorList(List<Color> colorList) async {
+    final SharedPreferences prefs = await SharedPreferences.getInstance();
+
+    // Clear existing values before setting new ones
+    prefs.remove('themeColors');
+
+    List<String> stringList = convertColorListToStringList(colorList);
+    prefs.setStringList('themeColors', stringList);
+  }
+
+  Future<List<Color>> loadColorList() async {
+    final SharedPreferences prefs = await SharedPreferences.getInstance();
+    List<String>? stringList = prefs.getStringList('themeColors');
+    return stringList != null ? convertStringListToColorList(stringList) : [];
+  }
+Future<void> saveImageList(List<String> stringList) async {
+    final SharedPreferences prefs = await SharedPreferences.getInstance();
+
+    // Clear existing values before setting new ones
+    prefs.remove('themeList');
+
+    prefs.setStringList('themeList', stringList);
+  }
+
+  Future<List<String>> loadImageList() async {
+    final SharedPreferences prefs = await SharedPreferences.getInstance();
+    List<String>? stringList = prefs.getStringList('themeList');
+    return stringList != null ? stringList : [
+      'lib/assests/NewImages/MaleTheme1.png',
+      'lib/assests/NewImages/FemaleTheme1.png',
+      'lib/assests/NewImages/OthersTheme1.png'
+    ];
+  }
+
+
+
 
 
    Future<void> setStepsData(int steps) async {
@@ -91,7 +136,11 @@ int lasttimeSteps=0;
     // Save updated steps data to SharedPreferences
     await prefs.setString("StepsData", json.encode(stepsData));
   }
+  Future<void> setStepsDataFromFirebase(Map<String, dynamic> steps) async {
+    final SharedPreferences prefs = await SharedPreferences.getInstance();
 
+    await prefs.setString("StepsData", json.encode(steps));
+  }
   // Get Steps Data from Shared Preferences
   Future<Map<String, dynamic>> getStepsData() async {
     final SharedPreferences prefs = await SharedPreferences.getInstance();
@@ -236,7 +285,78 @@ int lasttimeSteps=0;
     return Firstrun;
   }
 
+  setGender(String gender) async {
+    // print("setFirstrun");
+    SharedPreferences pref = await SharedPreferences.getInstance();
+    pref.setString("Gender", gender);
+    // print(username);
+  }
 
+  getGender() async {
+    // print("getFirstrun called");
+    SharedPreferences pref = await SharedPreferences.getInstance();
+    String gender = pref.getString("Gender")??"Male";
+    return gender;
+  }
+
+ setHeight(int height) async {
+    // print("setFirstrun");
+    SharedPreferences pref = await SharedPreferences.getInstance();
+    pref.setInt("Height", height);
+    // print(username);
+  }
+
+  getHeight() async {
+    // print("getFirstrun called");
+    SharedPreferences pref = await SharedPreferences.getInstance();
+    int height = pref.getInt("Height")??162;
+    return height;
+  }
+
+
+setWeight(int weight) async {
+    // print("setFirstrun");
+    SharedPreferences pref = await SharedPreferences.getInstance();
+    pref.setInt("Weight", weight);
+    // print(username);
+  }
+
+  getWeight() async {
+    // print("getFirstrun called");
+    SharedPreferences pref = await SharedPreferences.getInstance();
+    int weight = pref.getInt("Weight")??55;
+    return weight;
+  }
+
+setAge(int age) async {
+    // print("setFirstrun");
+    SharedPreferences pref = await SharedPreferences.getInstance();
+    pref.setInt("Age", age);
+    // print(username);
+  }
+
+  getAge() async {
+    // print("getFirstrun called");
+    SharedPreferences pref = await SharedPreferences.getInstance();
+    int age = pref.getInt("Age")??25;
+    return age;
+  }
+
+
+
+setActivityLevel(double activityLevel) async {
+    // print("setFirstrun");
+    SharedPreferences pref = await SharedPreferences.getInstance();
+    pref.setDouble("ActivityLevel", activityLevel);
+    // print(username);
+  }
+
+  getActivityLevel() async {
+    // print("getFirstrun called");
+    SharedPreferences pref = await SharedPreferences.getInstance();
+    double activityLevel = pref.getDouble("ActivityLevel")??1.2;
+    return activityLevel;
+  }
 
 
 
@@ -346,7 +466,7 @@ int lasttimeSteps=0;
   getisguest() async {
     // print("getisStart called");
     SharedPreferences pref = await SharedPreferences.getInstance();
-    isguest= pref.getBool("isguest")??true;
+    isguest= pref.getBool("isguest")??false;
     return isguest;
   }
 

@@ -9,7 +9,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_background_service/flutter_background_service.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:geolocator/geolocator.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
 import 'package:pedometer/pedometer.dart';
@@ -18,7 +17,6 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:steptracking/presentations/Back_Service.dart';
 import 'package:steptracking/presentations/HomePage.dart';
 import 'package:steptracking/presentations/NotificationServices.dart';
-import 'LocalDataBaseForSteps/ObjectBox.dart';
 import 'SharedPrefrences/SharedPref.dart';
 import 'appsflyer/appsflyerMethod.dart';
 import 'firebase_options.dart';
@@ -40,7 +38,6 @@ Future<void> main() async {
 
   WidgetsFlutterBinding.ensureInitialized();
   appsflyerSdk = initiateAppsflyer();
-  await ObjectBoxClass.instance.init();
   IsolateNameServer.registerPortWithName(
     port.sendPort,
     isolateName,
@@ -203,13 +200,6 @@ Future<void> printHello() async {
     print(scheduledDateTZ4);
   });
 
-  // if(check){
-  //   print("stoping background service");
-  //   final service = FlutterBackgroundService();
-  //   service.invoke('stopService');
-  // }else{
-  //   print("background service runing");
-  // }
   print("Helllooo From Step Tracker middle");
 
 }
@@ -228,12 +218,11 @@ class MyApp extends StatelessWidget {
         ],
         title: "Step Tracker",
         theme: ThemeData.dark().copyWith(
-          scaffoldBackgroundColor: const Color(0xFF2D2D2D),
+          scaffoldBackgroundColor: const Color(0xFF0D0D0D),
+          useMaterial3: true
         ),
         debugShowCheckedModeBanner: false,
-        home: Scaffold(
-          body: SplashScreen(),
-        ),
+        home: SplashScreen(),
       ),
     );
   }

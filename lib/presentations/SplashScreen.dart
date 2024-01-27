@@ -10,12 +10,11 @@ import 'package:get/get.dart';
 import 'package:get/get_core/src/get_main.dart';
 import 'package:intl/intl.dart';
 import 'package:permission_handler/permission_handler.dart';
+import 'package:steptracking/Firebasefunctionalities/DatabaseServices.dart';
 import 'package:steptracking/appsflyer/appsflyerMethod.dart';
 import 'package:timezone/timezone.dart' as tz;
 import 'package:timezone/timezone.dart' as tz;
 import 'package:timezone/data/latest.dart' as tz;
-import '../LocalDataBaseForSteps/Model.dart';
-import '../LocalDataBaseForSteps/ObjectBox.dart';
 import '../SharedPrefrences/SharedPref.dart';
 import '../main.dart';
 import 'HomePage.dart';
@@ -37,52 +36,49 @@ class _SplashScreenState extends State<SplashScreen> {
   bool isGuest=false;
   // FirebaseAnalytics analytics =FirebaseAnalytics.instance;
   checkifLoginAndIntro() async {
-    auth.authStateChanges().listen((User? user) {
-      if (user != null && mounted) {
-        setState(() {
-          islogin = true;
-        });
-      }
-    });
     bool _isonboarding = await SharedPref().getisOnboardingt();
     bool _isguest = await SharedPref().getisguest();
-    setState(() {
-      isOnboarding = _isonboarding ;
-      isGuest=_isguest;
-    });
+    print("isGuest $_isguest");
+    print("_isonboarding $_isonboarding");
+   Future.delayed(Duration(seconds: 3),(){
+     if(_isonboarding){
+       print("_isonboarding $_isonboarding");
+       if(auth.currentUser!=null || _isguest)
+       {
+         print("isGuest $_isguest");
+         print("isAuthenticated ${auth.currentUser}");
+         Get.to(() =>  MainScreen(),
+           duration: const Duration(
+               milliseconds:
+               350),);
+       } //duration of transitions, default 1 sec
+       // transition: Transition.fade)
+       else {
+         print("isAuthenticated ${auth.currentUser}");
+
+         Get.to(() =>  SignUpScreen(),
+           duration: const Duration(
+               milliseconds:
+               500), //duration of transitions, default 1 sec
+           // transition: Transition.fade
+         );}
+
+     }else{
+       print("_isonboarding--------------> $_isonboarding");
+       print("isAuthenticated ${auth.currentUser}");
+
+       Get.to(() =>  IntroScreen(),
+         duration: const Duration(
+             milliseconds:
+             350), //duration of transitions, default 1 sec
+         // transition: Transition.fade
+       );
+     }
+   });
+
+
   }
 
-//   Future<void> initPlatformState() async {
-// // Configure BackgroundFetch.
-//     var status = await BackgroundFetch.configure(BackgroundFetchConfig(
-//       minimumFetchInterval: 15,
-//       forceAlarmManager: false,
-//       stopOnTerminate: false,
-//       startOnBoot: true,
-//       enableHeadless: true,
-//       requiresBatteryNotLow: false,
-//       requiresCharging: false,
-//       requiresStorageNotLow: false,
-//       requiresDeviceIdle: false,
-//       requiredNetworkType: NetworkType.NONE,
-//     ), _onBackgroundFetch, _onBackgroundFetchTimeout);
-//     print("BackgroundFetch] configure success: $status");
-// // Schedule backgroundfetch for the 1st time it will execute with 1000ms delay.
-// // where device must be powered (and delay will be throttled by the OS).
-//     BackgroundFetch.scheduleTask(
-//         TaskConfig(
-//         taskId: "6",
-//         delay: 1000,
-//         periodic: true,
-//         stopOnTerminate: false,
-//         enableHeadless: true,
-//         startOnBoot: true
-//     ));
-//   }
-//   void _onBackgroundFetchTimeout(String taskId) {
-//     print("[BackgroundFetch] TIMEOUT: $taskId");
-//     BackgroundFetch.finish(taskId);
-//   }
   void scheduleNotification() async {
     flutterLocalNotificationsPlugin.cancelAll();
     final tz.Location local = tz.getLocation('Asia/Kolkata');
@@ -184,7 +180,8 @@ class _SplashScreenState extends State<SplashScreen> {
   void initState() {
     super.initState();
     // initPlatformState();
-    requestExactAlarmPermission();
+    // requestExactAlarmPermission();
+    // getData();
     tz.initializeTimeZones();
     tz.setLocalLocation(tz.getLocation('Asia/Kolkata'));
     scheduleNotification();
@@ -197,40 +194,46 @@ class _SplashScreenState extends State<SplashScreen> {
     afLogEvent(appsflyerSdk, "application_opened",values);
 
   checkifLoginAndIntro();
-  Future.delayed(
-      const Duration(seconds: 3),
-      () async => {
-        if( isOnboarding ){
-      if(islogin || isGuest)
-            {
-              Get.to(() =>  MainScreen(),
-                  duration: const Duration(
-                      milliseconds:
-                          350),)
-            } //duration of transitions, default 1 sec
-                  // transition: Transition.fade)
-              else {
-              Get.to(() =>  SignUpScreen(),
-                  duration: const Duration(
-                      milliseconds:
-                      500), //duration of transitions, default 1 sec
-                  // transition: Transition.fade
-              )
-             }}
-        else{
-            Get.to(() =>  IntroScreen(),
-                duration: const Duration(
-                    milliseconds:
-                        350), //duration of transitions, default 1 sec
-                // transition: Transition.fade
-            )
-              }
-
-          });
+  // Future.delayed(
+  //     const Duration(seconds: 3),
+  //     () async => {
+  //       if( isOnboarding ){
+  //
+  //     if(islogin || isGuest)
+  //           {
+  //             Get.to(() =>  MainScreen(),
+  //                 duration: const Duration(
+  //                     milliseconds:
+  //                         350),)
+  //           } //duration of transitions, default 1 sec
+  //                 // transition: Transition.fade)
+  //             else {
+  //             Get.to(() =>  SignUpScreen(),
+  //                 duration: const Duration(
+  //                     milliseconds:
+  //                     500), //duration of transitions, default 1 sec
+  //                 // transition: Transition.fade
+  //             )
+  //            }}
+  //       else{
+  //           Get.to(() =>  IntroScreen(),
+  //               duration: const Duration(
+  //                   milliseconds:
+  //                       350), //duration of transitions, default 1 sec
+  //               // transition: Transition.fade
+  //           )
+  //             }
+  //
+  //         });
 
 
   }
-
+ Future<Map<String, dynamic>> getData() async{
+    DatabaseServices _services=DatabaseServices();
+    await _services.getStepsData();
+    Map<String, dynamic> Steps = await SharedPref().getStepsData() ?? {};
+    return Steps;
+ }
 
 
   @override

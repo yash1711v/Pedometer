@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 
 class GradiantArchProgress extends CustomPainter {
   late final Color startColor;
+  late final Color middle;
   late final Color endColor;
   late final  int StepsCompleted;
   late final  int StepsTarget;
@@ -14,6 +15,7 @@ class GradiantArchProgress extends CustomPainter {
 bool Greater=false;
   GradiantArchProgress(
       {required this.startColor,
+      required this.middle,
       required this.endColor,
       required this.StepsCompleted,
       required this.StepsTarget,
@@ -21,6 +23,8 @@ bool Greater=false;
 
   @override
   void paint(Canvas canvas, Size size) {
+    // print("Steps Completed -------> $StepsCompleted");
+    // print("Steps Target -------> $StepsTarget");
     if(StepsCompleted>StepsTarget){
       progress=StepsCompleted/StepsTarget;
       progress2=(StepsCompleted-StepsTarget)/StepsTarget;

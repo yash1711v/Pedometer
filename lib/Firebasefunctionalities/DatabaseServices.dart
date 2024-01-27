@@ -7,18 +7,36 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:get/get_core/src/get_main.dart';
 import 'package:intl/intl.dart';
+import 'package:steptracking/presentations/MainScreen.dart';
 
 import '../SharedPrefrences/SharedPref.dart';
 import '../presentations/HomePage.dart';
 class DatabaseServices {
-      void writeToDatabase(String Uid,String username, String Email , String Password, int defaultSteps,String DeviceId,BuildContext context) {
+      void writeToDatabase(
+          {required String Uid,
+      required String username,
+      required String Email,
+      required String gender,
+      required String Password,
+      required int defaultSteps,
+      required String DeviceId,
+      required int age ,
+      required int height ,
+      required int weight ,
+      required double activityLevel ,
+      required BuildContext context}) {
         DatabaseReference databaseReference = FirebaseDatabase.instance.reference();
       try{
         databaseReference.child('users').child(Uid).set({
           'username': username,
           'email': Email,
           'password' : Password,
-          'defaultsteps' :  defaultSteps,
+          'StepsTarget' :  defaultSteps,
+          'Gender':gender,
+          'Age':age,
+          'Height':height,
+          'Weight':weight,
+          'ActivityLevel':activityLevel,
           "Device_ID" : DeviceId
          }).then((value) {
 
@@ -39,13 +57,13 @@ class DatabaseServices {
             backgroundColor: Colors.black,
           ));
 
-          SharedPref().setUsername(username);
-            // Get.to(()=>HomePage(),
-            //     duration: const Duration(
-            //         seconds:
-            //         1),
-            //     transition: Transition.fadeIn
-            // );
+          // SharedPref().setUsername(username);
+            Get.to(()=>MainScreen(),
+                duration: const Duration(
+                    seconds:
+                    1),
+                transition: Transition.fadeIn
+            );
         });
       }catch(error){print(error);
       }
@@ -68,7 +86,17 @@ class DatabaseServices {
         DatabaseReference databaseReference = FirebaseDatabase.instance.reference();
         try{
           databaseReference.child('users').child(Uid).update({
-            'defaultsteps' :  defaultSteps
+            'StepsTarget' :  defaultSteps
+          });
+        }catch(error){print(error);
+        }
+
+      }
+      void UpdateEmail(String Uid, String Email) {
+        DatabaseReference databaseReference = FirebaseDatabase.instance.reference();
+        try{
+          databaseReference.child('users').child(Uid).update({
+            'username' :  Email,
           });
         }catch(error){print(error);
         }
@@ -89,91 +117,57 @@ class DatabaseServices {
       }
 
       void sendStepsToFirebase(int steps) async {
+        print("----------------------------------------------?jmbhjch");
         DatabaseReference databaseReference = FirebaseDatabase.instance.reference();
         String _uid = await SharedPref().getUid();
+        print("In store in firebase methof------>"+_uid);
         final Map<String, dynamic> stepsData = await SharedPref().getStepsData();// Replace with your user ID
         String stepsDataJson = json.encode(stepsData);
-        databaseReference
+         databaseReference
             .child('users')
-            .child(_uid)
-            // .child('steps')
-            .update({'steps': stepsDataJson});
-      //   DateTime now = DateTime.now();
-      //   Map<String,Object> newtimedatw={};
-      //   String formattedDate = DateFormat('yyyy-MM-dd').format(now);
-      //   String FormattedTime = DateFormat('hh a').format(now);
-      //   String previoustime=await SharedPref().getPreviousTime()??"00 Am";
-      //   String pre = DateFormat('hh a').format(now.subtract(Duration(hours: 1)));
-      //   int lasttimesteps=0;
-      //   DateTime startTime = DateTime(now.year, now.month, now.day, 0, 0);
-      //   DateTime endTime = now.subtract(Duration(hours: 1));
-      //
-      //   int intervalInMinutes = 60; // Adjust as needed
-      //   final year = (now.year).toString();
-      //   final month = now.month<10?"0"+now.month.toString():now.month.toString(); // Use month number directly
-      //   final date = (now.day).toString();
-      //   // Run the loop
-      //   for (DateTime loopTime = startTime; loopTime.isBefore(endTime); loopTime = loopTime.add(Duration(minutes: intervalInMinutes))) {
-      //     // Format the current time in the desired format
-      //     String formattedTime = DateFormat('hh a').format(loopTime);
-      //     print(formattedTime);
-      //     databaseReference
-      //         .child('users')
-      //         .child(_uid)
-      //         .child('steps').child(year)
-      //         .child(month).child(date)
-      //         .child(formattedTime)
-      //         .once().then((value) {
-      //       var dataSnapshot =value;
-      //       if(dataSnapshot.snapshot.value!=null){
-      //         lasttimesteps=lasttimesteps+int.parse(dataSnapshot.snapshot.value.toString());
-      //         int Stepstobeset=steps-lasttimesteps;
-      //         databaseReference
-      //             .child('users')
-      //             .child(_uid)
-      //             .child('steps').child(year)
-      //             .child(month).child(date).update({FormattedTime:Stepstobeset});
-      //         print("Lasttimestepsp in if condition--------------------->"+lasttimesteps.toString());
-      //       }else{
-      //
-      //         print("Lasttimestepsp in else condition--------------------->"+lasttimesteps.toString());
-      //         databaseReference
-      //             .child('users')
-      //             .child(_uid)
-      //             .child('steps').child(year)
-      //             .child(month).child(date)
-      //             .child(formattedTime).set(0);
-      //       }
-      //
-      //     });
-      //     // Print or use the formatted time as needed
-      //
-      //   }
-      //
+            .child(_uid).child('steps').once().then((DatabaseEvent event) {
+              if(event.snapshot.exists){
+                databaseReference
+                    .child('users')
+                    .child(_uid)
+                // .child('steps')
+                    .update({'steps': stepsDataJson});
+              }else{
+                databaseReference
+                    .child('users')
+                    .child(_uid).child('steps').set(stepsDataJson);
+
+              }
+
+         });
+
+
       }
-      // void getStepsData() async {
-      //   String _uid = await SharedPref().getUid();
-      //   String? stepsDataJson = "";
-      //
-      //   DatabaseReference databaseReference = FirebaseDatabase.instance.reference().child('users').child(_uid).child('steps');
-      //   try {
-      //     databaseReference.onValue.listen((event) {
-      //       print(event.snapshot.value.toString());
-      //       stepsDataJson = event.snapshot.value.toString();
-      //         print("jhcjhbedj"+stepsDataJson.toString());
-      //     });
-      //   } catch (e) {
-      //     print('Error: $e');
-      //   }
-      //   print("jhcjhbedj"+stepsDataJson.toString());
-      //   // Future<DatabaseEvent> databaseReference = FirebaseDatabase.instance.reference().child('users').child(_uid).child('steps').once();
-      //   // databaseReference.then((value){
-      //   //   print("jhcjhbedj"+value.toString());
-      //   //   stepsDataJson = value.toString();
-      //   // });
-      //   // Map<String, dynamic> retrievedStepsData = stepsDataJson != null ? json.decode(stepsDataJson!) : {};
-      //   // print("stepsData ${retrievedStepsData}");
-      //
-      // }
+     Future<String?> getStepsData() async {
+        String _uid = await SharedPref().getUid();
+        String? stepsDataJson = "";
+        Map<String, dynamic> stepsData={};
+        DatabaseReference databaseReference = FirebaseDatabase.instance.reference().child('users').child(_uid).child('steps');
+
+        try {
+          DatabaseEvent event = await databaseReference.once();
+          event.snapshot.value;
+          print( event.snapshot.value);
+            stepsDataJson = event.snapshot.value.toString();
+              stepsData=json.decode(stepsDataJson);
+          SharedPref().setStepsDataFromFirebase(stepsData).then((value) async => {
+          await SharedPref().getStepsData().then((value) {
+            print("stepsData after getting from firebase and setting to the Shared Pref ${value}");
+
+          })
+          });
+        } catch (e) {
+          print('Error: $e');
+        }
+        print("stepsData  ${stepsDataJson}");
+
+        return stepsDataJson;
+
+      }
 }
 

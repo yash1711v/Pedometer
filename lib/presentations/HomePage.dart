@@ -26,13 +26,10 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:intl/intl.dart';
 import 'package:lottie/lottie.dart';
 import 'package:pedometer/pedometer.dart';
-import 'package:percent_indicator/percent_indicator.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:geolocator/geolocator.dart';
 import '../Firebasefunctionalities/DatabaseServices.dart';
-import '../LocalDataBaseForSteps/DatabaseHelper.dart';
-import '../LocalDataBaseForSteps/ObjectBox.dart';
+
 import '../SharedPrefrences/SharedPref.dart';
 import '../main.dart';
 import '../widgets/BottomNavbar.dart';
@@ -93,10 +90,16 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
 bool isDone=false;
 int StepscomingFromFirebase=0;
 DatabaseServices _services=DatabaseServices();
-  DatabaseHelper dbHelper = DatabaseHelper();
- Map<String, dynamic> stepsData ={};
 
+ Map<String, dynamic> stepsData ={};
+  double Weight=60;
+  double Height= 162;
+  int Age=20;
+  String Gender= "Male";
+  double ActivityLevel= 1.25;
+  late List<Color> Themee=[Color(0xFFF7722A),Color(0xFFE032A1),Color(0xFFCF03F9)];
   void initState() {
+    getColors();
     super.initState();
     GetPermissions();
     tz.initializeTimeZones();
@@ -104,8 +107,8 @@ DatabaseServices _services=DatabaseServices();
     notificationServices.initializeNotification() ;
     _getLastResetDay();
     getUserData();
-    firebaseData();
-    _services.getStepsData();
+    // firebaseData();
+    // _services.getStepsData();
     OptimizeBattery.isIgnoringBatteryOptimizations().then((onValue) {
       setState(() {
         if (onValue) {
@@ -144,33 +147,12 @@ DatabaseServices _services=DatabaseServices();
 
     });}
   }
-
-  // void _storeSteps(int Steps) async {
-  //
-  //   ObjectBoxClass.instance.storeSteps(Steps).then((value) {
-  //     _getTotalYearlySteps();
-  //   });
-  //
-  //   // Optionally, you can add code here to update the UI or show a success message.
-  //
-  // }
-  //
-  //
-  // Future<void> _getTotalYearlySteps() async {
-  //   final Map<String, dynamic> stepsData = await ObjectBoxClass.instance.getStepsData();
-  //   print(stepsData.toString());
-  //   final now = DateTime.now();
-  //   final year = (now.year).toString();
-  //   final month = now.month<10?"0"+now.month.toString():now.month.toString(); // Use month number directly
-  //   final date = (now.day).toString();
-  //   final time = (DateFormat('h a').format(now)).toString();
-  //   print(year);
-  //   print(month);
-  //   print(date);
-  //   print(time);
-  //   print(now);
-  //   print('Steps Target is----------> ${stepsData['${year}']['${month}']['${date}']['${time}']}');
-  // }
+Future<void> getColors() async {
+  List<Color> loadedTheme = await SharedPref().loadColorList();
+  setState(() {
+    Themee=loadedTheme;
+  });
+}
 
   void checkisSingleDeviceloggedIn(String Uid,String Deviceid,bool isGuest) async{
     // print("checkSingleDeviceLoggededIn calling after 1 sec");
@@ -229,126 +211,12 @@ DatabaseServices _services=DatabaseServices();
 }
   void onClickedNotification(String? playload)=> Get.to(()=>HomePage());
 
-      Future<double> getSpeed() async {
-    Position position = await Geolocator.getCurrentPosition(
-        desiredAccuracy: LocationAccuracy.high);
 
-    // Calculate speed in m/s
-    double speed = position.speed ?? 0.0;
-
-    // Convert speed to km/h
-    speed *= 3.6;
-    setState(() {
-      currentSpeed=speed;
-    });
-    // print("this Speed is In get Speed Method------------------------------------------>"+currentSpeed.toString());
-    return speed;
-  }
-
-
-
-
-
-  Map<String, int> stepCounts = {}; // Initialize an empty map
-
-  void updateStepCount(DateTime date, int steps) {
-    String formattedDate = date.toIso8601String(); // Convert date to a string
-    stepCounts[formattedDate] = steps; // Update or create entry
-  }
-  Future<void> firebaseData() async {
-    if(isGuest==true){
-      print("In fire base if Guest is ");
-      SharedPref().setStepsTarget(StepsTarget);
-      indicatorProgress = (StepsCompleted / StepsTarget) as double;
-      if (indicatorProgress >= 1) {
-        setState(() {
-          indicatorProgress = 1;
-          // SharedPref().setStartTime(DateTime.now().toString());
-          // startTime=DateTime.now();
-        });
-      }
-    }
-    else{
-       // print("infirebase data");
-       // print("Print is guest in firebase "+isGuest.toString());
-      String _uid = await SharedPref().getUid();
-      DatabaseReference databaseReference = FirebaseDatabase.instance
-          .reference()
-          .child('users')
-          .child(_uid)
-          .child('defaultsteps');
-      try {
-        databaseReference.onValue.listen((event) {
-          // print("sixinxs: "+event.snapshot.value.toString());
-          setState(() {
-            if(event.snapshot.value!=null){
-              StepsTarget=int.parse(event.snapshot.value.toString());}else{
-              StepsTarget=6000;
-            }
-            // isGuest?null:SharedPref().setStepsTarget(StepsTarget);
-            indicatorProgress = (StepsCompleted / StepsTarget) as double;
-            if (indicatorProgress >= 1) {
-              setState(() {
-                indicatorProgress = 1;
-                // SharedPref().setStartTime(DateTime.now().toString());
-                // startTime=DateTime.now();
-              });
-            }
-          });
-
-        });
-      } catch (e) {
-        print('Error: $e');
-      }
-    }
-  }
   StreamSubscription<StepCount>? _subscription;
   StreamSubscription<PedestrianStatus>? _pedestrianStatusSubscription;
   double deviceHeight(BuildContext context) =>
       MediaQuery.of(context).size.height;
 
-  String StepsToDistance(int steps, bool isMiles) {
-    double stepsInKm = steps / 1312.33595801;
-    double totalDistance;
-    String unit;
-    double totalTimeInHours = stepsInKm / speedInHours;
-    DateTime dateTime = DateTime(0, 0, 0, totalTimeInHours.toInt(), (totalTimeInHours % 1 * 60).toInt());
-    String formattedTime = "${dateTime.hour.toString().padLeft(2, '0')}:${dateTime.minute.toString().padLeft(2, '0')}";
-    List<String> timeParts = formattedTime.split(':');
-    int hours = int.parse(timeParts[0]);
-    int minutes = int.parse(timeParts[1]);
-    setState(() {
-      totalDuration= Duration(hours: hours, minutes: minutes);
-    });
-    SharedPref().saveDuration( totalDuration);
-    if (isMiles) {
-      // Convert steps to miles
-      totalDistance = stepsInKm * 0.62137;
-      unit = " miles";
-    } else {
-      // Convert steps to meters
-      totalDistance = stepsInKm * 1000;
-      unit = " m";
-    }
-
-    if (totalDistance >= 1000) {
-      // If the total distance is 1 kilometer or more, return in kilometers
-      setState(() {
-        // totalDuration = Duration.zero; // or set it to the desired value
-        inMiles = isMiles ? totalDistance : totalDistance / 1609.34;
-      });
-      // SharedPref().saveDuration(totalDuration);
-      return "${isMiles ? totalDistance.toStringAsFixed(1) + unit : (totalDistance / 1000).toStringAsFixed(1)+ " Km" } ";
-    } else {
-      // If the total distance is less than 1 kilometer, return in meters
-      setState(() {
-        // totalDuration = Duration.zero; // or set it to the desired value
-        inMiles = isMiles ? totalDistance * 1609.34 : totalDistance;
-      });
-      // SharedPref().saveDuration(totalDuration);
-      return "${isMiles ? (totalDistance * 1609.34).toStringAsFixed(1) + unit : totalDistance.toStringAsFixed(1) + " m"} ";
-    }
-  }
 
 
 
@@ -468,7 +336,7 @@ DatabaseServices _services=DatabaseServices();
                       await SharedPref().setTodaysSteps(StepsCompleted);
                     DateTime now = DateTime.now();
                     String formattedDate = DateFormat('yyyy-MM-dd').format(now);
-                    updateStepCount(DateTime.parse(formattedDate), StepsCompleted);
+                    // updateStepCount(DateTime.parse(formattedDate), StepsCompleted);
                     isGuest==false?_services.sendStepsToFirebase(StepsCompleted):null;
                     // SharedPref().saveStepsData(stepCounts);
                       SharedPref().setStepsData(StepsCompleted).then((value) async {
@@ -494,7 +362,7 @@ DatabaseServices _services=DatabaseServices();
                       await SharedPref().setTodaysSteps(StepsCompleted);
                       DateTime now = DateTime.now();
                       String formattedDate = DateFormat('yyyy-MM-dd').format(now);
-                      updateStepCount(DateTime.parse(formattedDate), StepsCompleted);
+                      // updateStepCount(DateTime.parse(formattedDate), StepsCompleted);
                       isGuest==false?_services.sendStepsToFirebase(StepsCompleted):null;
                       // SharedPref().saveStepsData(stepCounts);
                       SharedPref().setStepsData(StepsCompleted).then((value) async {
@@ -512,7 +380,7 @@ DatabaseServices _services=DatabaseServices();
                       await SharedPref().setTodaysSteps(StepsCompleted);
                       DateTime now = DateTime.now();
                       String formattedDate = DateFormat('yyyy-MM-dd').format(now);
-                      updateStepCount(DateTime.parse(formattedDate), StepsCompleted);
+                      // updateStepCount(DateTime.parse(formattedDate), StepsCompleted);
                       isGuest==false?_services.sendStepsToFirebase(StepsCompleted):null;
                       // SharedPref().saveStepsData(stepCounts);
                       SharedPref().setStepsData(StepsCompleted).then((value) async {
@@ -532,12 +400,12 @@ DatabaseServices _services=DatabaseServices();
           onError: (error) => print('Error: $error'),
         );
         // Pedestrian Status Stream
-        _pedestrianStatusSubscription =
-            Pedometer.pedestrianStatusStream.listen((PedestrianStatus event) {
-              setState(() {
-                _pedestrianStatus = event.status;
-              });
-            });
+        // _pedestrianStatusSubscription =
+        //     Pedometer.pedestrianStatusStream.listen((PedestrianStatus event) {
+        //       setState(() {
+        //         _pedestrianStatus = event.status;
+        //       });
+        //     });
         }else{
           // await Permission.activityRecognition.request();
           // await Permission.location.request();
@@ -546,7 +414,7 @@ DatabaseServices _services=DatabaseServices();
             SharedPref().setisStart(false);
           });
         }
-
+      _services.sendStepsToFirebase(StepsCompleted);
     return StepsCompleted;
   }
   void _resetStepCount(int steps) async {
@@ -570,6 +438,207 @@ DatabaseServices _services=DatabaseServices();
     // print("new Day in _reset last day------------------->"+newday.toString());
     // startListening();
   }
+
+  String formatTime(double timeInMinutes) {
+    print(timeInMinutes.toStringAsFixed(0));
+    if (timeInMinutes <= 1) {
+      // Return seconds
+      int seconds = int.parse((timeInMinutes * 60).toStringAsFixed(0));
+      return '$seconds sec${seconds != 1 ? 's' : ''}';
+    } else if (timeInMinutes < 60) {
+      // Return minutes
+      int minutes = int.parse(timeInMinutes.toStringAsFixed(0));
+      return '$minutes min${minutes != 1 ? 's' : ''}';
+    } else if (timeInMinutes < 1440) {
+      // Return hours
+      int hours = timeInMinutes ~/ 60;
+      return '$hours H${hours != 1 ? 's' : ''}';
+    } else if (timeInMinutes < 43200) {
+      // Return days
+      int days = timeInMinutes ~/ 1440;
+      return '$days day${days != 1 ? 's' : ''}';
+    } else {
+      // Return years
+      int years = timeInMinutes ~/ 525600;
+      return '$years year${years != 1 ? 's' : ''}';
+    }
+  }
+
+  String calculateTimeToCoverDistance({
+    required int steps,
+    required double distance,
+    required bool isMetric, // Add a parameter to specify whether the distance is in kilometers or miles
+
+  }) {
+    print(distance);
+    print(steps);
+    // Calculate step length
+    double stepLength = (Height * 0.415) / steps;
+    // print("stepslength $stepLength");
+    // Number of steps for 1 kilometer (adjust as needed)
+    double stepsPerKilometer = isMetric ? 1000 / stepLength : 1609.34 / stepLength;
+    // print("stepsPerKilometer $stepsPerKilometer");
+
+    // Calculate walking speed (kilometers per minute)
+    double walkingSpeed = stepsPerKilometer / distance;
+    if (!walkingSpeed.isFinite || walkingSpeed <= 0) {
+      return "0";
+    }
+    // print("walkingSpeed $walkingSpeed");
+
+    // Calculate time to cover the distance (in minutes)
+    double timeInMinutes = distance / walkingSpeed;
+    // print("timeInMinutes " + timeInMinutes.toStringAsFixed(3));
+
+    return formatTime(double.parse(timeInMinutes.toStringAsFixed(0)));
+  }
+  double calculateTimeToCoverDistanceInMinutes({
+    required int steps,
+    required double distance,
+    required bool isMetric,
+  }) {
+    // print(distance);
+    // print(steps);
+    // Calculate step length
+    double stepLength = (Height * 0.415) / steps;
+    // print("stepslength $stepLength");
+    // Number of steps for 1 kilometer (adjust as needed)
+    double stepsPerKilometer = isMetric ? 1000 / stepLength : 1609.34 / stepLength;
+    // print("stepsPerKilometer $stepsPerKilometer");
+
+    // Calculate walking speed (kilometers per minute)
+    double walkingSpeed = stepsPerKilometer / distance;
+    if (!walkingSpeed.isFinite || walkingSpeed <= 0) {
+      return 0.0;
+    }
+    print("walkingSpeed $walkingSpeed");
+
+    // Calculate time to cover the distance (in minutes)
+    double timeInMinutes = distance / walkingSpeed;
+    // print("timeInMinutes " + timeInMinutes.toStringAsFixed(3));
+
+    return timeInMinutes;
+  }
+
+  String calculateCaloriesBurned({
+
+    required int steps,
+
+  })  {
+    if (steps <= 0) {
+      return "0 kcal"; // Return 0 kcal if steps are zero or negative
+    }
+
+  // print("Steps-----------?$steps");
+    // Calculate BMR using Harris-Benedict equation
+    double bmr = (Gender.toLowerCase() == "male")
+        ? 88.362 + (13.397 * Weight) + (4.799 * Height) - (5.677 * Age)
+        : (Gender.toLowerCase() == "female")
+        ? 447.593 + (9.247 * Weight) + (3.098 * Height) - (4.330 * Age)
+        : 0.0; // Placeholder for other gender (customize as needed)
+
+    // Calculate TDEE using activity factor
+    double tdee = bmr * ActivityLevel;
+
+    // Estimate calories burned during walking (calories per step)
+    double caloriesPerStep =
+    0.04; // Adjust this value based on walking conditions
+
+    // Total calories burned during walking
+    double caloriesBurned = steps * caloriesPerStep;
+      // print("Calories Burned------> $caloriesBurned");
+    // Add walking calories to TDEE
+    double totalCaloriesBurned = caloriesBurned;
+
+    return totalCaloriesBurned.toStringAsFixed(0) + " kcal";
+  }
+
+  double StepsToDistanceDouble(int steps, bool isMiles) {
+    double stepsInKm = steps / 1312.33595801;
+    double totalDistance;
+    String unit;
+    double totalTimeInHours = stepsInKm / 4.82803;
+    DateTime dateTime = DateTime(
+        0, 0, 0, totalTimeInHours.toInt(), (totalTimeInHours % 1 * 60).toInt());
+    String formattedTime =
+        "${dateTime.hour.toString().padLeft(2, '0')}:${dateTime.minute.toString().padLeft(2, '0')}";
+    List<String> timeParts = formattedTime.split(':');
+
+    if (isMiles) {
+      // Convert steps to miles
+      totalDistance = stepsInKm * 0.62137;
+      unit = " miles";
+    } else {
+      // Convert steps to meters
+      totalDistance = stepsInKm * 1000;
+      unit = " m";
+    }
+    return totalDistance;
+  }
+
+  String time = "";
+  String formatted(double totalDistance, bool isMiles, String unit) {
+    if (totalDistance >= 1000) {
+      // If the total distance is 1 kilometer or more, return in kilometers
+      setState(() {
+        // totalDuration = Duration.zero; // or set it to the desired value
+        inMiles = isMiles ? totalDistance : totalDistance / 1609.34;
+      });
+      // SharedPref().saveDuration(totalDuration);
+      return "${isMiles ? totalDistance.toStringAsFixed(1) + unit : (totalDistance / 1000).toStringAsFixed(1) + " Km"} ";
+    } else {
+      // If the total distance is less than 1 kilometer, return in meters
+      setState(() {
+        // totalDuration = Duration.zero; // or set it to the desired value
+        inMiles = isMiles ? totalDistance * 1609.34 : totalDistance;
+      });
+      // SharedPref().saveDuration(totalDuration);
+      setState(() {
+        time =
+        "${isMiles ? (totalDistance * 1609.34).toStringAsFixed(1) + unit : totalDistance.toStringAsFixed(1)} ";
+      });
+      return "${isMiles ? (totalDistance * 1609.34).toStringAsFixed(1) + unit : totalDistance.toStringAsFixed(1) + unit} ";
+    }
+  }
+
+  String StepsToDistance(int steps, bool isMiles) {
+    double stepsInKm = steps / 1312.33595801;
+    double totalDistance;
+    String unit;
+    double totalTimeInHours = stepsInKm / 4.82803;
+    DateTime dateTime = DateTime(
+        0, 0, 0, totalTimeInHours.toInt(), (totalTimeInHours % 1 * 60).toInt());
+    String formattedTime =
+        "${dateTime.hour.toString().padLeft(2, '0')}:${dateTime.minute.toString().padLeft(2, '0')}";
+    List<String> timeParts = formattedTime.split(':');
+
+    if (isMiles) {
+      // Convert steps to miles
+      totalDistance = stepsInKm * 0.62137;
+      unit = " miles";
+    } else {
+      // Convert steps to meters
+      totalDistance = stepsInKm * 1000;
+      unit = " m";
+    }
+    return formatted(totalDistance, isMiles, unit);
+  }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
   void stopListening() {
     _subscription?.cancel();
     _pedestrianStatusSubscription?.cancel();
@@ -606,26 +675,34 @@ DatabaseServices _services=DatabaseServices();
 
     return caloriesBurnt;
   }
-Future<bool> checkifotherloggedin() async {
-    bool check=await SharedPref().getischecking();
-    return check;
-}
+
   Future<void> getUserData() async {
     bool IntroDone=await SharedPref().getIntroScreenInfo();
     bool isstart=await SharedPref().getisStart();
     int stepscmingFromfirebase= await SharedPref().getStepsComingFromFirebase();
+    print("Steps coming from Firebase----------->$stepscmingFromfirebase");
     int TodaysSteps=await SharedPref().getTodaysSteps()??0;
     bool isguest=await SharedPref().getisguest();
     String _uid = await SharedPref().getUid();
     int target=await SharedPref().getStepsTarget();
     bool isChecking=await SharedPref().getischecking();
+    double activityLevel= await SharedPref().getActivityLevel();
     final Map<String, dynamic> stepsdata = await SharedPref().getStepsData();
     // DateTime StartTi=await SharedPref().getStartTime()??DateTime.now();
     Duration? Activity = await SharedPref().getSavedDuration();
     bool isMiles=await SharedPref().getisMiles();
     int lastDayStep=await SharedPref().getLastDaySteps();
     int extra=await SharedPref().getextraSteps()??0;
+    int weight=await SharedPref().getWeight();
+    int height= await SharedPref().getHeight();
+    int age=await SharedPref().getAge();
+    String gender= await SharedPref().getGender();
     setState(() {
+      Weight=double.parse(weight.toString());
+      Height=double.parse(height.toString());
+      Age=age;
+      Gender=gender;
+      ActivityLevel=activityLevel;
       Uid=_uid;
       ischecking=isChecking;
       introdone=IntroDone;
@@ -643,18 +720,14 @@ Future<bool> checkifotherloggedin() async {
       stepsData=stepsdata;
     });
     checkisSingleDeviceloggedIn( Uid, Deviceid, isGuest);
-     print("------------------------------------------------------/-------------------------------${stepsdata}");
+     print("------------------------------------------------------/-------------------------------${StepsTarget}");
 
   }
-  void setstatecallback(){
-    setState(() {
 
-    });
-  }
 List<String> WhichGraoh=['Day','Week','Month'];
   int indexofwhichGraph=0;
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context)  {
     return WillPopScope(
       onWillPop: () async {
         SystemNavigator.pop();
@@ -699,8 +772,9 @@ List<String> WhichGraoh=['Day','Week','Month'];
                         height: MediaQuery.of(context).size.width*0.6,
                         child: CustomPaint(
                           painter:  GradiantArchProgress(
-                              startColor: Color(0xFFFF8900),
-                              endColor: Color(0xD5CE00FF), StepsCompleted: StepsCompleted, StepsTarget: StepsTarget, width: 25.0),
+                              startColor: Themee[0],
+                              middle: Themee[1],
+                              endColor: Themee[2], StepsCompleted: StepsCompleted, StepsTarget: StepsTarget, width: 25.0),
                         ),
                       )
                     ],
@@ -720,10 +794,7 @@ List<String> WhichGraoh=['Day','Week','Month'];
                 ShaderMask(
                   shaderCallback: (Rect bounds) {
                     return LinearGradient(
-                      colors: [
-                        Color(0xFFFF8900),
-                        Color(0xFFCE00FF)
-                      ],  // Replace these colors with your desired gradient colors
+                      colors: Themee,  // Replace these colors with your desired gradient colors
                       begin: Alignment.center,
                       end: Alignment.bottomRight,
                     ).createShader(bounds);
@@ -747,9 +818,19 @@ List<String> WhichGraoh=['Day','Week','Month'];
                   children: [
                     Column(
                       children: [
-                        SvgPicture.asset("lib/assests/NewImages/Kcal.svg"),
+                        SizedBox(
+                          width: MediaQuery.of(context).size.width*0.125,
+                          height: MediaQuery.of(context).size.width*0.125,
+                          child: CustomPaint(
+                            painter:  GradiantArchProgress(
+                                startColor: Themee[0],
+                                middle: Themee[1],
+                                endColor: Themee[2], StepsCompleted: int.parse(calculateCaloriesBurned(steps: StepsCompleted).replaceAll(" kcal", "")), StepsTarget: int.parse(calculateCaloriesBurned(steps: StepsTarget).replaceAll(" kcal", "")), width: 5.0),
+                            child:  Image.asset("lib/assests/NewImages/Calories.png",scale: 5,),
+                          ),
+                        ),
                         SizedBox(height: 10,),
-                        Text(calculateCaloriesBurnt(StepsCompleted).toStringAsFixed(0)+" Kcal",
+                        Text(calculateCaloriesBurned(steps: StepsCompleted),
                           style: TextStyle(
                             color: Color(0xFFF3F3F3),
                             fontSize: 24.sp,
@@ -763,7 +844,20 @@ List<String> WhichGraoh=['Day','Week','Month'];
                     ),
                      Column(
                       children: [
-                        SvgPicture.asset("lib/assests/NewImages/Distance.svg"),
+                        SizedBox(
+                          width: MediaQuery.of(context).size.width*0.125,
+                          height: MediaQuery.of(context).size.width*0.125,
+                          child: CustomPaint(
+                            painter:  GradiantArchProgress(
+                                startColor: Themee[0],
+                                middle: Themee[1],
+                                endColor: Themee[2], StepsCompleted: int.parse(StepsToDistanceDouble(StepsCompleted,isMils).toStringAsFixed(0)), StepsTarget: int.parse(StepsToDistanceDouble(StepsTarget,isMils).toStringAsFixed(0)), width: 5.0),
+                            child:  Padding(
+                              padding:  EdgeInsets.only(right: 2,top: 2),
+                              child: Center(child: Image.asset("lib/assests/NewImages/Distance.png",scale: 6,)),
+                            ),
+                          ),
+                        ),
                         SizedBox(height: 10,),
                         Text(StepsToDistance(StepsCompleted,isMils),
                           style: TextStyle(
@@ -779,9 +873,19 @@ List<String> WhichGraoh=['Day','Week','Month'];
                     ),
                      Column(
                       children: [
-                        SvgPicture.asset("lib/assests/NewImages/Time.svg"),
+                        SizedBox(
+                          width: MediaQuery.of(context).size.width*0.125,
+                          height: MediaQuery.of(context).size.width*0.125,
+                          child: CustomPaint(
+                            painter:  GradiantArchProgress(
+                                startColor: Themee[0],
+                                middle: Themee[1],
+                                endColor: Themee[2], StepsCompleted: int.parse(calculateTimeToCoverDistanceInMinutes(steps: StepsCompleted, distance: StepsToDistanceDouble(StepsCompleted,isMils), isMetric: isMils).toStringAsFixed(0)), StepsTarget: int.parse(calculateTimeToCoverDistanceInMinutes(steps: StepsTarget, distance: StepsToDistanceDouble(StepsTarget,isMils), isMetric: isMils).toStringAsFixed(0)), width: 5.0),
+                            child:  Image.asset("lib/assests/NewImages/Clock.png",scale: 5,),
+                          ),
+                        ),
                         SizedBox(height: 10,),
-                        Text("${totalDuration.inMinutes>60?totalDuration.inHours.toString().padLeft(2, '0') + " H": totalDuration.inMinutes.toString().padLeft(2, '0') + " m"}",
+                        Text(calculateTimeToCoverDistance(steps: StepsCompleted, distance: StepsToDistanceDouble(StepsCompleted,isMils), isMetric: isMils),
                           style: TextStyle(
                             color: Color(0xFFF3F3F3),
                             fontSize: 24.sp,
@@ -815,9 +919,7 @@ List<String> WhichGraoh=['Day','Week','Month'];
                         width: 70,
                         decoration: BoxDecoration(
                           gradient: LinearGradient(
-                            colors: [
-                              Color(0xFFFF8900),
-                              Color(0xD5CE00FF)], // Add your desired colors
+                            colors: Themee, // Add your desired colors
                             begin: Alignment.centerLeft,
                             end: Alignment.centerRight,
                           ),
@@ -848,7 +950,7 @@ List<String> WhichGraoh=['Day','Week','Month'];
                   ],
                 ),
                 SizedBox(height: 30,),
-                LineChartSample2(WhichGraoh[indexofwhichGraph]),
+                LineChartSample2(WhichGraoh[indexofwhichGraph],Themee),
                 SizedBox(height: 90,),
               ],
             ),

@@ -6,6 +6,7 @@ import 'package:steptracking/presentations/HomePage.dart';
 import 'package:steptracking/presentations/ReportScreen.dart';
 import 'package:steptracking/presentations/SettingsScreen.dart';
 
+import '../SharedPrefrences/SharedPref.dart';
 import '../widgets/BottomNavbar.dart';
 import 'Linechart.dart';
 
@@ -28,8 +29,22 @@ class _MainScreenState extends State<MainScreen> {
 
 
   }
+  late List<Color> Themee=[];
+  Future<void> getColors() async {
+    List<Color> loadedTheme = await SharedPref().loadColorList();
+    setState(() {
+      Themee=loadedTheme;
+    });
+  }
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    getColors();
+  }
   @override
   Widget build(BuildContext context) {
+    getColors();
     return Scaffold(
       extendBody: true,
       extendBodyBehindAppBar: true,
@@ -56,9 +71,7 @@ class _MainScreenState extends State<MainScreen> {
               margin: EdgeInsets.symmetric(horizontal: 68.0),
               decoration: BoxDecoration(
                 gradient: LinearGradient(
-                  colors: [
-                    Color(0xFFFF8900),
-                    Color(0xD5CE00FF)], // Add your desired colors
+                  colors: Themee, // Add your desired colors
                   begin: Alignment.centerLeft,
                   end: Alignment.centerRight,
                 ),

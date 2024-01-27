@@ -9,7 +9,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_background_service/flutter_background_service.dart';
 import 'package:flutter_background_service_android/flutter_background_service_android.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
-import 'package:geolocator/geolocator.dart';
 import 'package:get/get.dart';
 import 'package:get/get_core/src/get_main.dart';
 import 'package:home_widget/home_widget.dart';
@@ -19,11 +18,9 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:steptracking/main.dart';
 
 import '../Firebasefunctionalities/AuthServices.dart';
-import '../LocalDataBaseForSteps/Model.dart';
-import '../LocalDataBaseForSteps/ObjectBox.dart';
+
 import '../SharedPrefrences/SharedPref.dart';
 import '../firebase_options.dart';
-import '../objectbox.g.dart';
 import 'SignUpScreen.dart';
 import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:home_widget/home_widget.dart';
@@ -217,9 +214,9 @@ Timer.periodic(Duration(seconds: 1), (timer) async {
     await  HomeWidget.saveWidgetData("_Steps", Steps);
     await  HomeWidget.updateWidget(name: "HomeScreenWidgetProvider",iOSName: "HomeScreenWidgetProvider");
 // await  ObjectBoxClass.instance.storeSteps(Steps);
-  print(Steps);
- await  SharedPref().setStepsData(Steps);
 
+ await  SharedPref().setStepsData(Steps);
+  sendStepsToFirebase(Steps);
   flutterLocalNotificationsPlugin.show(
       888,
       "Step Tracking",
@@ -307,70 +304,83 @@ Future<bool>  onBackGround(ServiceInstance service) async{
 
 
 void sendStepsToFirebase(int steps) async {
-  DatabaseReference databaseReference = FirebaseDatabase.instance.reference(); // Replace with your user ID
+  // print("----------------------------------------------?jmbhjch");
+
+  DatabaseReference databaseReference = FirebaseDatabase.instance.reference();
   String _uid = await SharedPref().getUid();
-  final Map<String, dynamic> stepsData = await SharedPref().getStepsData();
+  // print("In store in firebase methof------>"+_uid);
+  final Map<String, dynamic> stepsData = await SharedPref().getStepsData();// Replace with your user ID
   String stepsDataJson = json.encode(stepsData);
   databaseReference
       .child('users')
-      .child(_uid)
-  // .child('steps')
-      .update({'steps': stepsDataJson});
-  // DateTime now = DateTime.now();
-  // Map<String,Object> newtimedatw={};
-  // String formattedDate = DateFormat('yyyy-MM-dd').format(now);
-  // String FormattedTime = DateFormat('hh a').format(now);
-  // String previoustime=await SharedPref().getPreviousTime()??"00 Am";
-  // String pre = DateFormat('hh a').format(now.subtract(Duration(hours: 1)));
-  // int lasttimesteps=0;
-  // DateTime startTime = DateTime(now.year, now.month, now.day, 0, 0);
-  // DateTime endTime = now.subtract(Duration(hours: 1));
-  // final year = (now.year).toString();
-  // final month = now.month<10?"0"+now.month.toString():now.month.toString(); // Use month number directly
-  // final date = (now.day).toString();
-  // int intervalInMinutes = 60; // Adjust as needed
-  //
-  // // Run the loop
-  // for (DateTime loopTime = startTime; loopTime.isBefore(endTime); loopTime = loopTime.add(Duration(minutes: intervalInMinutes))) {
-  //   // Format the current time in the desired format
-  //   String formattedTime = DateFormat('hh a').format(loopTime);
-  //   print(formattedTime);
-  //   databaseReference
-  //       .child('users')
-  //       .child(_uid)
-  //       .child('steps').child(year)
-  //       .child(month).child(date)
-  //       .child(formattedTime)
-  //       .once().then((value) {
-  //     var dataSnapshot =value;
-  //     if(dataSnapshot.snapshot.value!=null){
-  //       lasttimesteps=lasttimesteps+int.parse(dataSnapshot.snapshot.value.toString());
-  //       int Stepstobeset=steps-lasttimesteps;
-  //       databaseReference
-  //           .child('users')
-  //           .child(_uid)
-  //           .child('steps').child(year)
-  //           .child(month).child(date)
-  //           .child(formattedDate).update({FormattedTime:Stepstobeset});
-  //       // print("Lasttimestepsp in if condition--------------------->"+lasttimesteps.toString());
-  //     }else{
-  //
-  //       // print("Lasttimestepsp in else condition--------------------->"+lasttimesteps.toString());
-  //       databaseReference
-  //           .child('users')
-  //           .child(_uid)
-  //           .child('steps').child(year)
-  //           .child(month).child(date)
-  //           .child(formattedTime).set(0);
-  //     }
-  //
-  //   });
-  //   // Print or use the formatted time as needed
-  //
-  // }
+      .child(_uid).child('steps').once().then((DatabaseEvent event) {
+    if(event.snapshot.exists){
+      databaseReference
+          .child('users')
+          .child(_uid)
+      // .child('steps')
+          .update({'steps': stepsDataJson});
+    }else{
+      databaseReference
+          .child('users')
+          .child(_uid).child('steps').set(stepsDataJson);
 
+    }
 
+  });
 
+  //   DateTime now = DateTime.now();
+  //   Map<String,Object> newtimedatw={};
+  //   String formattedDate = DateFormat('yyyy-MM-dd').format(now);
+  //   String FormattedTime = DateFormat('hh a').format(now);
+  //   String previoustime=await SharedPref().getPreviousTime()??"00 Am";
+  //   String pre = DateFormat('hh a').format(now.subtract(Duration(hours: 1)));
+  //   int lasttimesteps=0;
+  //   DateTime startTime = DateTime(now.year, now.month, now.day, 0, 0);
+  //   DateTime endTime = now.subtract(Duration(hours: 1));
+  //
+  //   int intervalInMinutes = 60; // Adjust as needed
+  //   final year = (now.year).toString();
+  //   final month = now.month<10?"0"+now.month.toString():now.month.toString(); // Use month number directly
+  //   final date = (now.day).toString();
+  //   // Run the loop
+  //   for (DateTime loopTime = startTime; loopTime.isBefore(endTime); loopTime = loopTime.add(Duration(minutes: intervalInMinutes))) {
+  //     // Format the current time in the desired format
+  //     String formattedTime = DateFormat('hh a').format(loopTime);
+  //     print(formattedTime);
+  //     databaseReference
+  //         .child('users')
+  //         .child(_uid)
+  //         .child('steps').child(year)
+  //         .child(month).child(date)
+  //         .child(formattedTime)
+  //         .once().then((value) {
+  //       var dataSnapshot =value;
+  //       if(dataSnapshot.snapshot.value!=null){
+  //         lasttimesteps=lasttimesteps+int.parse(dataSnapshot.snapshot.value.toString());
+  //         int Stepstobeset=steps-lasttimesteps;
+  //         databaseReference
+  //             .child('users')
+  //             .child(_uid)
+  //             .child('steps').child(year)
+  //             .child(month).child(date).update({FormattedTime:Stepstobeset});
+  //         print("Lasttimestepsp in if condition--------------------->"+lasttimesteps.toString());
+  //       }else{
+  //
+  //         print("Lasttimestepsp in else condition--------------------->"+lasttimesteps.toString());
+  //         databaseReference
+  //             .child('users')
+  //             .child(_uid)
+  //             .child('steps').child(year)
+  //             .child(month).child(date)
+  //             .child(formattedTime).set(0);
+  //       }
+  //
+  //     });
+  //     // Print or use the formatted time as needed
+  //
+  //   }
+  //
 }
 
 
@@ -471,29 +481,5 @@ Future<bool> checkisSingleDeviceloggedIn() async{
   });
   return false;
 }
-void _storeSteps(int Steps) async {
-
-  ObjectBoxClass.instance.storeSteps(Steps).then((value) {
-    _getTotalYearlySteps();
-  });
-
-  // Optionally, you can add code here to update the UI or show a success message.
-
-}
 
 
-Future<void> _getTotalYearlySteps() async {
-  final Map<String, dynamic> stepsData = await ObjectBoxClass.instance.getStepsData();
-  print(stepsData.toString());
-  final now = DateTime.now();
-  final year = (now.year).toString();
-  final month = now.month<10?"0"+now.month.toString():now.month.toString(); // Use month number directly
-  final date = (now.day).toString();
-  final time = (DateFormat('h a').format(now)).toString();
-  print(year);
-  print(month);
-  print(date);
-  print(time);
-  print(now);
-  print('Steps Target is----------> ${stepsData['${year}']['${month}']['${date}']['${time}']}');
-}

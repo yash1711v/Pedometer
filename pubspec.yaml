@@ -38,8 +38,6 @@ dependencies:
   pedometer: ^4.0.1
   cupertino_icons: ^1.0.6
   get: ^4.6.5
-  intro_slider: ^4.2.1
-  fluttertoast: ^8.2.2
   firebase_core: ^2.16.0
   firebase_auth: ^4.1.4
   cloud_firestore: ^4.1.0
@@ -48,14 +46,12 @@ dependencies:
   firebase_database: ^10.3.2
   permission_handler: ^11.0.1
   flutter_screenutil: ^5.9.0
-  percent_indicator: ^4.2.3
   google_fonts: ^6.1.0
   lottie: ^2.6.0
   intl: ^0.18.1
   fl_chart: ^0.64.0
   device_info: ^2.0.3
   smooth_page_indicator: ^1.1.0
-  geolocator: ^10.1.0
   flutter_background_service: ^5.0.1
   flutter_local_notifications: ^16.1.0
   google_sign_in: ^6.1.5
@@ -65,15 +61,17 @@ dependencies:
   url_launcher: ^6.1.14
   android_alarm_manager_plus: ^3.0.3
   connectivity_plus: ^5.0.1
-
   appsflyer_sdk: ^6.12.2
   optimize_battery: ^0.0.4
   home_widget: ^0.4.1
   flutter_foreground_task: ^6.1.2
   flutter_svg: ^2.0.9
-  sqflite: ^2.3.0
-  objectbox: ^2.4.0
-  objectbox_flutter_libs: any
+  sliding_number: ^0.0.4
+  outline_gradient_button: ^2.0.1+1
+  wheel_slider: ^1.2.1
+  flutter_gradient_button: ^0.0.1
+  flutter_reaction_button: ^3.0.0+3
+
 
 
 

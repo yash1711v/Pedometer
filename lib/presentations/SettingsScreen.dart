@@ -5,6 +5,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_reaction_button/flutter_reaction_button.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:get/get_core/src/get_main.dart';
@@ -27,8 +28,48 @@ class SettingsScreen extends StatefulWidget {
 
 class _SettingsScreenState extends State<SettingsScreen> {
   void initState(){
+    setState(() {
+      Theme.add(Color(0xFFF7722A));
+      Theme.add(Color(0xFFE032A1));
+      Theme.add(Color(0xFFCF03F9));
+      Theme1.add(Color(0xFFF7722A));
+      Theme1.add(Color(0xFFE032A1));
+      Theme1.add(Color(0xFFCF03F9));
+      Theme2.add(Color(0xFF04EF77));
+      Theme2.add(Color(0xFF1F8EAE));
+      Theme2.add(Color(0xFF2E52D0));
+      Theme3.add(Color(0xFFFF00E2));
+      Theme3.add(Color(0xFF9242EB));
+      Theme3.add(Color(0xFF2F7FF3));
+
+    });
     getUserData();
   }
+  Reaction<String> initialSelectedReaction = Reaction<String>(
+    value: 'like',
+    icon:  Container(
+      // color: Colors.white,
+      width: 25,
+      height: 25,
+      decoration: BoxDecoration(
+        shape: BoxShape.circle,
+        border: Border.all(
+          color: Colors.transparent, // Replace with your border color
+          width: 3, // Replace with your border width
+        ),
+        gradient: LinearGradient(
+          colors: [
+            Color(0xFFF7722A),
+            Color(0xFFE032A1),
+            Color(0xFFCF03F9),
+          ], // Replace with your gradient colors
+          begin: Alignment.topCenter,
+          end: Alignment.bottomCenter,
+        ),
+      ),
+      // child: Center(child: Text("Next",style: TextStyle(color: Colors.white),)),
+    ),
+  );
   late TextEditingController _EmailController = TextEditingController();
 
   final FocusNode _emailNode = FocusNode();
@@ -43,6 +84,11 @@ class _SettingsScreenState extends State<SettingsScreen> {
   int StepsTarget = 0;
   bool isGuest=false;
   String Deviceid="";
+  List<Color> Theme1=[];
+  List<Color> Theme=[];
+  List<Color> Theme2=[];
+  List<Color> Theme3=[];
+  String value="0";
       String formattedDate = DateFormat('yyyy-MM-dd').format( DateTime.now());
   DatabaseReference ref= FirebaseDatabase.instance.reference();
   final AuthServices _authServices=AuthServices();
@@ -68,6 +114,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
     String email = await SharedPref().getEmail();
     int stepTar=await SharedPref().getStepsTarget();
     bool isguest=await SharedPref().getisguest();
+    List<Color> theme=await SharedPref().loadColorList();
     setState(() {
       Email=email;
       UserName=useName;
@@ -75,27 +122,104 @@ class _SettingsScreenState extends State<SettingsScreen> {
       isMIles=isMiles;
       StepsTarget=stepTar;
       isGuest=isguest;
-    });
-    print("isguest----------------------------------------------------->"+isguest.toString());
-    if(isGuest){}else{
-      DatabaseReference databaseReference = FirebaseDatabase.instance
-          .reference()
-          .child('users')
-          .child(_uid)
-          .child('defaultsteps');
-      try {
-        databaseReference.onValue.listen((event) {
-          print(event.snapshot.value.toString());
-          setState(() {
-            StepsTarget = int.parse(event.snapshot.value.toString());
-
-          });
-          SharedPref().setStepsTarget(int.parse(event.snapshot.value.toString()));
+      _EmailController.text=UserName;
+      Theme=theme;
+      _dailyStepController.text=StepsTarget.toString();
+      if(Theme[0]==Color(0xFFF7722A)){
+        print("theme1");
+        setState(() {
+          initialSelectedReaction= Reaction<String>(
+            value: 'like',
+            icon:  Container(
+              // color: Colors.white,
+              width: 25,
+              height: 25,
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                border: Border.all(
+                  color: Colors.transparent, // Replace with your border color
+                  width: 3, // Replace with your border width
+                ),
+                gradient: LinearGradient(
+                  colors: [
+                    Color(0xFFF7722A),
+                    Color(0xFFE032A1),
+                    Color(0xFFCF03F9),
+                  ], // Replace with your gradient colors
+                  begin: Alignment.topCenter,
+                  end: Alignment.bottomCenter,
+                ),
+              ),
+              // child: Center(child: Text("Next",style: TextStyle(color: Colors.white),)),
+            ),
+          );
         });
-      } catch (e) {
-        print('Error: $e');
+      }else if(Theme[0]==Color(0xFF04EF77)){
+        print("theme2");
+          setState(() {
+
+        initialSelectedReaction =    Reaction<String>(
+          value: 'love',
+          icon:  Container(
+            // color: Colors.white,
+            width: 25,
+            height: 25,
+            decoration: BoxDecoration(
+              shape: BoxShape.circle,
+              border: Border.all(
+                color:Colors.transparent, // Replace with your border color
+                width: 3, // Replace with your border width
+              ),
+              gradient: LinearGradient(
+                colors: [
+                  Color(0xFF04EF77),
+                  Color(0xFF1F8EAE),
+                  Color(0xFF2E52D0),
+                ], // Replace with your gradient colors
+                begin: Alignment.topCenter,
+                end: Alignment.bottomCenter,
+              ),
+            ),
+            // child: Center(child: Text("Next",style: TextStyle(color: Colors.white),)),
+          ),
+        );
+          });
+      }else{
+        print("theme3");
+      setState(() {
+
+        initialSelectedReaction=  Reaction<String>(
+          value: 'Amazing',
+          icon:
+          Container(
+            // color: Colors.white,
+            width: 25,
+            height: 25,
+            decoration: BoxDecoration(
+              shape: BoxShape.circle,
+              border: Border.all(
+                color:  Colors.transparent, // Replace with your border color
+                width: 3, // Replace with your border width
+              ),
+              gradient: LinearGradient(
+                colors: [
+                  Color(0xFFFF00E2),
+                  Color(0xFF9242EB),
+                  Color(0xFF2F7FF3),
+                ], // Replace with your gradient colors
+                begin: Alignment.topCenter,
+                end: Alignment.bottomCenter,
+              ),
+            ),
+            // child: Center(child: Text("Next",style: TextStyle(color: Colors.white),)),
+          ),
+        );
+      });
       }
-    }
+    });
+
+    print("isguest----------------------------------------------------->"+isguest.toString());
+
 
   }
 
@@ -111,7 +235,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Color(0xFF2D2D2D),
+       resizeToAvoidBottomInset: true,
       body: Padding(
         padding: EdgeInsets.symmetric(horizontal: 20.w,),
         child: Column(
@@ -122,7 +246,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
             Align(
               alignment: Alignment.topLeft,
               child: Text(
-                'SETTINGS',
+                'Profile',
                 style: TextStyle(
                     color: Colors.white,
                     fontSize: 54.sp,
@@ -143,254 +267,61 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 height: 0,
               ),
             ),
-            SizedBox(
-              height: 25.h,
-            ),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Text(
-                  'Username',
-                  style: TextStyle(
+
+            SizedBox(height: 15.h,),
+            Text(
+              'Username',
+              style: TextStyle(
                 color: Colors.white,
                 fontSize: 22.sp,
                 fontFamily: 'Work Sans',
                 fontWeight: FontWeight.w400,
                 height: 0,
-                  ),
-                ),
-                 // SizedBox(width: 185.w,),
-                Text(
-                 UserName,
-                  style: TextStyle(
-                    color: Color(0xFFA9A9A9),
-                    fontSize: 18.sp,
-                    fontFamily: 'Work Sans',
-                    fontWeight: FontWeight.w400,
-                    height: 0,
-                  ),
-                ),
-              ],
+              ),
             ),
-            SizedBox(height: 15.h,),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Text(
-                  'Email',
-                  style: TextStyle(
-                    color: Colors.white,
-                    fontSize: 22.sp,
-                    fontFamily: 'Work Sans',
-                    fontWeight: FontWeight.w400,
-                    height: 0,
-                  ),
+            SizedBox(height: 15,),
+            TextField(
+              textAlign: TextAlign.center,
+              controller: _EmailController,
+              readOnly: false,
+              obscureText: false,
+              focusNode: _emailNode,
+              style:  TextStyle(
+                  color: Colors.white
+              ),
+              decoration: InputDecoration(
+                hintStyle:  TextStyle(
+                  color: Colors.white,
+                  fontSize: 16.w,
+                  fontFamily: 'Inter',
+                  fontWeight: FontWeight.w400,
+                  height: 0,
                 ),
-                // SizedBox(width: 161.w,),
-                GestureDetector(
-                  onTap: (){
-                    isGuest?Get.to(()=>SignUpScreen()):null;
-                  },
-                  child: Text(
-                    Email,
-                    style: TextStyle(
-                      color: Color(0xFFA9A9A9),
-                      fontSize: 18.sp,
-                      fontFamily: 'Work Sans',
-                      fontWeight: FontWeight.w400,
-                      height: 0,
-                    ),
-                  ),
+                enabledBorder: OutlineInputBorder(
+                  borderSide: BorderSide(
+                      width: 2.w,
+                      color: Colors.white
+                  ), //<-- SEE HERE
+                  borderRadius: BorderRadius.circular(10.r),
                 ),
-              ],
+                focusedBorder: OutlineInputBorder(
+                  borderSide:  BorderSide(
+                      width: 2.w,
+                      color:Colors.white), //<-- SEE HERE
+                  borderRadius: BorderRadius.circular(10.r),
+                ),
+              ),
+              keyboardType: TextInputType.emailAddress,
+              onChanged: (value) async {
+                setState(() {
+                  _email = value;
+                });
+                await SharedPref().setUsername(_email);
+                 services.UpdateEmail(Uid, _email);
+
+              },
             ),
-            SizedBox(height: 2.h,),
-            Row(
-            mainAxisAlignment: MainAxisAlignment.end,
-              children: [
-                SizedBox(width:235.w ,),
-                TextButton(onPressed: (){
-                  setState(() {
-                    _EmailController.text="";
-                  });
-                isGuest?Get.to(()=>SignUpScreen()):showModalBottomSheet(
-                    isDismissible: false,
-                      context: context,
-                      isScrollControlled: true,
-                      shape:  RoundedRectangleBorder( // <-- SEE HERE
-                        borderRadius: BorderRadius.only(
-                            topLeft: Radius.circular(10.0.r),
-                            topRight: Radius.circular(10.0.r)
-                        ),
-                      ),
-                      enableDrag: false,
-                      backgroundColor: const Color(0xFF2D2D2D),
-                      builder: (context){
-                        return  SizedBox(
-                            height: _emailNode.hasFocus?650.h:200.h,
-                            child: Padding(
-                              padding:  EdgeInsets.symmetric(horizontal: 25.w,vertical: 30.h),
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: <Widget>[
 
-                                  Text(
-                                    'Email ID',
-                                    style: TextStyle(
-                                      color: Colors.white,
-                                      fontSize: 16.sp,
-                                      fontFamily: 'Inter',
-                                      fontWeight: FontWeight.w400,
-                                      height: 0,
-                                    ),
-                                  ),
-                                  SizedBox(height: 8.0.h),
-                                  const Text(
-                                    'Reset link will be sent to this ID',
-                                    style: TextStyle(
-                                      color: Colors.white,
-                                      fontSize: 16,
-                                      fontFamily: 'Inter',
-                                      fontWeight: FontWeight.w400,
-                                      height: 0,
-                                    ),
-                                  ),
-                                  SizedBox(height: 16.0.h),
-                                  Row(
-                                    children: [
-                                      Expanded(
-                                        child: SizedBox(
-                                          width: 340.w,
-                                          height: 60.h,
-                                          child: TextField(
-                                            controller: _EmailController,
-                                            readOnly: false,
-                                            obscureText: false,
-                                            focusNode: _emailNode,
-                                            style:  TextStyle(
-                                                color: Colors.white
-                                            ),
-                                            decoration: InputDecoration(
-                                              hintText: Email,
-                                              hintStyle:  TextStyle(
-                                                color: Colors.white,
-                                                fontSize: 16.w,
-                                                fontFamily: 'Inter',
-                                                fontWeight: FontWeight.w400,
-                                                height: 0,
-                                              ),
-                                              enabledBorder: OutlineInputBorder(
-                                                borderSide: BorderSide(
-                                                    width: 2.w,
-                                                    color: Colors.white
-                                                ), //<-- SEE HERE
-                                                borderRadius: BorderRadius.circular(10.r),
-                                              ),
-                                              focusedBorder: OutlineInputBorder(
-                                                borderSide:  BorderSide(
-                                                    width: 2.w,
-                                                    color:Colors.white), //<-- SEE HERE
-                                                borderRadius: BorderRadius.circular(10.r),
-                                              ),
-                                            ),
-                                            keyboardType: TextInputType.emailAddress,
-                                            onChanged: (value){
-                                              setState(() {
-                                                _email = value;
-                                              });
-                                            },
-                                          ),
-                                        ),
-                                      ),
-                                      SizedBox(width: 8.0.w),
-                                      SizedBox(
-                                        width: 74.w,
-                                        height: 60.h,
-                                        child: OutlinedButton(
-                                          onPressed: () async {
-
-                                            // Implement reset logic here
-                                            try {
-                                              await FirebaseAuth.instance
-                                                  .sendPasswordResetEmail(email: Email.trim())
-                                                  .then((value) {
-                                                ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                                                  content: Container(
-                                                    child: Text('reset link succesfully sent to Id',
-                                                      style: TextStyle(
-                                                        color: Colors.white,
-                                                        fontSize: 16.sp,
-                                                        fontFamily: 'Inter',
-                                                        fontWeight: FontWeight.w400,
-                                                        height: 0,
-                                                      ),
-
-                                                    ),
-                                                  ),
-                                                  behavior: SnackBarBehavior.floating,
-                                                  backgroundColor: Colors.black,
-                                                ));
-
-                                                print("succesfully sent ");
-                                              });
-                                              // Reset email sent successfully
-                                            } catch (e) {
-                                              ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                                                content: Container(
-                                                  child: Text('Enter Valid Email',
-                                                    style: TextStyle(
-                                                      color: Colors.white,
-                                                      fontSize: 16.sp,
-                                                      fontFamily: 'Inter',
-                                                      fontWeight: FontWeight.w400,
-                                                      height: 0,
-                                                    ),
-
-                                                  ),
-                                                ),
-                                                behavior: SnackBarBehavior.floating,
-                                                backgroundColor: Colors.black,
-                                              ));
-
-                                              print("Error: $e");
-                                              // Handle error
-                                            }
-                                          Navigator.pop(context);
-                                          },
-                                          child: const Icon(
-                                            Icons.arrow_forward,
-                                            color: Colors.white,
-                                          ),
-                                          style: ButtonStyle(
-                                              side: MaterialStateProperty.all(BorderSide(width: 2.0.w,color: Colors.white)),
-                                              shape: MaterialStateProperty.all<RoundedRectangleBorder>(
-                                                  RoundedRectangleBorder(
-                                                      borderRadius: BorderRadius.circular(10.0.r)
-                                                  )
-                                              )
-                                          ) ,
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-
-                                ],
-                              ),
-                            ));
-                      });
-                },
-                  child: Text(
-                  isGuest? "Create Account":'Change Password',
-                  style: TextStyle(
-                    color: Colors.white,
-                    fontSize: 14.sp,
-                    fontFamily: 'Work Sans',
-                    fontWeight: FontWeight.w400,
-                    decoration: TextDecoration.underline,
-                    height: 0,
-                  ),),),
-              ],
-            ),
             SizedBox(height: 59.h,),
             Row(
               mainAxisAlignment: MainAxisAlignment.start,
@@ -421,9 +352,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 ),
                 // SizedBox(width: 91.w,),
                 TextButton(onPressed: (){
-                  setState(() {
-                    _dailyStepController.text="";
-                  });
+
                   showModalBottomSheet(
                       isDismissible: false,
                       context: context,
@@ -470,14 +399,13 @@ class _SettingsScreenState extends State<SettingsScreen> {
                                                 color: Colors.black
                                             ),
                                             decoration: InputDecoration(
-                                              hintText: StepsTarget.toString(),
-                                              hintStyle:  TextStyle(
-                                                color: Colors.black,
-                                                fontSize: 16.w,
-                                                fontFamily: 'Inter',
-                                                fontWeight: FontWeight.w400,
-                                                height: 0,
-                                              ),
+                                              // hintStyle:  TextStyle(
+                                              //   color: Colors.black,
+                                              //   fontSize: 16.w,
+                                              //   fontFamily: 'Inter',
+                                              //   fontWeight: FontWeight.w400,
+                                              //   height: 0,
+                                              // ),
                                               enabledBorder: OutlineInputBorder(
                                                 borderSide: BorderSide(
                                                     width: 2.w,
@@ -496,6 +424,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                                             onChanged: (value){
                                               setState(() {
                                                 StepsTarget = int.parse(value);
+                                                _dailyStepController.text=StepsTarget.toString();
                                               });
                                               SharedPref().setStepsTarget(StepsTarget);
                                             },
@@ -593,6 +522,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
               ],
             ),
             SizedBox(height: 5.h,),
+
+            SizedBox(height: 5.h,),
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
@@ -610,7 +541,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 Switch(
                   // This bool value toggles the switch.
                   value: isMIles,
-                  activeColor: Colors.red,
+                  activeColor: Theme[0],
                   onChanged: (bool value) {
                     // This is called when the user toggles the switch.
                     setState(() {
@@ -634,6 +565,130 @@ class _SettingsScreenState extends State<SettingsScreen> {
                   height: 0,
                 ),
               ),
+            ),
+            SizedBox(height: 15,),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text(
+                  'Theme',
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontSize: 22.sp,
+                    fontFamily: 'Work Sans',
+                    fontWeight: FontWeight.w400,
+                    height: 0,
+                  ),
+                ),
+                SizedBox(
+                  width: 25,
+                  child: ReactionButton(
+                   toggle: false,
+                    boxColor: Colors.white,
+                    selectedReaction: initialSelectedReaction,
+                    onReactionChanged: (Reaction<String>? reaction) async {
+                      print(reaction?.value);
+                       if(reaction?.value=="like") {
+                        await SharedPref().saveColorList(Theme1);
+                        setState(() {
+                          Theme=Theme1;
+                          initialSelectedReaction=reaction!;
+                        });
+                      }else if(reaction?.value=="love"){
+                         await SharedPref().saveColorList(Theme2);
+                         setState(() {
+                           Theme=Theme2;
+                           initialSelectedReaction=reaction!;
+                         });
+                       }else{
+                         await SharedPref().saveColorList(Theme3);
+                         setState(() {
+                           Theme=Theme3;
+                           initialSelectedReaction=reaction!;
+                         });
+                       }
+                    }, reactions: <Reaction<String>>[
+                    Reaction<String>(
+                      value: 'like',
+                      icon:  Container(
+                        // color: Colors.white,
+                        width: 25,
+                        height: 25,
+                        decoration: BoxDecoration(
+                          shape: BoxShape.circle,
+                          border: Border.all(
+                            color: Colors.transparent, // Replace with your border color
+                            width: 3, // Replace with your border width
+                          ),
+                          gradient: LinearGradient(
+                            colors: [
+                              Color(0xFFF7722A),
+                              Color(0xFFE032A1),
+                              Color(0xFFCF03F9),
+                            ], // Replace with your gradient colors
+                            begin: Alignment.topCenter,
+                            end: Alignment.bottomCenter,
+                          ),
+                        ),
+                        // child: Center(child: Text("Next",style: TextStyle(color: Colors.white),)),
+                      ),
+                    ),
+                    Reaction<String>(
+                      value: 'love',
+                      icon:  Container(
+                        // color: Colors.white,
+                        width: 25,
+                        height: 25,
+                        decoration: BoxDecoration(
+                          shape: BoxShape.circle,
+                          border: Border.all(
+                            color:Colors.transparent, // Replace with your border color
+                            width: 3, // Replace with your border width
+                          ),
+                          gradient: LinearGradient(
+                            colors: [
+                              Color(0xFF04EF77),
+                              Color(0xFF1F8EAE),
+                              Color(0xFF2E52D0),
+                            ], // Replace with your gradient colors
+                            begin: Alignment.topCenter,
+                            end: Alignment.bottomCenter,
+                          ),
+                        ),
+                        // child: Center(child: Text("Next",style: TextStyle(color: Colors.white),)),
+                      ),
+                    ),
+                    Reaction<String>(
+                      value: 'Amazing',
+                      icon:
+                      Container(
+                        // color: Colors.white,
+                        width: 25,
+                        height: 25,
+                        decoration: BoxDecoration(
+                          shape: BoxShape.circle,
+                          border: Border.all(
+                            color:  Colors.transparent, // Replace with your border color
+                            width: 3, // Replace with your border width
+                          ),
+                          gradient: LinearGradient(
+                            colors: [
+                              Color(0xFFFF00E2),
+                              Color(0xFF9242EB),
+                              Color(0xFF2F7FF3),
+                            ], // Replace with your gradient colors
+                            begin: Alignment.topCenter,
+                            end: Alignment.bottomCenter,
+                          ),
+                        ),
+                        // child: Center(child: Text("Next",style: TextStyle(color: Colors.white),)),
+                      ),
+                    ),
+                  ],
+                    isChecked: false,
+                    itemSize: const Size(30, 30), ),
+                ),
+              ],
             ),
             SizedBox(height: 30.h,),
             GestureDetector(

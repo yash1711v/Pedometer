@@ -6,13 +6,13 @@ import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:fluttertoast/fluttertoast.dart';
 import 'package:get/get.dart';
 import 'package:get/get_core/src/get_main.dart';
 import 'package:lottie/lottie.dart';
 import 'package:steptracking/Firebasefunctionalities/AuthServices.dart';
 import 'package:steptracking/appsflyer/appsflyerMethod.dart';
 import 'package:steptracking/main.dart';
+import 'package:steptracking/presentations/MainScreen.dart';
 import '../SharedPrefrences/SharedPref.dart';
 import 'HomePage.dart';
 import 'Login.dart';
@@ -283,6 +283,9 @@ class _SignUpScreenState extends State<SignUpScreen> {
                                   },
                                  );
                                  clicked("signup $_email");
+                                 String deviceid=await getDeviceUID();
+
+                                 SharedPref().setDeviceid(deviceid);
                                   _authServices.SignUp(_email,password,context);
                                   Future.delayed(Duration(seconds: 1),(){Navigator.pop(context);});
 
@@ -456,7 +459,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                                     // await SharedPref().setTodaysSteps(0);
                                   // SharedPref().setIntroScreenInfo(false);
                                   //SharedPref().setisStart(false);
-                                    Get.to(HomePage());
+                                    Get.offAll(MainScreen());
                                   },
                               ),
                             ]),

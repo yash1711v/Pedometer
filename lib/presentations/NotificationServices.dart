@@ -31,7 +31,7 @@ const NotificationDetails(android: AndroidNotificationDetails(
   importance: Importance.max,
 ) );
 void initializeNotification() async {
-  _flutterLocalNotificationsPlugin.resolvePlatformSpecificImplementation<AndroidFlutterLocalNotificationsPlugin>()?.requestNotificationsPermission();
+  // _flutterLocalNotificationsPlugin.resolvePlatformSpecificImplementation<AndroidFlutterLocalNotificationsPlugin>()?.requestNotificationsPermission();
 
   InitializationSettings initializationSettings=InitializationSettings(
     android: _androidInitializationSettings

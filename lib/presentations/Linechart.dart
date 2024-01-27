@@ -5,19 +5,16 @@ import 'package:steptracking/SharedPrefrences/SharedPref.dart';
 
 class LineChartSample2 extends StatefulWidget {
   String which="";
+  List<Color> GradientColors=[];
 
-
-  LineChartSample2(this.which);
+  LineChartSample2(this.which,this.GradientColors);
 
   @override
   State<LineChartSample2> createState() => _LineChartSample2State();
 }
 
 class _LineChartSample2State extends State<LineChartSample2> {
-  List<Color> gradientColors = [
-    Color(0xFFFF8900),
-    Color(0xD5CE00FF),
-  ];
+
   List<int> StepsList = [];
   int daysInMonth(String Year, String Month) {
     int year=int.parse(Year);
@@ -406,7 +403,7 @@ class _LineChartSample2State extends State<LineChartSample2> {
           }),
           isCurved: true,
           gradient: LinearGradient(
-            colors: gradientColors,
+            colors:  widget.GradientColors,
           ),
           barWidth: 5,
           isStrokeCapRound: true,
@@ -416,7 +413,7 @@ class _LineChartSample2State extends State<LineChartSample2> {
           belowBarData: BarAreaData(
             show: true,
             gradient: LinearGradient(
-              colors: gradientColors
+              colors:  widget.GradientColors
                   .map((color) => color.withOpacity(0.3))
                   .toList(),
             ),
@@ -494,9 +491,9 @@ class _LineChartSample2State extends State<LineChartSample2> {
           isCurved: true,
           gradient: LinearGradient(
             colors: [
-              ColorTween(begin: gradientColors[0], end: gradientColors[1])
+              ColorTween(begin:  widget.GradientColors[0], end:  widget.GradientColors[2])
                   .lerp(0.2)!,
-              ColorTween(begin: gradientColors[0], end: gradientColors[1])
+              ColorTween(begin:  widget.GradientColors[0], end:  widget.GradientColors[2])
                   .lerp(0.2)!,
             ],
           ),
@@ -509,10 +506,10 @@ class _LineChartSample2State extends State<LineChartSample2> {
             show: true,
             gradient: LinearGradient(
               colors: [
-                ColorTween(begin: gradientColors[0], end: gradientColors[1])
+                ColorTween(begin:  widget.GradientColors[0], end:  widget.GradientColors[2])
                     .lerp(0.2)!
                     .withOpacity(0.1),
-                ColorTween(begin: gradientColors[0], end: gradientColors[1])
+                ColorTween(begin:  widget.GradientColors[0], end:  widget.GradientColors[2])
                     .lerp(0.2)!
                     .withOpacity(0.1),
               ],
