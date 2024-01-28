@@ -1004,7 +1004,7 @@ class _UserNameScreenState extends State<UserNameScreen> {
                       radius: 10,
                       gradientDirection: GradientDirection.leftToRight,
                       textStyle: TextStyle(color: Colors.white),
-                      text: onLastPage ? "Welcome" : "Next",
+                      text: onLastPage ? Text("Welcome") : Text("Next"),
                       onPressed: () async {
                         print("Button clicked");
                         if (onLastPage) {

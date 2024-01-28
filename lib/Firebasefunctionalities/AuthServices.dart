@@ -109,6 +109,7 @@ class AuthServices {
     final GoogleSignInAccount? googleSignInAccount =
     await GoogleSignIn().signIn().then((value) {
       print("in then of google signin");
+      int Steptarget=6000;
       Future.delayed(Duration(seconds: 1), () async {
         userObj = value!;
         // print("User ID --> " + userObj.id);
@@ -158,7 +159,8 @@ class AuthServices {
                     SharedPref().setUsername(event.snapshot.child("username").value.toString());
                     SharedPref().setEmail(event.snapshot.child("email").value.toString());
                     SharedPref().setPassword(event.snapshot.child("password").value.toString());
-                    SharedPref().setStepsTarget(int.parse(event.snapshot.child("StepsTarget").value.toString()));
+                     Steptarget=int.parse(event.snapshot.child("StepsTarget").value.toString())!=null?int.parse(event.snapshot.child("StepsTarget").value.toString()):6000;
+                    SharedPref().setStepsTarget(Steptarget);
 print(int.parse(event.snapshot.child("StepsTarget").value.toString()));                    final now = DateTime.now();
                     final year = (now.year).toString();
                     final month = now.month<10?"0"+now.month.toString():now.month.toString(); // Use month number directly

@@ -88,7 +88,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
   List<Color> Theme=[];
   List<Color> Theme2=[];
   List<Color> Theme3=[];
-  String value="0";
+  int value=1;
       String formattedDate = DateFormat('yyyy-MM-dd').format( DateTime.now());
   DatabaseReference ref= FirebaseDatabase.instance.reference();
   final AuthServices _authServices=AuthServices();
@@ -128,92 +128,19 @@ class _SettingsScreenState extends State<SettingsScreen> {
       if(Theme[0]==Color(0xFFF7722A)){
         print("theme1");
         setState(() {
-          initialSelectedReaction= Reaction<String>(
-            value: 'like',
-            icon:  Container(
-              // color: Colors.white,
-              width: 25,
-              height: 25,
-              decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                border: Border.all(
-                  color: Colors.transparent, // Replace with your border color
-                  width: 3, // Replace with your border width
-                ),
-                gradient: LinearGradient(
-                  colors: [
-                    Color(0xFFF7722A),
-                    Color(0xFFE032A1),
-                    Color(0xFFCF03F9),
-                  ], // Replace with your gradient colors
-                  begin: Alignment.topCenter,
-                  end: Alignment.bottomCenter,
-                ),
-              ),
-              // child: Center(child: Text("Next",style: TextStyle(color: Colors.white),)),
-            ),
-          );
+          value=1;
         });
-      }else if(Theme[0]==Color(0xFF04EF77)){
+      }
+      else if(Theme[0]==Color(0xFF04EF77)){
         print("theme2");
           setState(() {
-
-        initialSelectedReaction =    Reaction<String>(
-          value: 'love',
-          icon:  Container(
-            // color: Colors.white,
-            width: 25,
-            height: 25,
-            decoration: BoxDecoration(
-              shape: BoxShape.circle,
-              border: Border.all(
-                color:Colors.transparent, // Replace with your border color
-                width: 3, // Replace with your border width
-              ),
-              gradient: LinearGradient(
-                colors: [
-                  Color(0xFF04EF77),
-                  Color(0xFF1F8EAE),
-                  Color(0xFF2E52D0),
-                ], // Replace with your gradient colors
-                begin: Alignment.topCenter,
-                end: Alignment.bottomCenter,
-              ),
-            ),
-            // child: Center(child: Text("Next",style: TextStyle(color: Colors.white),)),
-          ),
-        );
+            value=2;
           });
-      }else{
+      }
+      else{
         print("theme3");
       setState(() {
-
-        initialSelectedReaction=  Reaction<String>(
-          value: 'Amazing',
-          icon:
-          Container(
-            // color: Colors.white,
-            width: 25,
-            height: 25,
-            decoration: BoxDecoration(
-              shape: BoxShape.circle,
-              border: Border.all(
-                color:  Colors.transparent, // Replace with your border color
-                width: 3, // Replace with your border width
-              ),
-              gradient: LinearGradient(
-                colors: [
-                  Color(0xFFFF00E2),
-                  Color(0xFF9242EB),
-                  Color(0xFF2F7FF3),
-                ], // Replace with your gradient colors
-                begin: Alignment.topCenter,
-                end: Alignment.bottomCenter,
-              ),
-            ),
-            // child: Center(child: Text("Next",style: TextStyle(color: Colors.white),)),
-          ),
-        );
+        value=3;
       });
       }
     });
@@ -580,114 +507,103 @@ class _SettingsScreenState extends State<SettingsScreen> {
                     height: 0,
                   ),
                 ),
-                SizedBox(
-                  width: 25,
-                  child: ReactionButton(
-                   toggle: false,
-                    boxColor: Colors.white,
-                    selectedReaction: initialSelectedReaction,
-                    onReactionChanged: (Reaction<String>? reaction) async {
-                      print(reaction?.value);
-                       if(reaction?.value=="like") {
-                        await SharedPref().saveColorList(Theme1);
-                        setState(() {
-                          Theme=Theme1;
-                          initialSelectedReaction=reaction!;
-                        });
-                      }else if(reaction?.value=="love"){
-                         await SharedPref().saveColorList(Theme2);
-                         setState(() {
-                           Theme=Theme2;
-                           initialSelectedReaction=reaction!;
-                         });
-                       }else{
-                         await SharedPref().saveColorList(Theme3);
-                         setState(() {
-                           Theme=Theme3;
-                           initialSelectedReaction=reaction!;
-                         });
-                       }
-                    }, reactions: <Reaction<String>>[
-                    Reaction<String>(
-                      value: 'like',
-                      icon:  Container(
-                        // color: Colors.white,
-                        width: 25,
-                        height: 25,
-                        decoration: BoxDecoration(
-                          shape: BoxShape.circle,
-                          border: Border.all(
-                            color: Colors.transparent, // Replace with your border color
-                            width: 3, // Replace with your border width
-                          ),
-                          gradient: LinearGradient(
-                            colors: [
-                              Color(0xFFF7722A),
-                              Color(0xFFE032A1),
-                              Color(0xFFCF03F9),
-                            ], // Replace with your gradient colors
-                            begin: Alignment.topCenter,
-                            end: Alignment.bottomCenter,
-                          ),
-                        ),
-                        // child: Center(child: Text("Next",style: TextStyle(color: Colors.white),)),
+                SizedBox(width: 120),
+                GestureDetector(
+                  onTap: (){
+                    setState(() {
+                      Theme=Theme1;
+                      value=1;
+                    });
+                    SharedPref().saveColorList(Theme);
+
+                  },
+                  child: Container(
+                    // color: Colors.white,
+                    width: 25,
+                    height: 25,
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      border: Border.all(
+                        color:  value==1?Colors.white:Colors.transparent,
+                        width: 3, // Replace with your border width
+                      ),
+                      gradient: LinearGradient(
+                        colors: [
+                          Color(0xFFF7722A),
+                          Color(0xFFE032A1),
+                          Color(0xFFCF03F9),
+                        ], // Replace with your gradient colors
+                        begin: Alignment.topCenter,
+                        end: Alignment.bottomCenter,
                       ),
                     ),
-                    Reaction<String>(
-                      value: 'love',
-                      icon:  Container(
-                        // color: Colors.white,
-                        width: 25,
-                        height: 25,
-                        decoration: BoxDecoration(
-                          shape: BoxShape.circle,
-                          border: Border.all(
-                            color:Colors.transparent, // Replace with your border color
-                            width: 3, // Replace with your border width
-                          ),
-                          gradient: LinearGradient(
-                            colors: [
-                              Color(0xFF04EF77),
-                              Color(0xFF1F8EAE),
-                              Color(0xFF2E52D0),
-                            ], // Replace with your gradient colors
-                            begin: Alignment.topCenter,
-                            end: Alignment.bottomCenter,
-                          ),
-                        ),
-                        // child: Center(child: Text("Next",style: TextStyle(color: Colors.white),)),
-                      ),
-                    ),
-                    Reaction<String>(
-                      value: 'Amazing',
-                      icon:
-                      Container(
-                        // color: Colors.white,
-                        width: 25,
-                        height: 25,
-                        decoration: BoxDecoration(
-                          shape: BoxShape.circle,
-                          border: Border.all(
-                            color:  Colors.transparent, // Replace with your border color
-                            width: 3, // Replace with your border width
-                          ),
-                          gradient: LinearGradient(
-                            colors: [
-                              Color(0xFFFF00E2),
-                              Color(0xFF9242EB),
-                              Color(0xFF2F7FF3),
-                            ], // Replace with your gradient colors
-                            begin: Alignment.topCenter,
-                            end: Alignment.bottomCenter,
-                          ),
-                        ),
-                        // child: Center(child: Text("Next",style: TextStyle(color: Colors.white),)),
-                      ),
-                    ),
-                  ],
-                    isChecked: false,
-                    itemSize: const Size(30, 30), ),
+                    // child: Center(child: Text("Next",style: TextStyle(color: Colors.white),)),
+                  ),
                 ),
+                GestureDetector(
+                  onTap: (){
+                    setState(() {
+                      Theme=Theme2;
+                      value=2;
+
+                    });
+                    SharedPref().saveColorList(Theme);
+
+                  },
+                  child: Container(
+                    // color: Colors.white,
+                    width: 25,
+                    height: 25,
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      border: Border.all(
+                        color:  value==2?Colors.white:Colors.transparent,                        width: 3, // Replace with your border width
+                      ),
+                      gradient: LinearGradient(
+                        colors: [
+                          Color(0xFF04EF77),
+                          Color(0xFF1F8EAE),
+                          Color(0xFF2E52D0),
+                        ], // Replace with your gradient colors
+                        begin: Alignment.topCenter,
+                        end: Alignment.bottomCenter,
+                      ),
+                    ),
+                    // child: Center(child: Text("Next",style: TextStyle(color: Colors.white),)),
+                  ),
+                ),
+                GestureDetector(
+                  onTap: (){
+                    setState(() {
+                      Theme=Theme3;
+                      value=3;
+                    });
+                    SharedPref().saveColorList(Theme);
+                  },
+                  child: Container(
+                    // color: Colors.white,
+                    width: 25,
+                    height: 25,
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      border: Border.all(
+                        color:  value==3?Colors.white:Colors.transparent, // Replace with your border color
+                        width: 3, // Replace with your border width
+                      ),
+                      gradient: LinearGradient(
+                        colors: [
+                          Color(0xFFFF00E2),
+                          Color(0xFF9242EB),
+                          Color(0xFF2F7FF3),
+                        ], // Replace with your gradient colors
+                        begin: Alignment.topCenter,
+                        end: Alignment.bottomCenter,
+                      ),
+                    ),
+                    // child: Center(child: Text("Next",style: TextStyle(color: Colors.white),)),
+                  ),
+                ),
+
               ],
             ),
             SizedBox(height: 30.h,),

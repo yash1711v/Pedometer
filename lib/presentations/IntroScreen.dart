@@ -105,15 +105,15 @@ class _IntroScreenState extends State<IntroScreen> {
   bool Notification =false;
   bool Activitysensor=false;
 
-  String Whichtext() {
+  Widget Whichtext() {
     if(page==3){
-      return "Ask Permision";
+      return Text("Ask Permision");
     }else if(page==3 && Notification==false && Activitysensor==false ){
-      return  "Ask Permision";
+      return  Text("Ask Permision");
     }else if(page==3 && Activitysensor==true){
-      return "Welcome";
+      return Text("Welcome");
     }else{
-      return "Next";
+      return Text("Next");
     }
   }
   @override
@@ -1066,6 +1066,7 @@ class _IntroScreenState extends State<IntroScreen> {
                           else{_controller.nextPage(duration: Duration(milliseconds: 500), curve: Curves.easeIn);}
                 },
               ),
+
               SizedBox(height: 20,),
             ],
           ),
