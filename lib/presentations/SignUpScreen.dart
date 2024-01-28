@@ -63,6 +63,14 @@ int value=0;
   void initState() {
     whichTheme();
   }
+  @override
+  void didChangeDependencies() {
+    // TODO: implement didChangeDependencies
+    super.didChangeDependencies();
+    for(int i=0;i<ImagesBg.length;i++) {
+      AssetImage(ImagesBg[i]);
+    }
+  }
   whichTheme() async {
     List<Color> Th= await SharedPref().loadColorList();
     setState(() {

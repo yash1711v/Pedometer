@@ -2,7 +2,9 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:get/get.dart';
 import 'package:steptracking/presentations/HomePage.dart';
+import 'package:steptracking/presentations/LevelMapScreen.dart';
 import 'package:steptracking/presentations/ReportScreen.dart';
 import 'package:steptracking/presentations/SettingsScreen.dart';
 
@@ -99,6 +101,7 @@ class _MainScreenState extends State<MainScreen> {
                           setState(() {
                             _selectedIndex=index;
                           });
+
                           _pageController.jumpToPage(_selectedIndex);
                         },
                         items:  [
