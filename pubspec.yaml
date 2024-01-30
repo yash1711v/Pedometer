@@ -71,7 +71,6 @@ dependencies:
   wheel_slider: ^1.2.1
   flutter_gradient_button: ^0.0.1
   flutter_reaction_button: ^3.0.0+3
-  level_map: ^0.2.0
   xml: ^6.5.0
 
 
