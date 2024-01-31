@@ -193,11 +193,12 @@ class _IntroScreenState extends State<IntroScreen> {
                             ),
                           ),
                           Padding(
-                            padding: const EdgeInsets.only(left: 25.0),
+                            padding: const EdgeInsets.only(left: 0.0),
                             child: Container(
                               height: 600,
+                              width: 600,
                               child: Image.asset("lib/assests/NewImages/TemporarilyData.png",
-                                scale: 1,
+                                width: 800,
                               ),
                             ),
                           )

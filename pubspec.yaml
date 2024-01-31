@@ -113,6 +113,7 @@ flutter:
     - lib/assests/Images/Confetti_Animation.json
     - lib/assests/Images/DialogueboxLOgo.png
     - lib/assests/NewImages/
+    - lib/assests/NewImages/UngroupedAwards/
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/assets-and-images/#resolution-aware

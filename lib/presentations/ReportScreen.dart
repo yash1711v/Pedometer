@@ -603,10 +603,503 @@ class _ReportScreenState extends State<ReportScreen> {
       AssetImage(Images[i]);
     }
   }
-  int currentlevel=20;
-  int currentlevelKm=20;
-  int currentlevelCalories=20;
+  int currentlevel=0;
+  int currentlevelKm=0;
+  int currentlevelCalories=0;
  int currentOption=0;
+ String Achievement="Achievement";
+ String AchievedFor="Unlock";
+
+ String Ig="lib/assests/NewImages/UngroupedAwards/Lock.png";
+
+ whichBadges(){
+   if(currentOption==0){
+     if(currentlevel==1){
+       setState(() {
+         Achievement="StepStarter";
+         AchievedFor="1,000 steps";
+         Ig="lib/assests/NewImages/UngroupedAwards/b1.png";
+
+       });
+
+     }
+     else if(currentlevel==2){
+       setState(() {
+         Achievement="StrideStar";
+         AchievedFor="2,000 steps";
+         Ig="lib/assests/NewImages/UngroupedAwards/b2.png";
+
+       });
+     }
+     else if(currentlevel==3){
+       setState(() {
+         Achievement="QuickQuota";
+         AchievedFor="3,000 steps";
+         Ig="lib/assests/NewImages/UngroupedAwards/b3.png";
+
+       });
+     }
+     else if(currentlevel==4){
+       setState(() {
+         Achievement="WalkWarrior";
+         AchievedFor="4,000 steps";
+         Ig="lib/assests/NewImages/UngroupedAwards/b4.png";
+
+       });
+     }
+     else if(currentlevel==5){
+       setState(() {
+         Achievement="StrollChamp";
+         AchievedFor="5,000 steps";
+         Ig="lib/assests/NewImages/UngroupedAwards/b5.png";
+
+       });
+     }
+     else if(currentlevel==6) {
+       setState(() {
+         Achievement="PedometerPro";
+         AchievedFor="6,000 steps";
+         Ig="lib/assests/NewImages/UngroupedAwards/b6.png";
+
+       });
+     }
+     else if(currentlevel==7){
+       setState(() {
+         Achievement="DailyDasher";
+         AchievedFor="7,000 steps";
+         Ig="lib/assests/NewImages/UngroupedAwards/b7.png";
+
+       });
+     }
+     else if(currentlevel==8){
+       setState(() {
+         Achievement="WalkWhiz";
+         AchievedFor="8,000 steps";
+         Ig="lib/assests/NewImages/UngroupedAwards/b8.png";
+
+       });
+     }
+     else if(currentlevel==9){
+       setState(() {
+         Achievement="StepSprinter";
+         AchievedFor="9,000 steps";
+         Ig="lib/assests/NewImages/UngroupedAwards/b9.png";
+
+       });
+     }
+     else if(currentlevel==10){
+       setState(() {
+         Achievement="TrekMaster";
+         AchievedFor="10,000 steps";
+         Ig="lib/assests/NewImages/UngroupedAwards/b10.png";
+
+       });
+     }
+     else if(currentlevel==11){
+       setState(() {
+         Achievement="StepHero";
+         AchievedFor="12,000 steps)";
+         Ig="lib/assests/NewImages/UngroupedAwards/b11.png";
+
+       });
+     }
+     else if(currentlevel==12){
+       setState(() {
+         Achievement="QuickQuotient";
+         AchievedFor="15,000 steps";
+         Ig="lib/assests/NewImages/UngroupedAwards/b12.png";
+
+       });
+     }
+     else if(currentlevel==13){
+       setState(() {
+         Achievement="StrideStrategist";
+         AchievedFor="18,000 steps";
+         Ig="lib/assests/NewImages/UngroupedAwards/b13.png";
+
+       });
+     }
+     else if(currentlevel==14){
+       setState(() {
+         Achievement="WalkVirtuoso";
+         AchievedFor="20,000 steps";
+         Ig="lib/assests/NewImages/UngroupedAwards/b14.png";
+
+       });
+     }
+     else if(currentlevel==15){
+       setState(() {
+         Achievement="StepSorcerer";
+         AchievedFor="25,000 steps";
+         Ig="lib/assests/NewImages/UngroupedAwards/b15.png";
+
+       });
+     }
+     else if(currentlevel==16){
+       setState(() {
+         Achievement="SwiftStrider";
+         AchievedFor="30,000 steps";
+         Ig="lib/assests/NewImages/UngroupedAwards/b16.png";
+
+       });
+     }
+     else if(currentlevel==17){
+       setState(() {
+         Achievement="StrollSavvy";
+         AchievedFor="35,000 steps";
+         Ig="lib/assests/NewImages/UngroupedAwards/b17.png";
+
+       });
+     }
+     else if(currentlevel==18){
+       setState(() {
+         Achievement="StepVoyager";
+         AchievedFor="40,000 steps";
+         Ig="lib/assests/NewImages/UngroupedAwards/b18.png";
+
+       });
+     }
+     else if(currentlevel==19){
+       setState(() {
+         Achievement="RapidRambler";
+         AchievedFor="45,000 steps";
+         Ig="lib/assests/NewImages/UngroupedAwards/b19.png";
+
+       });
+     }
+     else if(currentlevel==20){
+       setState(() {
+         Achievement="StepLegend";
+         AchievedFor="50,000 steps";
+         Ig="lib/assests/NewImages/UngroupedAwards/b20.png";
+
+       });
+     }
+   }
+   else if(currentOption==1){
+     if(currentlevelCalories==1){
+       setState(() {
+         Achievement="Emberling";
+         AchievedFor="500 calories";
+         Ig="lib/assests/NewImages/UngroupedAwards/e1.png";
+
+       });
+
+     }
+     else if(currentlevelCalories==2){
+       setState(() {
+         Achievement="Blazelet";
+         AchievedFor="1,000 calories";
+         Ig="lib/assests/NewImages/UngroupedAwards/e2.png";
+
+       });
+     }
+     else if(currentlevelCalories==3){
+       setState(() {
+         Achievement="Infernite";
+         AchievedFor="2,500 calories";
+         Ig="lib/assests/NewImages/UngroupedAwards/e3.png";
+
+       });
+     }
+     else if(currentlevelCalories==4){
+       setState(() {
+         Achievement="Pyrobyte";
+         AchievedFor="5,000 calories";
+         Ig="lib/assests/NewImages/UngroupedAwards/e4.png";
+
+       });
+     }
+     else if(currentlevelCalories==5){
+       setState(() {
+         Achievement="Flamelet";
+         AchievedFor="7,500 calories";
+         Ig="lib/assests/NewImages/UngroupedAwards/e5.png";
+
+       });
+     }
+     else if(currentlevelCalories==6) {
+       setState(() {
+         Achievement="Scorchie";
+         AchievedFor="10,000 calories";
+         Ig="lib/assests/NewImages/UngroupedAwards/e6.png";
+
+       });
+     }
+     else if(currentlevelCalories==7){
+       setState(() {
+         Achievement="Fireling";
+         AchievedFor="15,000 calories";
+         Ig="lib/assests/NewImages/UngroupedAwards/e7.png";
+
+       });
+     }
+     else if(currentlevel==8){
+       setState(() {
+         Achievement="Incendio";
+         AchievedFor="20,000 calories";
+         Ig="lib/assests/NewImages/UngroupedAwards/e8.png";
+
+       });
+     }
+     else if(currentlevelCalories==9){
+       setState(() {
+         Achievement="Pyrokin";
+         AchievedFor="25,000 calories";
+         Ig="lib/assests/NewImages/UngroupedAwards/e9.png";
+
+       });
+     }
+     else if(currentlevelCalories==10){
+       setState(() {
+         Achievement="Infernix";
+         AchievedFor="30,000 calories";
+         Ig="lib/assests/NewImages/UngroupedAwards/e10.png";
+
+       });
+     }
+     else if(currentlevelCalories==11){
+       setState(() {
+         Achievement="Emberite";
+         AchievedFor="40,000 calories";
+         Ig="lib/assests/NewImages/UngroupedAwards/e11.png";
+
+       });
+     }
+     else if(currentlevelCalories==12){
+       setState(() {
+         Achievement="Firestreak";
+         AchievedFor="50,000 calories";
+         Ig="lib/assests/NewImages/UngroupedAwards/e12.png";
+
+       });
+     }
+     else if(currentlevelCalories==13){
+       setState(() {
+         Achievement="Powerflame";
+         AchievedFor="75,000 calories";
+         Ig="lib/assests/NewImages/UngroupedAwards/e13.png";
+
+       });
+     }
+     else if(currentlevelCalories==14){
+       setState(() {
+         Achievement="Calorix";
+         AchievedFor="100,000 calories";
+         Ig="lib/assests/NewImages/UngroupedAwards/e14.png";
+
+       });
+     }
+     else if(currentlevelCalories==15){
+       setState(() {
+         Achievement="Enerdragon";
+         AchievedFor="150,000 calories";
+         Ig="lib/assests/NewImages/UngroupedAwards/e15.png";
+
+       });
+     }
+     else if(currentlevelCalories==16){
+       setState(() {
+         Achievement="Dracorix";
+         AchievedFor="200,000 calories";
+         Ig="lib/assests/NewImages/UngroupedAwards/e16.png";
+
+       });
+     }
+     else if(currentlevelCalories==17){
+       setState(() {
+         Achievement="Dynafire";
+         AchievedFor="250,000 calories";
+         Ig="lib/assests/NewImages/UngroupedAwards/e17.png";
+
+       });
+     }
+     else if(currentlevelCalories==18){
+       setState(() {
+         Achievement="Flareon";
+         AchievedFor="300,000 calories";
+         Ig="lib/assests/NewImages/UngroupedAwards/e18.png";
+
+       });
+     }
+     else if(currentlevelCalories==19){
+       setState(() {
+         Achievement="Alchemix";
+         AchievedFor="500,000 calories";
+         Ig="lib/assests/NewImages/UngroupedAwards/e19.png";
+
+       });
+     }
+     else if(currentlevelCalories==20){
+       setState(() {
+         Achievement="Legendrax";
+         AchievedFor="1,000,000 calories";
+         Ig="lib/assests/NewImages/UngroupedAwards/e20.png";
+
+       });
+     }
+   }
+   else{
+     if(currentlevelKm==1){
+       setState(() {
+         Achievement="Swift Strider";
+         AchievedFor="5 kms";
+         Ig="lib/assests/NewImages/UngroupedAwards/p20.png";
+       });
+
+     }
+     else if(currentlevelKm==2){
+       setState(() {
+         Achievement="Vista Voyager";
+         AchievedFor="10 kms";
+         Ig="lib/assests/NewImages/UngroupedAwards/p19.png";
+       });
+     }
+     else if(currentlevelKm==3){
+       setState(() {
+         Achievement="Zenith Explorer";
+         AchievedFor="25 kms";
+         Ig="lib/assests/NewImages/UngroupedAwards/p18.png";
+
+       });
+     }
+     else if(currentlevelKm==4){
+       setState(() {
+         Achievement="Trail Blaze";
+         AchievedFor="50 kms";
+         Ig="lib/assests/NewImages/UngroupedAwards/p17.png";
+
+       });
+     }
+     else if(currentlevelKm==5){
+       setState(() {
+         Achievement="Lunar Nomad";
+         AchievedFor="75 kms";
+         Ig="lib/assests/NewImages/UngroupedAwards/p16.png";
+
+       });
+     }
+     else if(currentlevelKm==6) {
+       setState(() {
+         Achievement="Zephyr Roamer";
+         AchievedFor="100 kms";
+         Ig="lib/assests/NewImages/UngroupedAwards/p15.png";
+
+       });
+     }
+     else if(currentlevelKm==7){
+       setState(() {
+         Achievement="Aero Adventurer";
+         AchievedFor="150 kms";
+         Ig="lib/assests/NewImages/UngroupedAwards/p14.png";
+
+       });
+     }
+     else if(currentlevelKm==8){
+       setState(() {
+         Achievement="Pinnacle Wayfarer";
+         AchievedFor="200 kms";
+         Ig="lib/assests/NewImages/UngroupedAwards/p13.png";
+
+       });
+     }
+     else if(currentlevelKm==9){
+       setState(() {
+         Achievement="Stellar Trekker";
+         AchievedFor="300 kms";
+         Ig="lib/assests/NewImages/UngroupedAwards/p12.png";
+
+       });
+     }
+     else if(currentlevelKm==10){
+       setState(() {
+         Achievement="Nova Nomad";
+         AchievedFor="500 kms";
+         Ig="lib/assests/NewImages/UngroupedAwards/p11.png";
+
+       });
+     }
+     else if(currentlevelKm==11){
+       setState(() {
+         Achievement="Orbit Wayfarer";
+         AchievedFor="750 kms";
+         Ig="lib/assests/NewImages/UngroupedAwards/p10.png";
+
+       });
+     }
+     else if(currentlevelKm==12){
+       setState(() {
+         Achievement="Galaxy Globetrotter";
+         AchievedFor="1,000 kms";
+         Ig="lib/assests/NewImages/UngroupedAwards/p9.png";
+
+       });
+     }
+     else if(currentlevelKm==13){
+       setState(() {
+         Achievement="Zenith Adventurer";
+         AchievedFor="1,500 kms";
+         Ig="lib/assests/NewImages/UngroupedAwards/p8.png";
+
+       });
+     }
+     else if(currentlevelKm==14){
+       setState(() {
+         Achievement="Cosmo Explorer";
+         AchievedFor="2,000 kms";
+         Ig="lib/assests/NewImages/UngroupedAwards/p7.png";
+
+       });
+     }
+     else if(currentlevelKm==15){
+       setState(() {
+         Achievement="Lunar Legend";
+         AchievedFor="2,500 kms";
+         Ig="lib/assests/NewImages/UngroupedAwards/p6.png";
+
+       });
+     }
+     else if(currentlevelKm==16){
+       setState(() {
+         Achievement="Epic Hiker";
+         AchievedFor="3,000 kms";
+         Ig="lib/assests/NewImages/UngroupedAwards/p5.png";
+
+       });
+     }
+     else if(currentlevelKm==17){
+       setState(() {
+         Achievement="Nebula Trekker";
+         AchievedFor="4,000 kms";
+         Ig="lib/assests/NewImages/UngroupedAwards/p4.png";
+
+       });
+     }
+     else if(currentlevelKm==18){
+       setState(() {
+         Achievement="Zenith Master";
+         AchievedFor="5,000 kms";
+         Ig="lib/assests/NewImages/UngroupedAwards/p3.png";
+
+       });
+     }
+     else if(currentlevelKm==19){
+       setState(() {
+         Achievement="Celestial Nomad";
+         AchievedFor="7,500 kms";
+         Ig="lib/assests/NewImages/UngroupedAwards/p2.png";
+
+       });
+     }
+     else if(currentlevelKm==20){
+       setState(() {
+         Achievement="Mystic Nomad";
+         AchievedFor="10,000 kms";
+         Ig="lib/assests/NewImages/UngroupedAwards/p1.png";
+       });
+     }
+   }
+ }
  @override
   Widget build(BuildContext context) {
     return
@@ -669,7 +1162,7 @@ class _ReportScreenState extends State<ReportScreen> {
                         left: 17,
                         top: 43,
                         child: Text(
-                          'The Neighbourhood ',
+                            AchievedFor,
                           style: TextStyle(
                             color: Color(0xFFF3F3F3),
                             fontSize: 20,
@@ -683,7 +1176,7 @@ class _ReportScreenState extends State<ReportScreen> {
                         left: 17,
                         top: 57,
                         child: Text(
-                          'Explorer',
+                          Achievement,
                           style: TextStyle(
                             color: Color(0xFFF3F3F3),
                             fontSize: 48,
@@ -692,6 +1185,13 @@ class _ReportScreenState extends State<ReportScreen> {
                             height: 0,
                           ),
                         ),
+                      ),
+                      Positioned(
+                        left: Ig=="lib/assests/NewImages/UngroupedAwards/Lock.png"?200:180,
+                        top: Ig=="lib/assests/NewImages/UngroupedAwards/Lock.png"?10:0,
+                        width: Ig=="lib/assests/NewImages/UngroupedAwards/Lock.png"?80:125,
+                        child:
+                         Image.asset(Ig)
                       ),
                     ],
                   ),
@@ -706,6 +1206,7 @@ class _ReportScreenState extends State<ReportScreen> {
                         currentOption=0;
                       });
                       // getHourlyStepsForCurrentDate();
+                      whichBadges();
                     },
                     child: Container(
                       width: 80,
@@ -746,6 +1247,7 @@ class _ReportScreenState extends State<ReportScreen> {
                           currentOption=1;
                         });
                         // CaloriesLevel();
+                        whichBadges();
                       },
                     child: Container(
                       width: 80,
@@ -786,6 +1288,7 @@ class _ReportScreenState extends State<ReportScreen> {
                           currentOption=2;
                         });
                         // DistanceLevel();
+                        whichBadges();
                       },
                     child: Container(
                       width: 80,

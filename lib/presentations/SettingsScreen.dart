@@ -686,11 +686,11 @@ class _SettingsScreenState extends State<SettingsScreen> {
                   ),
              ),
            ),
-            SizedBox(height: 41.h,),
+            SizedBox(height: 25.h,),
             Align(
               alignment: Alignment.bottomCenter,
               child: Text(
-                'Version 1.2',
+                'Version 2.0',
                 style: TextStyle(
                   color: Colors.grey,
                   fontSize: 14.sp,

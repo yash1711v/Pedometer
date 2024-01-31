@@ -64,9 +64,15 @@ class _LineChartSample2State extends State<LineChartSample2> {
       // print("date ${stepsData[year][month].containsKey(date)}");
     }
    // print(" this is in hourly graph  ${hourlyStepsList}");
-    setState(() {
-      StepsList=hourlyStepsList;
-    });
+    if(hourlyStepsList.isNotEmpty) {
+      setState(() {
+        StepsList = hourlyStepsList;
+      });
+    }else{
+      setState(() {
+        StepsList = [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0];
+      });
+    }
 
     return hourlyStepsList;
   }
@@ -182,9 +188,17 @@ class _LineChartSample2State extends State<LineChartSample2> {
     });
 
          // print('-------------jg\n--------->${weeklyStepsMap}');
-     setState(() {
-       StepsList=currentdateweek[getWeekNumber(widget.now)]!;
-     });
+       List<int> list=currentdateweek[getWeekNumber(widget.now)]!;
+       if(list.isNotEmpty) {
+         setState(() {
+           StepsList=currentdateweek[getWeekNumber(widget.now)]!;
+         });
+       }else{
+         setState(() {
+           StepsList = [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0];
+         });
+       }
+
   print("Weekly Step List $StepsList");
     return currentdateweek;
   }

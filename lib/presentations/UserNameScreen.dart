@@ -48,9 +48,10 @@ class _UserNameScreenState extends State<UserNameScreen> {
   ];
   DatabaseServices services = DatabaseServices();
   Map<String, int?> map = {};
-  int _cCurrentValue = 0;
-  int _cCurrentValueWeight = 0;
-  double Height = 0;
+  int _cCurrentValue = 160;
+  int _cCurrentValueWeight = 55;
+  double Height = 0
+  ;
   double Weight = 0;
   int Age = 0;
   int StepsTarget = 0;
