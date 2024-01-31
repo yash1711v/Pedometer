@@ -175,21 +175,31 @@ class _IntroScreenState extends State<IntroScreen> {
                     Center(
                       child: Stack(
                         children: [
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              Text("Embrace the Awards Challenge",
-                                style: TextStyle(
-                                  color: Colors.white,
-                                  fontSize: 34,
-                                  fontFamily: 'Teko',
-                                  fontWeight: FontWeight.w400,
-                                  height: 0,
+                          Padding(
+                            padding:  EdgeInsets.only(top: 35),
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Text("Embrace the Awards Challenge",
+                                  style: TextStyle(
+                                    color: Colors.white,
+                                    fontSize: 34,
+                                    fontFamily: 'Teko',
+                                    fontWeight: FontWeight.w400,
+                                    height: 0,
+                                  ),
                                 ),
-                              ),
-                            ],
+                              ],
+                            ),
                           ),
-                          Image.asset("lib/assests/NewImages/TemporarilyData.png",
+                          Padding(
+                            padding: const EdgeInsets.only(left: 25.0),
+                            child: Container(
+                              height: 600,
+                              child: Image.asset("lib/assests/NewImages/TemporarilyData.png",
+                                scale: 1,
+                              ),
+                            ),
                           )
                         ],
                       ),

@@ -619,11 +619,8 @@ class _LoginState extends State<Login> {
                                     SharedPref().setEmail("Sign Up Now");
                                     SharedPref().setisguest(true);
                                     // SharedPref().setIntroScreenInfo(false);
-                                    Get.to(
-                                      HomePage(),
-                                      duration: const Duration(seconds: 1),
-                                      // transition: Transition.fadeIn,
-                                    );
+                                    Get.offAll(UserNameScreen());
+
                                   },
                               ),
                             ]),

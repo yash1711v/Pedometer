@@ -44,6 +44,19 @@ int lasttimeSteps=0;
     lasttimeSteps = pref.getInt("lasttimeSteps")??0;
     return lasttimeSteps;
   }
+  setCurrentLevelSteps(int currentlevel) async {
+    // print("lasttimeSteps");
+    SharedPreferences pref = await SharedPreferences.getInstance();
+    pref.setInt("Currentlevel", currentlevel);
+    // print(username);
+  }
+
+  getCurrentLevelSteps() async {
+    // print("lasttimeSteps");
+    SharedPreferences pref = await SharedPreferences.getInstance();
+   int Currentlevel = pref.getInt("Currentlevel")??0;
+    return Currentlevel;
+  }
 
   List<String> convertColorListToStringList(List<Color> colorList) {
     return colorList.map((color) => color.value.toRadixString(16)).toList();

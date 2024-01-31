@@ -15,6 +15,7 @@ import 'package:pedometer/pedometer.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:steptracking/presentations/Back_Service.dart';
+import 'package:steptracking/presentations/HomeController.dart';
 import 'package:steptracking/presentations/HomePage.dart';
 import 'package:steptracking/presentations/NotificationServices.dart';
 import 'SharedPrefrences/SharedPref.dart';
@@ -204,9 +205,16 @@ Future<void> printHello() async {
 
 }
 // }
-class MyApp extends StatelessWidget {
+class MyApp extends StatefulWidget {
   const MyApp({super.key});
 
+  @override
+  State<MyApp> createState() => _MyAppState();
+}
+
+class _MyAppState extends State<MyApp> {
+  final HomeControllwe homeScreenController =
+  Get.put(HomeControllwe());
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {

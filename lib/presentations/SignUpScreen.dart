@@ -461,7 +461,7 @@ int value=0;
                                 // await SharedPref().setTodaysSteps(0);
                               // SharedPref().setIntroScreenInfo(false);
                               //SharedPref().setisStart(false);
-                                Get.offAll(MainScreen());
+                                Get.offAll(UserNameScreen());
                               },
                           ),
                         ]),

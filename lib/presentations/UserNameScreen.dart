@@ -114,10 +114,12 @@ class _UserNameScreenState extends State<UserNameScreen> {
     String uid=await SharedPref().getUid();
     String email=await SharedPref().getEmail();
     String pass=await SharedPref().getPassword();
+    bool isgues=await SharedPref().getisguest();
     setState(() {
       UID = uid;
       Email=email;
       Password=pass;
+      isGuest=isgues;
     });
   }
 
@@ -1008,8 +1010,16 @@ class _UserNameScreenState extends State<UserNameScreen> {
                       onPressed: () async {
                         print("Button clicked");
                         if (onLastPage) {
-                          FirebaseSetingUp(context);
-
+                          if(isGuest){
+                            Get.to(()=>MainScreen(),
+                                duration: const Duration(
+                                    seconds:
+                                    1),
+                                transition: Transition.fadeIn
+                            );
+                          }else {
+                            FirebaseSetingUp(context);
+                          }
                         } else {
                           _controller.nextPage(
                               duration: Duration(milliseconds: 500),

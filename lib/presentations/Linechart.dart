@@ -6,8 +6,8 @@ import 'package:steptracking/SharedPrefrences/SharedPref.dart';
 class LineChartSample2 extends StatefulWidget {
   String which="";
   List<Color> GradientColors=[];
-
-  LineChartSample2(this.which,this.GradientColors);
+  DateTime now;
+  LineChartSample2(this.which,this.GradientColors,this.now);
 
   @override
   State<LineChartSample2> createState() => _LineChartSample2State();
@@ -36,14 +36,14 @@ class _LineChartSample2State extends State<LineChartSample2> {
       return 31;
     }
   }
+
   Future<List<int>> getHourlyStepsForCurrentDate() async {
 
     final Map<String, dynamic> stepsData = await SharedPref().getStepsData();
      // print("this is in hourly graph "+stepsData.toString());
-    final now = DateTime.now();
-      final year = (now.year).toString();
-      final month = now.month<10?"0"+now.month.toString():now.month.toString(); // Use month number directly
-      final date = (now.day).toString();
+      final year = (widget.now.year).toString();
+      final month = widget.now.month<10?"0"+widget.now.month.toString():widget.now.month.toString(); // Use month number directly
+      final date = (widget.now.day).toString();
 
     // Initialize a list to store hourly steps for the current date
     List<int> hourlyStepsList = [];
@@ -75,9 +75,9 @@ class _LineChartSample2State extends State<LineChartSample2> {
 
     final Map<String, dynamic> stepsData = await SharedPref().getStepsData();
 // print("this is in monthly ${stepsData}");
-    final now = DateTime.now();
-    final year = now.year.toString();
-    final month = now.month < 10 ? "0" + now.month.toString() : now.month.toString();
+
+    final year = widget.now.year.toString();
+    final month = widget.now.month < 10 ? "0" + widget.now.month.toString() : widget.now.month.toString();
 
     // Initialize a list to store daily steps for the current month
     List<int> dailyStepsList = [];
@@ -150,7 +150,7 @@ class _LineChartSample2State extends State<LineChartSample2> {
       }
       // print(dailyStepsMap);
     Map<int, List<int>> weeklyStepsMap = {};
-
+       Map<int, List<int>> currentdateweek = {};
     int currentWeekNumber = 1;
     int daysInCurrentWeek = 0;
     int maxDaysInWeek = 7; // Assuming a Monday-to-Sunday week structure
@@ -172,16 +172,33 @@ class _LineChartSample2State extends State<LineChartSample2> {
       // Add steps to the current week
       weeklyStepsMap.putIfAbsent(currentWeekNumber, () => []);
       weeklyStepsMap[currentWeekNumber]!.add(steps);
-
+      int currentWeekNum = getWeekNumber(widget.now);
+      currentdateweek.putIfAbsent(currentWeekNum, () => []);
+      setState(() {
+        currentdateweek[currentWeekNum]=(weeklyStepsMap[currentWeekNum]!=null ?weeklyStepsMap[currentWeekNum]:[])! ;
+      });
       daysInCurrentWeek++;
       // print('-------------jg\n--------->${weeklyStepsMap}');
     });
+
          // print('-------------jg\n--------->${weeklyStepsMap}');
-    return weeklyStepsMap;
+     setState(() {
+       StepsList=currentdateweek[getWeekNumber(widget.now)]!;
+     });
+  print("Weekly Step List $StepsList");
+    return currentdateweek;
   }
 
   bool showAvg = false;
 
+  int getWeekNumber(DateTime date) {
+    // Get the week number for a given date
+    DateTime januaryFirst = DateTime(date.year, 1, 1);
+    int daysOffset = (date.weekday - januaryFirst.weekday + 7) % 7;
+    DateTime firstThursday = januaryFirst.add(Duration(days: daysOffset));
+    int weekNumber = 1 + ((date.difference(firstThursday).inDays) / 7).floor();
+    return weekNumber;
+  }
 
 
   @override

@@ -35,6 +35,7 @@ import '../main.dart';
 import '../widgets/BottomNavbar.dart';
 import '../widgets/GradiantArchProgress.dart';
 import 'Back_Service.dart';
+import 'HomeController.dart';
 import 'Linechart.dart';
 import 'NotificationServices.dart';
 import 'SignUpScreen.dart';
@@ -92,9 +93,9 @@ int StepscomingFromFirebase=0;
 DatabaseServices _services=DatabaseServices();
 
  Map<String, dynamic> stepsData ={};
+  int Age=20;
   double Weight=60;
   double Height= 162;
-  int Age=20;
   String Gender= "Male";
   double ActivityLevel= 1.25;
   late List<Color> Themee=[Color(0xFFF7722A),Color(0xFFE032A1),Color(0xFFCF03F9)];
@@ -686,7 +687,6 @@ Future<void> getColors() async {
     String _uid = await SharedPref().getUid();
     int target=await SharedPref().getStepsTarget();
     bool isChecking=await SharedPref().getischecking();
-    double activityLevel= await SharedPref().getActivityLevel();
     final Map<String, dynamic> stepsdata = await SharedPref().getStepsData();
     // DateTime StartTi=await SharedPref().getStartTime()??DateTime.now();
     Duration? Activity = await SharedPref().getSavedDuration();
@@ -695,8 +695,9 @@ Future<void> getColors() async {
     int extra=await SharedPref().getextraSteps()??0;
     int weight=await SharedPref().getWeight();
     int height= await SharedPref().getHeight();
-    int age=await SharedPref().getAge();
+    double activityLevel= await SharedPref().getActivityLevel();
     String gender= await SharedPref().getGender();
+    int age=await SharedPref().getAge();
     setState(() {
       Weight=double.parse(weight.toString());
       Height=double.parse(height.toString());
@@ -723,7 +724,7 @@ Future<void> getColors() async {
      print("------------------------------------------------------/-------------------------------${StepsTarget}");
 
   }
-
+  HomeControllwe homeControllwe = Get.find<HomeControllwe>();
 List<String> WhichGraoh=['Day','Week','Month'];
   int indexofwhichGraph=0;
   @override
@@ -880,12 +881,15 @@ List<String> WhichGraoh=['Day','Week','Month'];
                             painter:  GradiantArchProgress(
                                 startColor: Themee[0],
                                 middle: Themee[1],
-                                endColor: Themee[2], StepsCompleted: int.parse(calculateTimeToCoverDistanceInMinutes(steps: StepsCompleted, distance: StepsToDistanceDouble(StepsCompleted,isMils), isMetric: isMils).toStringAsFixed(0)), StepsTarget: int.parse(calculateTimeToCoverDistanceInMinutes(steps: StepsTarget, distance: StepsToDistanceDouble(StepsTarget,isMils), isMetric: isMils).toStringAsFixed(0)), width: 5.0),
+                                endColor: Themee[2],
+                                StepsCompleted: int.parse(calculateTimeToCoverDistanceInMinutes(
+                                    steps: StepsCompleted, distance: StepsToDistanceDouble(StepsCompleted,isMils), isMetric: isMils).toStringAsFixed(0)), StepsTarget: int.parse(calculateTimeToCoverDistanceInMinutes(steps: StepsTarget, distance: StepsToDistanceDouble(StepsTarget,isMils), isMetric: isMils).toStringAsFixed(0)), width: 5.0),
                             child:  Image.asset("lib/assests/NewImages/Clock.png",scale: 5,),
                           ),
                         ),
                         SizedBox(height: 10,),
-                        Text(calculateTimeToCoverDistance(steps: StepsCompleted, distance: StepsToDistanceDouble(StepsCompleted,isMils), isMetric: isMils),
+                        Text(
+                          calculateTimeToCoverDistance(steps: StepsCompleted, distance: StepsToDistanceDouble(StepsCompleted,isMils), isMetric: isMils),
                           style: TextStyle(
                             color: Color(0xFFF3F3F3),
                             fontSize: 24.sp,
@@ -950,7 +954,7 @@ List<String> WhichGraoh=['Day','Week','Month'];
                   ],
                 ),
                 SizedBox(height: 30,),
-                LineChartSample2(WhichGraoh[indexofwhichGraph],Themee),
+                LineChartSample2(WhichGraoh[indexofwhichGraph],Themee,homeControllwe.selectedDate.value),
                 SizedBox(height: 90,),
               ],
             ),
@@ -1133,6 +1137,7 @@ final int StepsTarget;
 }
 
 class _MonthCalendarState extends State<MonthCalendar> {
+  HomeControllwe homeControllwe = Get.find<HomeControllwe>();
   //
   // final List<DayProgress> dailyProgress = [
   //
@@ -1148,28 +1153,63 @@ class _MonthCalendarState extends State<MonthCalendar> {
     // Timer.periodic(Duration(seconds: 1), (timer) {
     //   getDailyStepsForCurrentMonth();
     // });
-    return GridView.builder(
-      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-        crossAxisCount: 7,
-        mainAxisSpacing: 0.0,
-        crossAxisSpacing: 0.0,
-      ),
-      itemBuilder: (context, index) {
-        final day = index + 1;
-        // Adjust the logic for progress based on the month
-        final progress = widget.dailyProgress.firstWhere((dp) => dp.day == day && dp.month == widget.currentMonth, orElse: () => DayProgress(day, widget.currentMonth , 0.0)).progress;
-        return DayTile(day: day, progress: progress);
-      },
-      itemCount: DateTime(DateTime.now().year, widget.currentMonth + 1, 0).day, // Number of days in the month
+    final List<String> daysOfWeek = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
+
+    return Column(
+      children: [
+        Padding(
+          padding:  EdgeInsets.symmetric(horizontal: 10),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: daysOfWeek
+                .map((day) => Text(
+              day,
+              style: TextStyle(fontWeight: FontWeight.bold),
+            ))
+                .toList(),
+          ),
+        ),
+        SizedBox(height: 5),
+        Expanded(
+          child: GridView.builder(
+            gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+              crossAxisCount: 7,
+              mainAxisSpacing: 0.0,
+              crossAxisSpacing: 0.0,
+            ),
+            itemBuilder: (context, index) {
+              final day = index + 1;
+              // Adjust the logic for progress based on the month
+              final progress = widget.dailyProgress.firstWhere((dp) => dp.day == day && dp.month == widget.currentMonth, orElse: () => DayProgress(day, widget.currentMonth , 0.0)).progress;
+              return GestureDetector(
+                  onTap: (){
+                    print("Date----------------------------> $day and Month ${widget.currentMonth} ");
+                    homeControllwe.updateSelectedDate(convertToDateTime(DateTime.now().year, widget.currentMonth, day));
+                    Navigator.pop(context);
+                  },
+                  child: DayTile(day: day, progress: progress));
+            },
+            itemCount: DateTime(DateTime.now().year, widget.currentMonth + 1, 0).day, // Number of days in the month
+          ),
+        ),
+      ],
     );
   }
 }
-class DayTile extends StatelessWidget {
+DateTime convertToDateTime(int year, int month, int day) {
+  return DateTime(year, month, day);
+}
+class DayTile extends StatefulWidget {
   final int day;
   final double progress;
 
   DayTile({required this.day, required this.progress});
 
+  @override
+  State<DayTile> createState() => _DayTileState();
+}
+
+class _DayTileState extends State<DayTile> {
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -1178,12 +1218,12 @@ class DayTile extends StatelessWidget {
       // ),
       child: Center(
         child: CustomPaint(
-          painter: RingPainter(progress, Color(0xFFFF8900),
+          painter: RingPainter(widget.progress, Color(0xFFFF8900),
             Color(0xD5CE00FF),),
           child: Padding(
             padding: const EdgeInsets.all(8.0),
             child: Text(
-              day.toString(),
+              widget.day.toString(),
               style: TextStyle(fontSize: 10),
             ),
           ),
