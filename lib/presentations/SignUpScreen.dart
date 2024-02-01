@@ -109,7 +109,7 @@ int value=0;
             backgroundColor: Colors.transparent,
             resizeToAvoidBottomInset: false,
             body: Padding(
-              padding:  EdgeInsets.only(top: 200),
+              padding:  EdgeInsets.only(top: 150),
               child: SingleChildScrollView(
 
                 child: Column(

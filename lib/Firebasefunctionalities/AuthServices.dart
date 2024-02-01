@@ -112,10 +112,6 @@ class AuthServices {
       int Steptarget=6000;
       Future.delayed(Duration(seconds: 1), () async {
         userObj = value!;
-        // print("User ID --> " + userObj.id);
-        // print("User Name --> " + userObj.displayName.toString());
-        // print("User Email --> " + userObj.email);
-        // print("User Photo --> " + userObj.photoUrl.toString());
         SharedPref().setUid(userObj.id.toString());
         SharedPref().setUsername(userObj.displayName.toString());
         SharedPref().setEmail(userObj.email);

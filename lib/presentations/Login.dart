@@ -127,9 +127,7 @@ class _LoginState extends State<Login> {
                     ),
                     textAlign: TextAlign.center,
                   ),
-                  SizedBox(
-                    height: 37.h,
-                  ),
+
                   Padding(
                     padding: EdgeInsets.symmetric(horizontal: 25.0.w),
                     child: Column(
@@ -547,8 +545,6 @@ class _LoginState extends State<Login> {
                                 print("UID: "+deviceid);
                                 SharedPref().setDeviceid(deviceid);
                                 _authServices.signInWithGoogle(context,deviceid);
-
-
                               },
                             ),
 

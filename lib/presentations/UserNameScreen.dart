@@ -130,6 +130,13 @@ class _UserNameScreenState extends State<UserNameScreen> {
   }
 
   void initState() {
+    setState(() {
+      Theme1 = [
+        Color(0xFFF7722A),
+        Color(0xFFE032A1),
+        Color(0xFFCF03F9)
+      ];
+    });
     whichTheme();
     whichthemeImages();
     super.initState();
@@ -314,8 +321,9 @@ class _UserNameScreenState extends State<UserNameScreen> {
               padding:  EdgeInsets.only(top: 35),
               child: Column(
                 children: [
-                Container(
-                  height: MediaQuery.of(context).size.height-200,
+                AnimatedContainer(
+                  duration: Duration(seconds: 1),
+                  height: onLastPage?600:750,
                   child:   PageView(
                       controller: _controller,
                       onPageChanged: (index) {
@@ -978,57 +986,50 @@ class _UserNameScreenState extends State<UserNameScreen> {
                         ),
                       ]),
                 ),
-                  Positioned(
-                    bottom: MediaQuery.of(context).size.height - 870,
-                    left: MediaQuery.of(context).size.width - 233,
-                    child: SmoothPageIndicator(
-                        controller: _controller,
-                        count: 2,
-                        effect: SwapEffect(
-                          type: SwapType.yRotation,
-                          activeDotColor:
-                              Color(0xffE23993), // Color of the active dot
-                          dotHeight: 10, // Height of the dots
-                          dotWidth: 10, // Width of the dots
-                          spacing: 8.0,
-                          paintStyle: PaintingStyle
-                              .stroke, // Use stroke for non-active dots
-                          strokeWidth: 1.5, // Stroke width for non-active dots
-                          dotColor: Colors.white,
-                        )),
-                  ),
-                  Positioned(
-                    bottom: MediaQuery.of(context).size.height - 950,
-                    left: MediaQuery.of(context).size.width - 380,
-                    child: GradientButton(
-                      colors: Theme1,
-                      width: 329,
-                      height: 56,
-                      radius: 10,
-                      gradientDirection: GradientDirection.leftToRight,
-                      textStyle: TextStyle(color: Colors.white),
-                      text: onLastPage ? Text("Welcome") : Text("Next"),
-                      onPressed: () async {
-                        print("Button clicked");
-                        if (onLastPage) {
-                          if(isGuest){
-                            Get.to(()=>MainScreen(),
-                                duration: const Duration(
-                                    seconds:
-                                    1),
-                                transition: Transition.fadeIn
-                            );
-                          }else {
-                            FirebaseSetingUp(context);
-                          }
-                        } else {
-                          _controller.nextPage(
-                              duration: Duration(milliseconds: 500),
-                              curve: Curves.easeIn);
+                  SmoothPageIndicator(
+                      controller: _controller,
+                      count: 2,
+                      effect: SwapEffect(
+                        type: SwapType.yRotation,
+                        activeDotColor:
+                            Color(0xffE23993), // Color of the active dot
+                        dotHeight: 10, // Height of the dots
+                        dotWidth: 10, // Width of the dots
+                        spacing: 8.0,
+                        paintStyle: PaintingStyle
+                            .stroke, // Use stroke for non-active dots
+                        strokeWidth: 1.5, // Stroke width for non-active dots
+                        dotColor: Colors.white,
+                      )),
+                  GradientButton(
+                    colors: Theme1,
+                    width: 329,
+                    height: 56,
+                    radius: 10,
+                    gradientDirection: GradientDirection.leftToRight,
+                    textStyle: TextStyle(color: Colors.white),
+                    text: onLastPage ? Text("Welcome") : Text("Next"),
+                    onPressed: () async {
+                      print("Button clicked");
+                      if (onLastPage) {
+                        if(isGuest){
+                          Get.to(()=>MainScreen(),
+                              duration: const Duration(
+                                  seconds:
+                                  1),
+                              transition: Transition.fadeIn
+                          );
+                        }else {
+                          FirebaseSetingUp(context);
                         }
-                      },
-                    ),
+                      } else {
+                        _controller.nextPage(
+                            duration: Duration(milliseconds: 500),
+                            curve: Curves.easeIn);
+                      }
+                    },
                   ),
+                  SizedBox(height: 20,)
                 ],
               ),
             ),

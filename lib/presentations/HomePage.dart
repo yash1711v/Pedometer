@@ -136,9 +136,9 @@ DatabaseServices _services=DatabaseServices();
 
   }
   Future<void> GetPermissions() async {
-    PermissionStatus status1=await Permission.activityRecognition.request();
+    // PermissionStatus status1=await Permission.activityRecognition.request();
     PermissionStatus status2=await Permission.sensors.request();
-    if(status1.isGranted && status2.isGranted){ startListening(context).then((value2) async {
+    if( status2.isGranted){ startListening(context).then((value2) async {
       await initializeService().then((value) {
         // print("Steps Completed--------jjjh------------>"+value2.toString());
         // _storeSteps(value2);
@@ -1072,9 +1072,26 @@ class _CustomState extends State<Custom> {
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Text(
-          DateFormat('MMMM yyyy').format(DateTime(DateTime.now().year, _currentPageIndex + 1, 1)),
-            style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              IconButton(onPressed: (){setState(() {
+                _currentPageIndex=_currentPageIndex-1;
+                _pageController.previousPage(duration: Duration(milliseconds: 25), curve: Curves.bounceOut);
+              });}, icon: Icon(Icons.arrow_back_ios,color: Colors.white,),),
+              Text(
+              DateFormat('MMMM yyyy').format(DateTime(DateTime.now().year, _currentPageIndex + 1, 1)),
+                style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+              ),
+              IconButton(onPressed: (){
+                setState(() {
+                  _currentPageIndex=_currentPageIndex+1;
+                  _pageController.nextPage(duration: Duration(milliseconds: 25), curve: Curves.bounceIn);
+                });
+
+
+              }, icon: Icon(Icons.arrow_forward_ios,color: Colors.white,),),
+            ],
           ),
           SizedBox(height: 16.0),
           SizedBox(

@@ -195,10 +195,11 @@ class _ReportScreenState extends State<ReportScreen> {
    print("Steps in km $stepsInKm");
    return int.parse(stepsInKm.toStringAsFixed(0));
  }
+
  CaloriesLevel(){
    getMonthlySteps().then((value) {
      int coloriesburn=calculateCaloriesBurned(steps: value);
-
+    print("caloriesburn-------------> $coloriesburn");
      if(coloriesburn==500){
        setState(() {
          currentlevelCalories=1;
@@ -430,12 +431,16 @@ class _ReportScreenState extends State<ReportScreen> {
    setState(() {
      StepsList=hourlyStepsList;
    });
+   print("----------------------------> $StepsList");
    int totalSteps=0;
    for(int i=0;i<StepsList.length;i++){
-     totalSteps=totalSteps+i;
+     totalSteps=totalSteps+StepsList[i];
    }
+   print("----------------------------> $totalSteps");
+
    List<int> calories=[1000,2000,3000,4000,5000,6000,7000,8000,9000,10000,12000,15000,18000,20000,25000,30000,35000,40000,45000,50000];
-   if(totalSteps>calories[currenevel]){
+   if(totalSteps>=calories[currenevel]){
+     print("In greater calories-------------> ${calories[currenevel]} and Total steps are-----------> $totalSteps");
      if(totalSteps>=1000 && totalSteps<2000){
        setState(() {
          currentlevel=1;
@@ -557,6 +562,7 @@ class _ReportScreenState extends State<ReportScreen> {
        SharedPref().setCurrentLevelSteps(currentlevel);
      }
    }else{
+     print("In less calories-------------> ${calories[currenevel]} and Total steps are-----------> $totalSteps");
      setState(() {
        currentlevel=currenevel;
      });
@@ -1188,7 +1194,7 @@ class _ReportScreenState extends State<ReportScreen> {
                       ),
                       Positioned(
                         left: Ig=="lib/assests/NewImages/UngroupedAwards/Lock.png"?200:180,
-                        top: Ig=="lib/assests/NewImages/UngroupedAwards/Lock.png"?10:0,
+                        top: Ig=="lib/assests/NewImages/UngroupedAwards/Lock.png"?10:10,
                         width: Ig=="lib/assests/NewImages/UngroupedAwards/Lock.png"?80:125,
                         child:
                          Image.asset(Ig)
