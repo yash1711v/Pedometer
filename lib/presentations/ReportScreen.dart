@@ -80,6 +80,7 @@ class _ReportScreenState extends State<ReportScreen> {
    getHourlyStepsForCurrentDate(currentlevelsteps);
    CaloriesLevel();
    DistanceLevel();
+   whichBadges();
 
  }
 
@@ -161,10 +162,10 @@ class _ReportScreenState extends State<ReportScreen> {
 
          // Add the total steps for the current date to the list
          if (totalStepsForDate > 0) {
-           dailyStepsMap[dateKey] = totalStepsForDate;
+           dailyStepsMap[dateKey.toString().padLeft(2,"0")] = totalStepsForDate;
          }
        });
-
+         print("DailySteps For each month-------> $dailyStepsMap");
        dailyStepsList = dailyStepsMap.values.toList();
        monthlyStepsMap["$year-$month"] = dailyStepsList;
 
@@ -182,6 +183,7 @@ class _ReportScreenState extends State<ReportScreen> {
  }
 
  int StepsToDistance(int steps) {
+   print("Stepsss--------------->  $steps");
    double stepsInKm = steps / 1312.33595801;
    double totalDistance;
    String unit;
@@ -200,98 +202,98 @@ class _ReportScreenState extends State<ReportScreen> {
    getMonthlySteps().then((value) {
      int coloriesburn=calculateCaloriesBurned(steps: value);
     print("caloriesburn-------------> $coloriesburn");
-     if(coloriesburn==500){
+     if(coloriesburn>=500 && coloriesburn<1000){
        setState(() {
          currentlevelCalories=1;
        });
      }
-     else if(coloriesburn==1000){
+     else if(coloriesburn>=1000 && coloriesburn<2500){
        setState(() {
          currentlevelCalories=2;
        });
-     } else if(coloriesburn==2500){
+     } else if(coloriesburn>=2500 && coloriesburn<5000){
        setState(() {
          currentlevelCalories=3;
        });
      }
-     else if(coloriesburn==5000){
+     else if(coloriesburn>=5000 && coloriesburn<7500){
        setState(() {
          currentlevelCalories=4;
        });
      }
-     else if(coloriesburn==7500){
+     else if(coloriesburn>=7500 && coloriesburn<10000){
        setState(() {
          currentlevelCalories=5;
        });
-     } else if(coloriesburn==10000){
+     } else if(coloriesburn>=10000 && coloriesburn<15000){
        setState(() {
          currentlevelCalories=6;
        });
-     }else if(coloriesburn==15000){
+     }else if(coloriesburn>=15000 && coloriesburn<20000){
        setState(() {
          currentlevelCalories=7;
        });
      }
-     else if(coloriesburn==20000){
+     else if(coloriesburn>=20000 && coloriesburn<25000){
        setState(() {
          currentlevelCalories=8;
        });
-     } else if(coloriesburn==25000){
+     } else if(coloriesburn>=25000 && coloriesburn<30000){
        setState(() {
          currentlevelCalories=9;
        });
      }
-     else if(coloriesburn==30000){
+     else if(coloriesburn>=30000 && coloriesburn<40000){
        setState(() {
          currentlevelCalories=10;
        });
      }
-     else if(coloriesburn==40000){
+     else if(coloriesburn>=40000 && coloriesburn<50000){
        setState(() {
          currentlevelCalories=11;
        });
      }
-     else if(coloriesburn==50000){
+     else if(coloriesburn>=50000 && coloriesburn<75000){
        setState(() {
          currentlevelCalories=12;
        });
      }
-     else if(coloriesburn==75000){
+     else if(coloriesburn>=75000 && coloriesburn<100000){
        setState(() {
          currentlevelCalories=13;
        });
      }
-     else if(coloriesburn==100000){
+     else if(coloriesburn>=100000 && coloriesburn<150000){
        setState(() {
          currentlevelCalories=14;
        });
      }
-     else if(coloriesburn==150000){
+     else if(coloriesburn>=150000 && coloriesburn<200000){
        setState(() {
          currentlevelCalories=15;
        });
      }
-     else if(coloriesburn==200000){
+     else if(coloriesburn>=200000 && coloriesburn<250000){
        setState(() {
          currentlevelCalories=16;
        });
      }
-     else if(coloriesburn==250000){
+     else if(coloriesburn>=250000 && coloriesburn<300000){
        setState(() {
          currentlevelCalories=17;
        });
      }
-     else if(coloriesburn==300000){
+     else if(coloriesburn>=300000 && coloriesburn<500000){
        setState(() {
          currentlevelCalories=18;
        });
      }
-     else if(coloriesburn==500000){
+     else if(coloriesburn>=500000 && coloriesburn<1000000){
        setState(() {
          currentlevelCalories=19;
        });
      }
-     else if(coloriesburn==1000000){
+     else if(coloriesburn>=1000000){
        setState(() {
          currentlevelCalories=20;
        });
@@ -300,8 +302,10 @@ class _ReportScreenState extends State<ReportScreen> {
  }
  DistanceLevel(){
    getMonthlySteps().then((value) {
+     print("Steps going to distance calculation--------> $value");
      int Distance=StepsToDistance(value);
-     if(Distance==5){
+     print("Distance is --------------->$Distance");
+     if(Distance>=5 && Distance<10){
        setState(() {
          currentlevelKm=1;
        });
@@ -780,9 +784,17 @@ class _ReportScreenState extends State<ReportScreen> {
          Ig="lib/assests/NewImages/UngroupedAwards/b20.png";
 
        });
+     }else{
+       setState(() {
+         Ig="lib/assests/NewImages/UngroupedAwards/Lock.png";
+          Achievement="Achievement";
+          AchievedFor="Unlock";
+
+       });
      }
    }
    else if(currentOption==1){
+     print("Calories level  $currentlevelCalories");
      if(currentlevelCalories==1){
        setState(() {
          Achievement="Emberling";
@@ -944,6 +956,14 @@ class _ReportScreenState extends State<ReportScreen> {
 
        });
      }
+     else{
+       setState(() {
+
+         Ig="lib/assests/NewImages/UngroupedAwards/Lock.png";
+         Achievement="Achievement";
+         AchievedFor="Unlock";
+       });
+     }
    }
    else{
      if(currentlevelKm==1){
@@ -1103,6 +1123,13 @@ class _ReportScreenState extends State<ReportScreen> {
          AchievedFor="10,000 kms";
          Ig="lib/assests/NewImages/UngroupedAwards/p1.png";
        });
+     }else{
+       setState(() {
+         Ig="lib/assests/NewImages/UngroupedAwards/Lock.png";
+         Ig="lib/assests/NewImages/UngroupedAwards/Lock.png";
+         Achievement="Achievement";
+         AchievedFor="Unlock";
+       });
      }
    }
  }
@@ -1193,11 +1220,13 @@ class _ReportScreenState extends State<ReportScreen> {
                         ),
                       ),
                       Positioned(
-                        left: Ig=="lib/assests/NewImages/UngroupedAwards/Lock.png"?200:180,
-                        top: Ig=="lib/assests/NewImages/UngroupedAwards/Lock.png"?10:10,
-                        width: Ig=="lib/assests/NewImages/UngroupedAwards/Lock.png"?80:125,
+                        left: 210,
+                        top: 15,
                         child:
-                         Image.asset(Ig)
+                         Container(
+                             width: 100,
+                             height: 100,
+                             child: Image.asset(Ig))
                       ),
                     ],
                   ),

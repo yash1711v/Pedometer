@@ -124,24 +124,9 @@ class AuthServices {
         await _auth.signInWithCredential(authCredential).then((value) {
           SharedPref().setisguest(false);
           Navigator.of(context).pop();
-          ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-            content: Container(
-              child: Text('Account Created',
-                style: TextStyle(
-                  color: Colors.white,
-                  fontSize: 16.sp,
-                  fontFamily: 'Inter',
-                  fontWeight: FontWeight.w400,
-                  height: 0,
-                ),
 
-              ),
-            ),
-            behavior: SnackBarBehavior.floating,
-            backgroundColor: Colors.black,
-          ));
           SharedPref().setisguest(false);
-          services.UpdateDeviceId(userObj.id,DeviceID);
+
           DateTime now = DateTime.now();
           String formattedDate = "${now.year.toString().padLeft(4, '0')}-${now.month.toString().padLeft(2, '0')}-${now.day.toString().padLeft(2, '0')}";
           print(formattedDate);
@@ -150,6 +135,7 @@ class AuthServices {
           DatabaseReference usersRef = database.ref().child('users').child(userObj.id);
                 usersRef.once().then((DatabaseEvent event) async {
                   if (event.snapshot.exists) {
+                    services.UpdateDeviceId(userObj.id,DeviceID);
                     // The uid exists, perform your task here
                     print("UID exists in the database. Performing task...");
                     SharedPref().setUsername(event.snapshot.child("username").value.toString());
@@ -171,6 +157,7 @@ print(int.parse(event.snapshot.child("StepsTarget").value.toString()));         
                   } else {
                     // The uid does not exist
                     print("UID does not exist in the database.");
+                    services.UpdateDeviceId(userObj.id,DeviceID);
                     Get.offAll(()=>UserNameScreen());
                   }
                 });

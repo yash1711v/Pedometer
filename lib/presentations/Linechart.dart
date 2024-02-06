@@ -68,6 +68,7 @@ class _LineChartSample2State extends State<LineChartSample2> {
       setState(() {
         StepsList = hourlyStepsList;
       });
+      // print("StepList--------------------> $StepsList");
     }else{
       setState(() {
         StepsList = [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0];
@@ -81,7 +82,7 @@ class _LineChartSample2State extends State<LineChartSample2> {
 
     final Map<String, dynamic> stepsData = await SharedPref().getStepsData();
 // print("this is in monthly ${stepsData}");
-
+     print("Steps Data from Shared pref ---------> $stepsData");
     final year = widget.now.year.toString();
     final month = widget.now.month < 10 ? "0" + widget.now.month.toString() : widget.now.month.toString();
 
@@ -106,14 +107,14 @@ class _LineChartSample2State extends State<LineChartSample2> {
 
         // Add the total steps for the current date to the list
         if (totalStepsForDate > 0) {
-          dailyStepsMap[dateKey] = totalStepsForDate;
+          dailyStepsMap[dateKey.toString().padLeft(2,"0")] = totalStepsForDate;
 
         }
       });
     }
-    // print("${dailyStepsMap}");
+    print("${dailyStepsMap}");
     dailyStepsList=dailyStepsMap.values.toList();
-    // print('-------------jg\n--------->${dailyStepsList}');
+    print('-------------jg\n--------->${dailyStepsList}');
    setState(() {
      StepsList=dailyStepsList;
    });
@@ -150,7 +151,7 @@ class _LineChartSample2State extends State<LineChartSample2> {
 
           // Add the total steps for the current date to the list
           if (totalStepsForDate > 0) {
-            dailyStepsMap[dateKey] = totalStepsForDate;
+            dailyStepsMap[dateKey.toString()] = totalStepsForDate;
           }
         });
       }
@@ -165,7 +166,7 @@ class _LineChartSample2State extends State<LineChartSample2> {
 
       // print(now.day);
 
-      String datee= "${now.year}-${now.month.toString().padLeft(2,"0")}-${date}";
+      String datee= "${now.year}-${now.month.toString().padLeft(2,"0")}-${date.toString().padLeft(2,"0")}";
       DateTime currentDate = DateTime.parse(datee);
       int currentDayOfWeek = currentDate.weekday;
      // print("ugvjhjhhjb ${currentDayOfWeek}");
@@ -199,7 +200,6 @@ class _LineChartSample2State extends State<LineChartSample2> {
          });
        }
 
-  print("Weekly Step List $StepsList");
     return currentdateweek;
   }
 
@@ -261,73 +261,91 @@ class _LineChartSample2State extends State<LineChartSample2> {
     Widget text;
     switch (value.toInt()) {
       case 0:
-        text =  Text(value.toString(), style: style);
+        text =  Text(value.toStringAsFixed(0), style: style);
         break;
         case 1:
-        text =  Text(value.toString(), style: style);
+        text =  Text(value.toStringAsFixed(0), style: style);
         break;
         case 2:
-        text =  Text(value.toString(), style: style);
+        text =  Text(value.toStringAsFixed(0), style: style);
         break;
         case 3:
-        text =  Text(value.toString(), style: style);
+        text =  Text(value.toStringAsFixed(0), style: style);
         break;
         case 4:
-        text =  Text(value.toString(), style: style);
+        text =  Text(value.toStringAsFixed(0), style: style);
         break;
         case 5:
-        text =  Text(value.toString(), style: style);
+        text =  Text(value.toStringAsFixed(0), style: style);
         break;
         case 6:
-        text =  Text(value.toString(), style: style);
+        text =  Text(value.toStringAsFixed(0), style: style);
         break;
         case 7:
-        text =  Text(value.toString(), style: style);
+        text =  Text(value.toStringAsFixed(0), style: style);
         break;
         case 8:
-        text =  Text(value.toString(), style: style);
+        text =  Text(value.toStringAsFixed(0), style: style);
         break;
         case 9:
-        text =  Text(value.toString(), style: style);
+        text =  Text(value.toStringAsFixed(0), style: style);
         break;
         case 10:
-        text =  Text(value.toString(), style: style);
+        text =  Text(value.toStringAsFixed(0), style: style);
         break;
         case 11:
-        text =  Text(value.toString(), style: style);
+        text =  Text(value.toStringAsFixed(0), style: style);
         break;
         case 12:
-        text =  Text(value.toString(), style: style);
+        text =  Text(value.toStringAsFixed(0), style: style);
         break;
         case 13:
-        text =  Text(value.toString(), style: style);
+        text =  Text(value.toStringAsFixed(0), style: style);
         break;
         case 14:
-        text =  Text(value.toString(), style: style);
+        text =  Text(value.toStringAsFixed(0), style: style);
         break;
         case 15:
-        text =  Text(value.toString(), style: style);
+        text =  Text(value.toStringAsFixed(0), style: style);
         break;
         case 16:
-        text =  Text(value.toString(), style: style);
+        text =  Text(value.toStringAsFixed(0), style: style);
         break;
         case 17:
-        text =  Text(value.toString(), style: style);
+        text =  Text(value.toStringAsFixed(0), style: style);
         break;
         case 18:
-        text =  Text(value.toString(), style: style);
+        text =  Text(value.toStringAsFixed(0), style: style);
         break;
         case 19:
-        text =  Text(value.toString(), style: style);
+        text =  Text(value.toStringAsFixed(0), style: style);
         break;
         case 20:
-        text =  Text(value.toString(), style: style);
+        text =  Text(value.toStringAsFixed(0), style: style);
         break;
     case 21:
-        text =  Text(value.toString(), style: style);
+        text =  Text(value.toStringAsFixed(0), style: style);
         break;
         case 22:
-        text =  Text(value.toString(), style: style);
+        text =  Text(value.toStringAsFixed(0), style: style);
+        break; case 23:
+        text =  Text(value.toStringAsFixed(0), style: style);
+        break; case 24:
+        text =  Text(value.toStringAsFixed(0), style: style);
+        break; case 25:
+        text =  Text(value.toStringAsFixed(0), style: style);
+        break; case 26:
+        text =  Text(value.toStringAsFixed(0), style: style);
+        break; case 27:
+        text =  Text(value.toStringAsFixed(0), style: style);
+        break;case 28:
+        text =  Text(value.toStringAsFixed(0), style: style);
+        break;case 29:
+        text =  Text(value.toStringAsFixed(0), style: style);
+        break;case 30:
+        text =  Text(value.toStringAsFixed(0), style: style);
+        break;case 31:
+        text =  Text(value.toStringAsFixed(0), style: style);
         break;
 
       default:
@@ -347,7 +365,7 @@ class _LineChartSample2State extends State<LineChartSample2> {
       fontSize: 15,
     );
     // print("Value----------------\n ${value}");
-    String text=value.toString();
+    String text=value.toStringAsFixed(0);
     // switch (value.toInt()) {
     //   case 1:
     //     text = value.toString();

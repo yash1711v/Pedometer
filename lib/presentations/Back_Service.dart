@@ -168,7 +168,7 @@ Timer.periodic(Duration(seconds: 1), (timer) async {
   });
 
 
-  DatabaseReference databaseReference2 = FirebaseDatabase.instance.reference().child('users').child(Uid).child("defaultsteps");
+  DatabaseReference databaseReference2 = FirebaseDatabase.instance.reference().child('users').child(Uid).child("StepsTarget");
   int maxprogress=6000;
 
 

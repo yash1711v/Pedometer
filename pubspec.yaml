@@ -72,6 +72,7 @@ dependencies:
   flutter_gradient_button: ^0.0.1
   flutter_reaction_button: ^3.0.0+3
   xml: ^6.5.0
+  recaptcha_enterprise_flutter: ^18.4.0
 
 
 

@@ -12,7 +12,7 @@ import 'package:steptracking/presentations/MainScreen.dart';
 import '../SharedPrefrences/SharedPref.dart';
 import '../presentations/HomePage.dart';
 class DatabaseServices {
-      void writeToDatabase(
+      Future<void> writeToDatabase(
           {required String Uid,
       required String username,
       required String Email,
@@ -24,7 +24,9 @@ class DatabaseServices {
       required int height ,
       required int weight ,
       required double activityLevel ,
-      required BuildContext context}) {
+      required BuildContext context,
+
+          }) async {
         DatabaseReference databaseReference = FirebaseDatabase.instance.reference();
       try{
         databaseReference.child('users').child(Uid).set({
@@ -40,24 +42,24 @@ class DatabaseServices {
           "Device_ID" : DeviceId
          }).then((value) {
 
-          ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-            content: Container(
-              child: Text('Data Saved',
-                style: TextStyle(
-                  color: Colors.white,
-                  fontSize: 16.sp,
-                  fontFamily: 'Inter',
-                  fontWeight: FontWeight.w400,
-                  height: 0,
-                ),
+          // ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+          //   content: Container(
+          //     child: Text('Data Saved',
+          //       style: TextStyle(
+          //         color: Colors.white,
+          //         fontSize: 16.sp,
+          //         fontFamily: 'Inter',
+          //         fontWeight: FontWeight.w400,
+          //         height: 0,
+          //       ),
+          //
+          //     ),
+          //   ),
+          //   behavior: SnackBarBehavior.floating,
+          //   backgroundColor: Colors.black,
+          // ));
 
-              ),
-            ),
-            behavior: SnackBarBehavior.floating,
-            backgroundColor: Colors.black,
-          ));
-
-          // SharedPref().setUsername(username);
+          SharedPref().setUsername(Email);
             Get.to(()=>MainScreen(),
                 duration: const Duration(
                     seconds:

@@ -504,7 +504,7 @@ Future<void> getColors() async {
     double stepLength = (Height * 0.415) / steps;
     // print("stepslength $stepLength");
     // Number of steps for 1 kilometer (adjust as needed)
-    double stepsPerKilometer = isMetric ? 1000 / stepLength : 1609.34 / stepLength;
+    double stepsPerKilometer = isMetric ? stepLength/1000   : stepLength/1609.34  ;
     // print("stepsPerKilometer $stepsPerKilometer");
 
     // Calculate walking speed (kilometers per minute)
@@ -512,7 +512,7 @@ Future<void> getColors() async {
     if (!walkingSpeed.isFinite || walkingSpeed <= 0) {
       return 0.0;
     }
-    print("walkingSpeed $walkingSpeed");
+    // print("walkingSpeed $walkingSpeed");
 
     // Calculate time to cover the distance (in minutes)
     double timeInMinutes = distance / walkingSpeed;
@@ -622,7 +622,7 @@ Future<void> getColors() async {
       totalDistance = stepsInKm * 1000;
       unit = " m";
     }
-    return formatted(totalDistance, isMiles, unit);
+    return formatted(isMiles?totalDistance/0.62137:totalDistance, isMiles, unit);
   }
 
 

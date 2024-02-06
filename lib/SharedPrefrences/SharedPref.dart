@@ -206,14 +206,21 @@ Future<void> saveImageList(List<String> stringList) async {
             },
           };
         });
-        print(stepsData);
+        print("Steps Data --------------> $stepsData");
 
       }
+      // makeHourValuesPositive(stepsData[year]![month]![date]);
     }
 
     return stepsData;
   }
-
+  void makeHourValuesPositive(Map<dynamic, dynamic> data) {
+    data.forEach((key, value) {
+      if (value is int && value < 0) {
+        data[key] = -value;
+      }
+    });
+  }
   void initializeStepsData(Map<String, dynamic> stepsData) {
     final now = DateTime.now();
     final year = (now.year).toString();

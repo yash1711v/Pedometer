@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'dart:io';
 import 'dart:math';
 
@@ -126,7 +127,12 @@ class _UserNameScreenState extends State<UserNameScreen> {
 
 
   FirebaseSetingUp(BuildContext context) async {
-    services.writeToDatabase(Uid: UID, username: UserName, Email: Email, gender: await SharedPref().getGender(), Password: Password, defaultSteps: await SharedPref().getStepsTarget(), DeviceId: await SharedPref().getDeviceid(), age: await SharedPref().getAge(), height: await SharedPref().getHeight(), weight: await SharedPref().getWeight(), activityLevel: await SharedPref().getActivityLevel(), context: context);
+    Map<String, dynamic> stepsData={};
+    stepsData=await SharedPref().getStepsData();
+    print(stepsData);
+    services.writeToDatabase(Uid: UID, username: UserName, Email: Email, gender: await SharedPref().getGender(), Password: Password, defaultSteps: await SharedPref().getStepsTarget(), DeviceId: await SharedPref().getDeviceid(), age: await SharedPref().getAge(), height: await SharedPref().getHeight(), weight: await SharedPref().getWeight(), activityLevel: await SharedPref().getActivityLevel(), context: context,).then((value) {
+      services.sendStepsToFirebase(60);
+    });
   }
 
   void initState() {
@@ -323,7 +329,7 @@ class _UserNameScreenState extends State<UserNameScreen> {
                 children: [
                 AnimatedContainer(
                   duration: Duration(seconds: 1),
-                  height: onLastPage?600:750,
+                  height: onLastPage?750:750,
                   child:   PageView(
                       controller: _controller,
                       onPageChanged: (index) {

@@ -660,7 +660,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                onTap: () async =>{
                  _authServices.signout(),
                  print("logout clicked"),
-                 await SharedPref().clearAllPreferences(),
+                 // await SharedPref().clearAllPreferences(),
                await SharedPref().setIntroScreenInfo(false),
                 SharedPref().setStepsComingFromFirebase(0),
                 SharedPref().setEmail(""),
