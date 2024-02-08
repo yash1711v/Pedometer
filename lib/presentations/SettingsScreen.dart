@@ -13,11 +13,14 @@ import 'package:intl/intl.dart';
 import 'package:steptracking/presentations/Back_Service.dart';
 import 'package:steptracking/presentations/HomePage.dart';
 import 'package:steptracking/presentations/SignUpScreen.dart';
+import 'package:steptracking/presentations/StepTargetUpdateScreen.dart';
+import 'package:steptracking/presentations/UserInfoUpdate.dart';
 import 'package:url_launcher/url_launcher.dart';
 import '../Firebasefunctionalities/AuthServices.dart';
 import '../Firebasefunctionalities/DatabaseServices.dart';
 import '../SharedPrefrences/SharedPref.dart';
 import '../widgets/BottomNavbar.dart';
+import 'HomeController.dart';
 
 class SettingsScreen extends StatefulWidget {
   const SettingsScreen({super.key});
@@ -106,6 +109,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
 
     return deviceUID;
   }
+  HomeControllwe homeControllwe = Get.find<HomeControllwe>();
   Future<void> getUserData() async {
     bool isMiles=await SharedPref().getisMiles();
     String useName = await SharedPref().getUsername();
@@ -115,16 +119,18 @@ class _SettingsScreenState extends State<SettingsScreen> {
     int stepTar=await SharedPref().getStepsTarget();
     bool isguest=await SharedPref().getisguest();
     List<Color> theme=await SharedPref().loadColorList();
+    homeControllwe.updateStepsTarget(stepTar);
     setState(() {
       Email=email;
       UserName=useName;
       Uid=_uid;
       isMIles=isMiles;
-      StepsTarget=stepTar;
+      StepsTarget=homeControllwe.StepsTarget.value;
       isGuest=isguest;
       _EmailController.text=UserName;
       Theme=theme;
       _dailyStepController.text=StepsTarget.toString();
+
       if(Theme[0]==Color(0xFFF7722A)){
         print("theme1");
         setState(() {
@@ -268,6 +274,35 @@ class _SettingsScreenState extends State<SettingsScreen> {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Text(
+                  'Update',
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontSize: 22.sp,
+                    fontFamily: 'Work Sans',
+                    fontWeight: FontWeight.w400,
+                    height: 0,
+                  ),
+                ),
+                // SizedBox(width: 91.w,),
+                TextButton(
+                    onPressed: (){
+                      Get.to(()=>UserInfoUpdate());
+                    },
+                    child: Row(
+                      children: [
+                        SizedBox(width: 5.w,),
+                        Icon(Icons.arrow_forward_ios_outlined,
+                          size: 20,
+                          color: Colors.white,)
+                      ],
+                    )),
+              ],
+            ),
+            SizedBox(height: 20.h,),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text(
                   'Daily Step Goal',
                   style: TextStyle(
                     color: Colors.white,
@@ -278,161 +313,14 @@ class _SettingsScreenState extends State<SettingsScreen> {
                   ),
                 ),
                 // SizedBox(width: 91.w,),
-                TextButton(onPressed: (){
-
-                  showModalBottomSheet(
-                      isDismissible: false,
-                      context: context,
-                      isScrollControlled: true,
-                      shape:  RoundedRectangleBorder( // <-- SEE HERE
-                        borderRadius: BorderRadius.only(
-                            topLeft: Radius.circular(10.0.r),
-                            topRight: Radius.circular(10.0.r)
-                        ),
-                      ),
-                      enableDrag: false,
-                      backgroundColor: Colors.white,
-                      builder: (context){
-                        return  SizedBox(
-                            height: _dailyStep.hasFocus?650.h:175.h,
-                            child: Padding(
-                              padding:  EdgeInsets.symmetric(horizontal: 25.w,vertical: 30.h),
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: <Widget>[
-
-                                  Text(
-                                    'SET DAILY STEP GOAL',
-                                    style: TextStyle(
-                                      color: Color(0xFF2D2D2D),
-                                      fontSize: 18.sp,
-                                      fontFamily: 'Inter',
-                                      fontWeight: FontWeight.w400,
-                                      height: 0,
-                                    ),
-                                  ),
-                                  SizedBox(height: 10.0.h),
-                                  Row(
-                                    children: [
-                                      Expanded(
-                                        child: SizedBox(
-                                          width: 290.w,
-                                          height: 62.h,
-                                          child: TextField(
-                                            controller: _dailyStepController,
-                                            obscureText: false,
-                                            focusNode: _dailyStep,
-                                            style:  TextStyle(
-                                                color: Colors.black
-                                            ),
-                                            decoration: InputDecoration(
-                                              // hintStyle:  TextStyle(
-                                              //   color: Colors.black,
-                                              //   fontSize: 16.w,
-                                              //   fontFamily: 'Inter',
-                                              //   fontWeight: FontWeight.w400,
-                                              //   height: 0,
-                                              // ),
-                                              enabledBorder: OutlineInputBorder(
-                                                borderSide: BorderSide(
-                                                    width: 2.w,
-                                                    color: Colors.black
-                                                ), //<-- SEE HERE
-                                                borderRadius: BorderRadius.circular(10.r),
-                                              ),
-                                              focusedBorder: OutlineInputBorder(
-                                                borderSide:  BorderSide(
-                                                    width: 2.w,
-                                                    color:Colors.black), //<-- SEE HERE
-                                                borderRadius: BorderRadius.circular(10.r),
-                                              ),
-                                            ),
-                                            keyboardType: TextInputType.number,
-                                            onChanged: (value){
-                                              setState(() {
-                                                StepsTarget = int.parse(value);
-                                                _dailyStepController.text=StepsTarget.toString();
-                                              });
-                                              SharedPref().setStepsTarget(StepsTarget);
-                                            },
-                                          ),
-                                        ),
-                                      ),
-                                      SizedBox(width: 10.0.w),
-                                      SizedBox(
-                                        width: 74.w,
-                                        height: 60.h,
-                                        child: OutlinedButton(
-                                          onPressed: () {
-                                            if(isGuest){
-                                              Navigator.pop(context);
-                                              SharedPref().setStepsTarget(StepsTarget);
-                                              ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                                                content: Container(
-                                                  child:
-                                                  Text('Daily Target Updated',
-                                                    style: TextStyle(
-                                                      color: Colors.white,
-                                                      fontSize: 16.sp,
-                                                      fontFamily: 'Inter',
-                                                      fontWeight: FontWeight.w400,
-                                                      height: 0,
-                                                    ),
-                                                  ),
-                                                ),
-                                                behavior: SnackBarBehavior.floating,
-                                                backgroundColor: Color(0xFF2D2D2D),
-                                              ));
-                                            }else{
-                                              Navigator.pop(context);
-                                              services.Update(Uid, StepsTarget);
-                                              SharedPref().setStepsTarget(StepsTarget);
-                                              ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                                                content: Container(
-                                                  child:
-                                                  Text('Daily Target Updated',
-                                                    style: TextStyle(
-                                                      color: Colors.white,
-                                                      fontSize: 16.sp,
-                                                      fontFamily: 'Inter',
-                                                      fontWeight: FontWeight.w400,
-                                                      height: 0,
-                                                    ),
-                                                  ),
-                                                ),
-                                                behavior: SnackBarBehavior.floating,
-                                                backgroundColor: Color(0xFF2D2D2D),
-                                              ));
-                                            }
-                                            // Implement reset logic here
-
-                                          },
-                                          child: const Icon(
-                                            Icons.arrow_forward,
-                                            color: Colors.black,
-                                          ),
-                                          style: ButtonStyle(
-                                              side: MaterialStateProperty.all(BorderSide(width: 2.0.w,color: Colors.black)),
-                                              shape: MaterialStateProperty.all<RoundedRectangleBorder>(
-                                                  RoundedRectangleBorder(
-                                                      borderRadius: BorderRadius.circular(10.0.r)
-                                                  )
-                                              )
-                                          ) ,
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-
-                                ],
-                              ),
-                            ));
-                      });
+                TextButton(
+                    onPressed: (){
+                       Get.to(()=>StepTargetUpdateScreen());
                  },
                     child: Row(
                   children: [
                     Text(
-                      StepsTarget.toString()+' steps',
+                      homeControllwe.StepsTarget.value.toString()+' steps',
                       style: TextStyle(
                         color: Color(0xFFA9A9A9),
                         fontSize: 17.sp,

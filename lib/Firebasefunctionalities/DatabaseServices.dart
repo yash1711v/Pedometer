@@ -94,6 +94,68 @@ class DatabaseServices {
         }
 
       }
+
+
+      void UpdateHeight(String Uid, int height) {
+        DatabaseReference databaseReference = FirebaseDatabase.instance.reference();
+        try{
+          databaseReference.child('users').child(Uid).update({
+            'Height' :  height
+          });
+        }catch(error){print(error);
+        }
+
+      }
+
+ void UpdateWeight(String Uid, int weight) {
+        DatabaseReference databaseReference = FirebaseDatabase.instance.reference();
+        try{
+          databaseReference.child('users').child(Uid).update({
+            'Weight' :  weight
+          });
+        }catch(error){print(error);
+        }
+
+      }
+      void UpdateActivityLevel(String Uid, double activityLevel) {
+        DatabaseReference databaseReference = FirebaseDatabase.instance.reference();
+        try{
+          databaseReference.child('users').child(Uid).update({
+            'ActivityLevel' :  activityLevel
+          });
+        }catch(error){print(error);
+        }
+
+      }
+      void UpdateAge(String Uid, int age) {
+        DatabaseReference databaseReference = FirebaseDatabase.instance.reference();
+        try{
+          databaseReference.child('users').child(Uid).update({
+            'Age' :  age
+          });
+        }catch(error){print(error);
+        }
+
+      }
+      void UpdateGender(String Uid, String gender) {
+        DatabaseReference databaseReference = FirebaseDatabase.instance.reference();
+        try{
+          databaseReference.child('users').child(Uid).update({
+            'Gender' :  gender
+          });
+        }catch(error){print(error);
+        }
+
+      }
+
+
+
+
+
+
+
+
+
       void UpdateEmail(String Uid, String Email) {
         DatabaseReference databaseReference = FirebaseDatabase.instance.reference();
         try{

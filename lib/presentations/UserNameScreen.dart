@@ -30,6 +30,9 @@ class UserNameScreen extends StatefulWidget {
 }
 
 class _UserNameScreenState extends State<UserNameScreen> {
+
+  int _cCurrentValue = 160;
+  int _cCurrentValueWeight = 55;
   late final TextEditingController _UserNameController =
       TextEditingController();
   final FocusNode _UserNameNode = FocusNode();
@@ -49,10 +52,7 @@ class _UserNameScreenState extends State<UserNameScreen> {
   ];
   DatabaseServices services = DatabaseServices();
   Map<String, int?> map = {};
-  int _cCurrentValue = 160;
-  int _cCurrentValueWeight = 55;
-  double Height = 0
-  ;
+  double Height = 0;
   double Weight = 0;
   int Age = 0;
   int StepsTarget = 0;
@@ -117,6 +117,7 @@ class _UserNameScreenState extends State<UserNameScreen> {
     String email=await SharedPref().getEmail();
     String pass=await SharedPref().getPassword();
     bool isgues=await SharedPref().getisguest();
+
     setState(() {
       UID = uid;
       Email=email;
@@ -306,8 +307,7 @@ class _UserNameScreenState extends State<UserNameScreen> {
   }
 
   PageController _controller = PageController();
-  double deviceHeight(BuildContext context) =>
-      MediaQuery.of(context).size.height;
+  double deviceHeight(BuildContext context) => MediaQuery.of(context).size.height;
 
   double deviceWidth(BuildContext context) => MediaQuery.of(context).size.width;
   bool onLastPage = false;
