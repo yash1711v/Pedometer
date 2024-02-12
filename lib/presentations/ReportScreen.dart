@@ -69,7 +69,7 @@ class _ReportScreenState extends State<ReportScreen> {
    double activityLevel= await SharedPref().getActivityLevel();
    String gender= await SharedPref().getGender();
    int age=await SharedPref().getAge();
-   // int currentlevelsteps=await SharedPref().getCurrentLevelSteps();
+   int currentlevelsteps=await SharedPref().getCurrentLevelSteps();
    setState(() {
      stepsData=StepsData;
      Weight=double.parse(weight.toString());
@@ -77,11 +77,11 @@ class _ReportScreenState extends State<ReportScreen> {
       Gender= gender;
       ActivityLevel=double.parse(activityLevel.toString());
       Age=age;
-     // currentlevel=currentlevelsteps;
+     currentlevel=currentlevelsteps;
    });
-   // getHourlyStepsForCurrentDate(currentlevelsteps);
-   // CaloriesLevel();
-   // DistanceLevel();
+   getHourlyStepsForCurrentDate(currentlevelsteps);
+   CaloriesLevel();
+   DistanceLevel();
    whichBadges();
 
  }
@@ -620,9 +620,9 @@ class _ReportScreenState extends State<ReportScreen> {
       AssetImage("lib/assests/NewImages/E$i.png");
     }
   }
-  int currentlevel=19;
-  int currentlevelKm=19;
-  int currentlevelCalories=19;
+  int currentlevel=0;
+  int currentlevelKm=0;
+  int currentlevelCalories=0;
  int currentOption=0;
  String Achievement="Achievement";
  String AchievedFor="Unlock";

@@ -4,9 +4,7 @@ import 'dart:async';
 import 'dart:io';
 import 'dart:isolate';
 import 'dart:ui';
-import 'package:android_alarm_manager_plus/android_alarm_manager_plus.dart';
-import 'package:connectivity_plus/connectivity_plus.dart';
-import 'package:firebase_auth/firebase_auth.dart';
+
 import 'package:flutter/gestures.dart';
 import 'dart:math' as math;
 import 'package:flutter_svg/svg.dart';
@@ -16,7 +14,6 @@ import 'package:timezone/timezone.dart' as tz;
 import 'package:timezone/data/latest.dart' as tz;
 import 'package:get/get.dart';
 import 'package:get/get_core/src/get_main.dart';
-import 'package:timezone/timezone.dart' as tz;
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -206,10 +203,10 @@ Future<void> getColors() async {
   }
 
 
-  void listenNotification(){
-   NotificationServices.onNotifications.stream.listen(onClickedNotification);
-
-}
+//   void listenNotification(){
+//    NotificationServices.onNotifications.stream.listen(onClickedNotification);
+//
+// }
   void onClickedNotification(String? playload)=> Get.to(()=>HomePage());
 
 
@@ -954,7 +951,10 @@ List<String> WhichGraoh=['Day','Week','Month'];
                   ],
                 ),
                 SizedBox(height: 30,),
-                LineChartSample2(WhichGraoh[indexofwhichGraph],Themee,homeControllwe.selectedDate.value),
+                Padding(
+                  padding:  EdgeInsets.only(right: 10),
+                  child: LineChartSample2(WhichGraoh[indexofwhichGraph],Themee,homeControllwe.selectedDate.value),
+                ),
                 SizedBox(height: 90,),
               ],
             ),

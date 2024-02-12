@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:rxdart/rxdart.dart';
 import 'package:timezone/timezone.dart' as tz;
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:timezone/data/latest.dart' as tz;
@@ -12,7 +11,7 @@ import 'package:flutter_timezone/flutter_timezone.dart';
 
 class NotificationServices{
 static final  _flutterLocalNotificationsPlugin=FlutterLocalNotificationsPlugin();
-static final onNotifications = BehaviorSubject<String?>();
+// static final onNotifications = BehaviorSubject<String?>();
 final AndroidInitializationSettings _androidInitializationSettings = AndroidInitializationSettings("small_logo");
 
 
@@ -38,9 +37,9 @@ void initializeNotification() async {
   );
   await _flutterLocalNotificationsPlugin.initialize(
       initializationSettings,
-  onDidReceiveNotificationResponse: (playload) async{
-        onNotifications.add(playload.payload);
-  }
+  // onDidReceiveNotificationResponse: (playload) async{
+  //       onNotifications.add(playload.payload);
+  // }
   );
   tz.initializeTimeZones();
   final String timeZoneName = 'Asia/Kolkata';

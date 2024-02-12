@@ -155,7 +155,10 @@ class _LoginState extends State<Login> {
                             controller: _EmailController,
                             obscureText: false,
                             focusNode: _emailNode,
-                            style: TextStyle(color: Colors.white),
+                            cursorHeight: 25,
+                            style: TextStyle(color: Colors.white,
+                              height: 1,
+                              fontSize: 21,),
                             decoration: InputDecoration(
                               enabledBorder: OutlineInputBorder(
                                 borderSide: BorderSide(
@@ -202,7 +205,10 @@ class _LoginState extends State<Login> {
                             obscureText: _isVisible,
                             readOnly: !_validateEmail(_email) ? true : false,
                             focusNode: _passwordNode,
-                            style: const TextStyle(color: Colors.white),
+                            cursorHeight: 25,
+                            style: TextStyle(color: Colors.white,
+                              height: 1,
+                              fontSize: 21,),
                             onChanged: (value) {
                               password = value;
                             },
@@ -301,7 +307,10 @@ class _LoginState extends State<Login> {
                                                           _EmailController2,
                                                       obscureText: false,
                                                       focusNode: _emailNode2,
+                                                      cursorHeight: 25,
                                                       style: TextStyle(
+                                                          height: 1,
+                                                          fontSize: 50,
                                                           color: Colors.white),
                                                       decoration: InputDecoration(
                                                         hintText: "Type here",
@@ -538,7 +547,7 @@ class _LoginState extends State<Login> {
                                 children: [
                                   Image.asset("lib/assests/NewImages/googleLogoImage.png",scale: 5,),
                                   SizedBox(width: 10,),
-                                  Text("SignUp With Google")],),
+                                  Text("Login With Google")],),
                               onPressed:    () async {
                                 print("hello");
                                 String deviceid=await getDeviceUID();
@@ -550,7 +559,7 @@ class _LoginState extends State<Login> {
 
                           ),
                         ),
-                        SizedBox(height: 20.h,),
+                        SizedBox(height: 35.h,),
                         Row(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [

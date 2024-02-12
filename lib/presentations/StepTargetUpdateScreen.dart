@@ -21,6 +21,9 @@ class _StepTargetUpdateScreenState extends State<StepTargetUpdateScreen> {
     Info();
   }
  HomeControllwe homeControllwe = Get.find<HomeControllwe>();
+ late final TextEditingController _defaultStepsController =
+ TextEditingController();
+ final FocusNode _defaultStepsNode = FocusNode();
  int currentSteps=0;
  Info() async {
    int height=await SharedPref().getHeight();
@@ -30,6 +33,7 @@ class _StepTargetUpdateScreenState extends State<StepTargetUpdateScreen> {
    String  gender=await SharedPref().getGender();
    int stepsTarget=await SharedPref().getStepsTarget();
    int steps=await SharedPref().getTodaysSteps();
+
    whichTheme();
    setState(() {
      Height=double.parse(height.toString());
@@ -39,7 +43,9 @@ class _StepTargetUpdateScreenState extends State<StepTargetUpdateScreen> {
      Gender=gender;
      StepsTarget=stepsTarget;
      currentSteps=steps;
+     _defaultStepsController.text=StepsTarget.toString();
    });
+
    print("Height $Height");
    print("Weight $Weight");
    print("Age $Age");
@@ -244,12 +250,12 @@ class _StepTargetUpdateScreenState extends State<StepTargetUpdateScreen> {
               ),
             ),
             SizedBox(
-              height: 50,
+              height: 100,
             ),
             Text(
-              "Your Goal",
+              "Steps Target",
               style: TextStyle(
-                fontSize: 80.sp,
+                fontSize: 45.sp,
                 fontFamily: 'Teko',
                 fontWeight: FontWeight.w600,
                 letterSpacing: 1.5,
@@ -257,17 +263,7 @@ class _StepTargetUpdateScreenState extends State<StepTargetUpdateScreen> {
                     .white, // Set the color to white since it will be masked by the gradient
               ),
             ),
-            Text(
-              "According to the BMI",
-              style: TextStyle(
-                fontSize: 24.sp,
-                fontFamily: 'Teko',
-                fontWeight: FontWeight.w600,
-                letterSpacing: 1.5,
-                color: Colors
-                    .white, // Set the color to white since it will be masked by the gradient
-              ),
-            ),
+
             SizedBox(
               height: 15,
             ),
@@ -275,19 +271,9 @@ class _StepTargetUpdateScreenState extends State<StepTargetUpdateScreen> {
               "lib/assests/NewImages/StepSettingPage.png",
               scale: 3,
             ),
+
             SizedBox(
-              height: 15,
-            ),
-            Text(
-              "Steps Target",
-              style: TextStyle(
-                fontSize: 46.sp,
-                fontFamily: 'Teko',
-                fontWeight: FontWeight.w600,
-                letterSpacing: 1.5,
-                color: Colors
-                    .white, // Set the color to white since it will be masked by the gradient
-              ),
+              height: 10,
             ),
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
@@ -303,29 +289,72 @@ class _StepTargetUpdateScreenState extends State<StepTargetUpdateScreen> {
                         }
                       });
                       await SharedPref().setStepsTarget(StepsTarget);
+                      setState(() {
+                        _defaultStepsController.text=StepsTarget.toString();
+                      });
+
                       homeControllwe.updateStepsTarget(StepsTarget);
 
                     },
                     icon: ImageIcon(AssetImage(
                         "lib/assests/NewImages/Subtraction.png"))),
-                ShaderMask(
-                  shaderCallback: (Rect bounds) {
-                    return LinearGradient(
-                      colors:
-                      Theme1, // Replace these colors with your desired gradient colors
-                      begin: Alignment.center,
-                      end: Alignment.bottomRight,
-                    ).createShader(bounds);
+                GestureDetector(
+                  onTap: (){
+                    showDialog(context: context, builder: (BuildContext context){
+                      return   AlertDialog(
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(10.0),
+                        ),
+                        backgroundColor: Colors.white,
+                        title: Text('Enter Steps Target',style: TextStyle(color: Colors.black),),
+                        content: TextField(
+                          controller: _defaultStepsController,
+                          focusNode: _defaultStepsNode,
+                          style:  TextStyle(color: Colors.black),
+
+                        ),
+                        actions: <Widget>[
+                          ElevatedButton(
+                            onPressed: () {
+                              Navigator.of(context).pop();
+                            },
+                            child: Text('Cancel'),
+                          ),
+                          ElevatedButton(
+                            onPressed: () {
+                              // Trigger callback function with entered text
+                              setState(() {
+                                StepsTarget=int.parse(_defaultStepsController.text);
+                              });
+                         SharedPref().setStepsTarget(StepsTarget);
+                              homeControllwe.updateStepsTarget(StepsTarget);
+                              Navigator.of(context).pop();
+                            },
+                            child: Text('OK'),
+                          ),
+                        ],
+                      );
+                    });
                   },
-                  child: Text(
-                    StepsTarget.toString(),
-                    style: TextStyle(
-                      fontSize: 46.sp,
-                      fontFamily: 'Teko',
-                      fontWeight: FontWeight.w600,
-                      letterSpacing: 1.5,
-                      color: Colors
-                          .white, // Set the color to white since it will be masked by the gradient
+                  child: ShaderMask(
+                    shaderCallback: (Rect bounds) {
+                      return LinearGradient(
+                        colors:
+                        Theme1, // Replace these colors with your desired gradient colors
+                        begin: Alignment.center,
+                        end: Alignment.bottomRight,
+                      ).createShader(bounds);
+                    },
+                    child: Text(
+                      StepsTarget.toString(),
+                      style: TextStyle(
+                        fontSize: 40.sp,
+                        fontFamily: 'Teko',
+                        fontWeight: FontWeight.w600,
+                        letterSpacing: 1.5,
+                        color: Colors
+                            .white, // Set the color to white since it will be masked by the gradient
+                      ),
                     ),
                   ),
                 ),
@@ -335,6 +364,9 @@ class _StepTargetUpdateScreenState extends State<StepTargetUpdateScreen> {
                       setState(() {
                         StepsTarget = StepsTarget + 100;
                       });
+                      setState(() {
+                        _defaultStepsController.text=StepsTarget.toString();
+                      });
                       await SharedPref().setStepsTarget(StepsTarget);
                       homeControllwe.updateStepsTarget(StepsTarget);
                     },
@@ -343,7 +375,7 @@ class _StepTargetUpdateScreenState extends State<StepTargetUpdateScreen> {
               ],
             ),
             SizedBox(
-              height: 58,
+              height: 25,
             ),
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,

@@ -56,11 +56,9 @@ dependencies:
   flutter_local_notifications: ^16.1.0
   google_sign_in: ^6.1.5
   timezone: ^0.9.2
-  rxdart: ^0.27.7
   flutter_timezone: ^1.0.7
   url_launcher: ^6.1.14
   android_alarm_manager_plus: ^3.0.3
-  connectivity_plus: ^5.0.1
   appsflyer_sdk: ^6.12.2
   optimize_battery: ^0.0.4
   home_widget: ^0.4.1

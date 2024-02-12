@@ -24,13 +24,14 @@ class UserInfoUpdate extends StatefulWidget {
 class _UserInfoUpdateState extends State<UserInfoUpdate> {
   int _cCurrentValue = 160;
   int _cCurrentValueWeight = 55;
-  late final TextEditingController _UserNameController =
+  late final TextEditingController ageController =
   TextEditingController();
-  final FocusNode _UserNameNode = FocusNode();
+  final FocusNode ageFocusNode = FocusNode();
   late final TextEditingController _defaultStepsController =
   TextEditingController();
   final FocusNode _defaultStepsNode = FocusNode();
   DatabaseServices _services =DatabaseServices();
+
   String UserName = "Enter Your Name";
   String Email = '';
   String Password = '';
@@ -131,6 +132,7 @@ class _UserInfoUpdateState extends State<UserInfoUpdate> {
       _cCurrentValue=height;
       _cCurrentValueWeight=weight;
       Age=age;
+      ageController.text=Age.toString();
        for(int i=0;i<ActivityLevelNumber.length;i++){
          if(activityLevel==ActivityLevelNumber[i]){
            setState(() {
@@ -187,6 +189,7 @@ class _UserInfoUpdateState extends State<UserInfoUpdate> {
         padding:  EdgeInsets.symmetric(vertical: 50),
         child: Column(
           children: [
+
             Padding(
               padding:  EdgeInsets.only(left: 20),
               child: Row(
@@ -196,30 +199,35 @@ class _UserInfoUpdateState extends State<UserInfoUpdate> {
                 ],
               ),
             ),
+            SizedBox(height: 25,),
             Center(
               child: Text(
                 "Body Mass Index",
                 style: TextStyle(
                   color: Colors.white,
-                  fontSize: 45.sp,
+                  fontSize: 40.sp,
                   fontFamily: 'Teko',
                   fontWeight: FontWeight.w400,
                   height: 0,
                 ),
               ),
             ),
+            SizedBox(height: 15,),
+
             Center(
               child: Text(
                 "Gender",
                 style: TextStyle(
                   color: Colors.white,
                   fontSize: 26,
-                  fontFamily: 'Teko',
+                  fontFamily: 'Work Sans',
                   fontWeight: FontWeight.w400,
                   height: 0,
                 ),
               ),
             ),
+            SizedBox(height: 15,),
+
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: [
@@ -273,8 +281,8 @@ class _UserInfoUpdateState extends State<UserInfoUpdate> {
                       child: Text(
                         "Male",
                         style: TextStyle(
-                          fontSize: 25.sp,
-                          fontFamily: 'Teko',
+                          fontSize: 20,
+                          fontFamily: 'Work Sans',
                           fontWeight: FontWeight.w600,
                           letterSpacing: 1.5,
                           color: Colors
@@ -332,10 +340,10 @@ class _UserInfoUpdateState extends State<UserInfoUpdate> {
                         ).createShader(bounds);
                       },
                       child: Text(
-                        "FeMale",
+                        "Female",
                         style: TextStyle(
-                          fontSize: 25.sp,
-                          fontFamily: 'Teko',
+                          fontSize: 20,
+                          fontFamily: 'Work Sans',
                           fontWeight: FontWeight.w600,
                           letterSpacing: 1.5,
                           color: Colors
@@ -395,8 +403,8 @@ class _UserInfoUpdateState extends State<UserInfoUpdate> {
                       child: Text(
                         "Others",
                         style: TextStyle(
-                          fontSize: 25.sp,
-                          fontFamily: 'Teko',
+                          fontSize: 20,
+                          fontFamily: 'Work Sans',
                           fontWeight: FontWeight.w600,
                           letterSpacing: 1.5,
                           color: Colors
@@ -408,20 +416,20 @@ class _UserInfoUpdateState extends State<UserInfoUpdate> {
                 ),
               ],
             ),
-            SizedBox(height: 15,),
+            SizedBox(height: 20,),
             Text(
               'Height (in cm)',
               style: TextStyle(
                 color: Colors.white,
                 fontSize: 16,
-                fontFamily: 'Teko',
+                fontFamily: 'Work Sans',
                 fontWeight: FontWeight.w400,
                 height: 0,
                 letterSpacing: 0.80,
               ),
             ),
             SizedBox(
-              height: 10,
+              height: 20,
             ),
             Container(
               width: 328,
@@ -458,8 +466,8 @@ class _UserInfoUpdateState extends State<UserInfoUpdate> {
                                     color: _cCurrentValue == index
                                         ? Theme1[0]
                                         : Colors.grey,
-                                    fontSize: 25,
-                                    fontFamily: 'teko'),
+                                    fontSize: 20,
+                                  fontFamily: 'Work Sans',),
                               ),
                             ],
                           ))),
@@ -490,7 +498,7 @@ class _UserInfoUpdateState extends State<UserInfoUpdate> {
               style: TextStyle(
                 color: Colors.white,
                 fontSize: 16,
-                fontFamily: 'Teko',
+                fontFamily: 'Work Sans',
                 fontWeight: FontWeight.w400,
                 height: 0,
                 letterSpacing: 0.80,
@@ -535,8 +543,8 @@ class _UserInfoUpdateState extends State<UserInfoUpdate> {
                                         index
                                         ? Theme1[0]
                                         : Colors.grey,
-                                    fontSize: 25,
-                                    fontFamily: 'teko'),
+                                    fontSize: 20,
+                                  fontFamily: 'Work Sans',),
                               ),
                             ],
                           ))),
@@ -567,7 +575,7 @@ class _UserInfoUpdateState extends State<UserInfoUpdate> {
               style: TextStyle(
                 color: Colors.white,
                 fontSize: 16,
-                fontFamily: 'Teko',
+                fontFamily: 'Work Sans',
                 fontWeight: FontWeight.w400,
                 height: 0,
                 letterSpacing: 0.80,
@@ -595,24 +603,62 @@ class _UserInfoUpdateState extends State<UserInfoUpdate> {
                     },
                     icon: ImageIcon(AssetImage(
                         "lib/assests/NewImages/Subtraction.png"))),
-                ShaderMask(
-                  shaderCallback: (Rect bounds) {
-                    return LinearGradient(
-                      colors:
-                      Theme1, // Replace these colors with your desired gradient colors
-                      begin: Alignment.center,
-                      end: Alignment.bottomRight,
-                    ).createShader(bounds);
+                GestureDetector(
+                  onTap: (){
+                    showDialog(context: context, builder: (BuildContext context){
+                      return   AlertDialog(
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(10.0),
+                        ),
+                        backgroundColor: Colors.white,
+                        title: Text('Enter Your Age',style: TextStyle(color: Colors.black),),
+                        content: TextField(
+                          controller: ageController,
+                          focusNode: ageFocusNode,
+                          style:  TextStyle(color: Colors.black),
+
+                        ),
+                        actions: <Widget>[
+                          ElevatedButton(
+                            onPressed: () {
+                              Navigator.of(context).pop();
+                            },
+                            child: Text('Cancel'),
+                          ),
+                          ElevatedButton(
+                            onPressed: () {
+                              // Trigger callback function with entered text
+                              setState(() {
+                                Age=int.parse(ageController.text);
+                              });
+                              _services.UpdateAge(UID, int.parse(Age.toStringAsFixed(0)));
+                              Navigator.of(context).pop();
+                            },
+                            child: Text('OK'),
+                          ),
+                        ],
+                      );
+                    });
                   },
-                  child: Text(
-                    Age.toString(),
-                    style: TextStyle(
-                      fontSize: 46.sp,
-                      fontFamily: 'Teko',
-                      fontWeight: FontWeight.w600,
-                      letterSpacing: 1.5,
-                      color: Colors
-                          .white, // Set the color to white since it will be masked by the gradient
+                  child: ShaderMask(
+                    shaderCallback: (Rect bounds) {
+                      return LinearGradient(
+                        colors:
+                        Theme1, // Replace these colors with your desired gradient colors
+                        begin: Alignment.center,
+                        end: Alignment.bottomRight,
+                      ).createShader(bounds);
+                    },
+                    child: Text(
+                      Age.toString(),
+                      style: TextStyle(
+                        fontSize: 46.sp,
+                        fontFamily: 'Work Sans',
+                        fontWeight: FontWeight.w600,
+                        letterSpacing: 1.5,
+                        color: Colors
+                            .white, // Set the color to white since it will be masked by the gradient
+                      ),
                     ),
                   ),
                 ),
@@ -639,7 +685,7 @@ class _UserInfoUpdateState extends State<UserInfoUpdate> {
               style: TextStyle(
                 color: Colors.white,
                 fontSize: 16,
-                fontFamily: 'Teko',
+                fontFamily: 'Work Sans',
                 fontWeight: FontWeight.w400,
                 height: 0,
                 letterSpacing: 0.80,

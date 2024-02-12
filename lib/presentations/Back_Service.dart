@@ -22,7 +22,6 @@ import '../Firebasefunctionalities/AuthServices.dart';
 import '../SharedPrefrences/SharedPref.dart';
 import '../firebase_options.dart';
 import 'SignUpScreen.dart';
-import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:home_widget/home_widget.dart';
 
 Future<void> initializeService() async {

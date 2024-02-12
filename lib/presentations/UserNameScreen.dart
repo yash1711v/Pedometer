@@ -33,9 +33,9 @@ class _UserNameScreenState extends State<UserNameScreen> {
 
   int _cCurrentValue = 160;
   int _cCurrentValueWeight = 55;
-  late final TextEditingController _UserNameController =
+  late final TextEditingController ageController =
       TextEditingController();
-  final FocusNode _UserNameNode = FocusNode();
+  final FocusNode ageFocusNode = FocusNode();
   late final TextEditingController _defaultStepsController =
       TextEditingController();
   final FocusNode _defaultStepsNode = FocusNode();
@@ -117,7 +117,7 @@ class _UserNameScreenState extends State<UserNameScreen> {
     String email=await SharedPref().getEmail();
     String pass=await SharedPref().getPassword();
     bool isgues=await SharedPref().getisguest();
-
+    ageController.text=Age.toString();
     setState(() {
       UID = uid;
       Email=email;
@@ -329,7 +329,7 @@ class _UserNameScreenState extends State<UserNameScreen> {
                 children: [
                 AnimatedContainer(
                   duration: Duration(seconds: 1),
-                  height: onLastPage?750:750,
+                  height: onLastPage?680:800,
                   child:   PageView(
                       controller: _controller,
                       onPageChanged: (index) {
@@ -342,30 +342,33 @@ class _UserNameScreenState extends State<UserNameScreen> {
                       children: [
                         Column(
                           children: [
+                            SizedBox(height: 40,),
                             Center(
                               child: Text(
                                 "Body Mass Index",
                                 style: TextStyle(
                                   color: Colors.white,
-                                  fontSize: 34,
+                                  fontSize: 35.sp,
                                   fontFamily: 'Teko',
                                   fontWeight: FontWeight.w400,
                                   height: 0,
                                 ),
                               ),
                             ),
+                            SizedBox(height: 10,),
                             Center(
                               child: Text(
                                 "Gender",
                                 style: TextStyle(
                                   color: Colors.white,
-                                  fontSize: 26,
-                                  fontFamily: 'Teko',
+                                  fontSize: 16,
+                                  fontFamily: 'Work Sans',
                                   fontWeight: FontWeight.w400,
                                   height: 0,
                                 ),
                               ),
                             ),
+                            SizedBox(height: 10,),
                             Row(
                               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                               children: [
@@ -416,8 +419,8 @@ class _UserNameScreenState extends State<UserNameScreen> {
                                       child: Text(
                                         "Male",
                                         style: TextStyle(
-                                          fontSize: 25.sp,
-                                          fontFamily: 'Teko',
+                                          fontSize: 16,
+                                          fontFamily: 'Work Sans',
                                           fontWeight: FontWeight.w600,
                                           letterSpacing: 1.5,
                                           color: Colors
@@ -472,10 +475,10 @@ class _UserNameScreenState extends State<UserNameScreen> {
                                         ).createShader(bounds);
                                       },
                                       child: Text(
-                                        "FeMale",
+                                        "Female",
                                         style: TextStyle(
-                                          fontSize: 25.sp,
-                                          fontFamily: 'Teko',
+                                          fontSize: 16,
+                                          fontFamily: 'Work Sans',
                                           fontWeight: FontWeight.w600,
                                           letterSpacing: 1.5,
                                           color: Colors
@@ -533,7 +536,7 @@ class _UserNameScreenState extends State<UserNameScreen> {
                                         "Others",
                                         style: TextStyle(
                                           fontSize: 25.sp,
-                                          fontFamily: 'Teko',
+                                          fontFamily: 'Work Sans',
                                           fontWeight: FontWeight.w600,
                                           letterSpacing: 1.5,
                                           color: Colors
@@ -551,7 +554,7 @@ class _UserNameScreenState extends State<UserNameScreen> {
                               style: TextStyle(
                                 color: Colors.white,
                                 fontSize: 16,
-                                fontFamily: 'Teko',
+                                fontFamily: 'Work Sans',
                                 fontWeight: FontWeight.w400,
                                 height: 0,
                                 letterSpacing: 0.80,
@@ -595,8 +598,8 @@ class _UserNameScreenState extends State<UserNameScreen> {
                                                     color: _cCurrentValue == index
                                                         ? Theme1[0]
                                                         : Colors.grey,
-                                                    fontSize: 25,
-                                                    fontFamily: 'teko'),
+                                                    fontSize: 20,
+                                                  fontFamily: 'Work Sans',),
                                               ),
                                             ],
                                           ))),
@@ -624,7 +627,7 @@ class _UserNameScreenState extends State<UserNameScreen> {
                               style: TextStyle(
                                 color: Colors.white,
                                 fontSize: 16,
-                                fontFamily: 'Teko',
+                                fontFamily: 'Work Sans',
                                 fontWeight: FontWeight.w400,
                                 height: 0,
                                 letterSpacing: 0.80,
@@ -669,8 +672,8 @@ class _UserNameScreenState extends State<UserNameScreen> {
                                                         index
                                                         ? Theme1[0]
                                                         : Colors.grey,
-                                                    fontSize: 25,
-                                                    fontFamily: 'teko'),
+                                                    fontSize: 20,
+                                                  fontFamily: 'Work Sans',),
                                               ),
                                             ],
                                           ))),
@@ -698,7 +701,7 @@ class _UserNameScreenState extends State<UserNameScreen> {
                               style: TextStyle(
                                 color: Colors.white,
                                 fontSize: 16,
-                                fontFamily: 'Teko',
+                                fontFamily: 'Work Sans',
                                 fontWeight: FontWeight.w400,
                                 height: 0,
                                 letterSpacing: 0.80,
@@ -719,28 +722,68 @@ class _UserNameScreenState extends State<UserNameScreen> {
                                           Age = 0;
                                         }
                                       });
+                                      setState(() {
+                                        ageController.text=Age.toString();
+                                      });
                                       await SharedPref().setAge(Age);
                                     },
                                     icon: ImageIcon(AssetImage(
                                         "lib/assests/NewImages/Subtraction.png"))),
-                                ShaderMask(
-                                  shaderCallback: (Rect bounds) {
-                                    return LinearGradient(
-                                      colors:
-                                      Theme1, // Replace these colors with your desired gradient colors
-                                      begin: Alignment.center,
-                                      end: Alignment.bottomRight,
-                                    ).createShader(bounds);
+                                GestureDetector(
+                                  onTap: (){
+                                    showDialog(context: context, builder: (BuildContext context){
+                                      return   AlertDialog(
+                                        shape: RoundedRectangleBorder(
+                                          borderRadius: BorderRadius.circular(10.0),
+                                        ),
+                                        backgroundColor: Colors.white,
+                                        title: Text('Enter Your Age',style: TextStyle(color: Colors.black),),
+                                        content: TextField(
+                                          controller: ageController,
+                                          focusNode: ageFocusNode,
+                                          style:  TextStyle(color: Colors.black),
+
+                                        ),
+                                        actions: <Widget>[
+                                          ElevatedButton(
+                                            onPressed: () {
+                                              Navigator.of(context).pop();
+                                            },
+                                            child: Text('Cancel'),
+                                          ),
+                                          ElevatedButton(
+                                            onPressed: () {
+                                              // Trigger callback function with entered text
+                                              setState(() {
+                                                Age=int.parse(ageController.text);
+                                              });
+                                              Navigator.of(context).pop();
+                                            },
+                                            child: Text('OK'),
+                                          ),
+                                        ],
+                                      );
+                                    });
                                   },
-                                  child: Text(
-                                    Age.toString(),
-                                    style: TextStyle(
-                                      fontSize: 46.sp,
-                                      fontFamily: 'Teko',
-                                      fontWeight: FontWeight.w600,
-                                      letterSpacing: 1.5,
-                                      color: Colors
-                                          .white, // Set the color to white since it will be masked by the gradient
+                                  child: ShaderMask(
+                                    shaderCallback: (Rect bounds) {
+                                      return LinearGradient(
+                                        colors:
+                                        Theme1, // Replace these colors with your desired gradient colors
+                                        begin: Alignment.center,
+                                        end: Alignment.bottomRight,
+                                      ).createShader(bounds);
+                                    },
+                                    child: Text(
+                                      Age.toString(),
+                                      style: TextStyle(
+                                        fontSize: 46.sp,
+                                        fontFamily: 'Work Sans',
+                                        fontWeight: FontWeight.w600,
+                                        letterSpacing: 1.5,
+                                        color: Colors
+                                            .white, // Set the color to white since it will be masked by the gradient
+                                      ),
                                     ),
                                   ),
                                 ),
@@ -749,6 +792,9 @@ class _UserNameScreenState extends State<UserNameScreen> {
                                       HapticFeedback.lightImpact();
                                       setState(() {
                                         Age = Age + 1;
+                                      });
+                                      setState(() {
+                                        ageController.text=Age.toString();
                                       });
                                       await SharedPref().setAge(Age);
                                     },
@@ -764,7 +810,7 @@ class _UserNameScreenState extends State<UserNameScreen> {
                               style: TextStyle(
                                 color: Colors.white,
                                 fontSize: 16,
-                                fontFamily: 'Teko',
+                                fontFamily: 'Work Sans',
                                 fontWeight: FontWeight.w400,
                                 height: 0,
                                 letterSpacing: 0.80,
@@ -831,25 +877,12 @@ class _UserNameScreenState extends State<UserNameScreen> {
                           ],
                         ),
                         Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
                           children: [
-                            SizedBox(
-                              height: 50,
-                            ),
                             Text(
-                              "Your Goal",
+                              "Steps Target",
                               style: TextStyle(
-                                fontSize: 40.sp,
-                                fontFamily: 'Teko',
-                                fontWeight: FontWeight.w600,
-                                letterSpacing: 1.5,
-                                color: Colors
-                                    .white, // Set the color to white since it will be masked by the gradient
-                              ),
-                            ),
-                            Text(
-                              "According to the BMI",
-                              style: TextStyle(
-                                fontSize: 12.sp,
+                                fontSize: 45.sp,
                                 fontFamily: 'Teko',
                                 fontWeight: FontWeight.w600,
                                 letterSpacing: 1.5,
@@ -866,17 +899,6 @@ class _UserNameScreenState extends State<UserNameScreen> {
                             ),
                             SizedBox(
                               height: 15,
-                            ),
-                            Text(
-                              "Steps Target",
-                              style: TextStyle(
-                                fontSize: 46.sp,
-                                fontFamily: 'Teko',
-                                fontWeight: FontWeight.w600,
-                                letterSpacing: 1.5,
-                                color: Colors
-                                    .white, // Set the color to white since it will be masked by the gradient
-                              ),
                             ),
                             Row(
                               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
@@ -896,24 +918,64 @@ class _UserNameScreenState extends State<UserNameScreen> {
                                     },
                                     icon: ImageIcon(AssetImage(
                                         "lib/assests/NewImages/Subtraction.png"))),
-                                ShaderMask(
-                                  shaderCallback: (Rect bounds) {
-                                    return LinearGradient(
-                                      colors:
-                                      Theme1, // Replace these colors with your desired gradient colors
-                                      begin: Alignment.center,
-                                      end: Alignment.bottomRight,
-                                    ).createShader(bounds);
+                                GestureDetector(
+                                  onTap: (){
+                                    showDialog(context: context, builder: (BuildContext context){
+                                      return   AlertDialog(
+                                        shape: RoundedRectangleBorder(
+                                          borderRadius: BorderRadius.circular(10.0),
+                                        ),
+                                        backgroundColor: Colors.white,
+                                        title: Text('Enter Steps Target',style: TextStyle(color: Colors.black),),
+                                        content: TextField(
+                                          controller: _defaultStepsController,
+                                          focusNode: _defaultStepsNode,
+                                          style:  TextStyle(color: Colors.black),
+
+                                        ),
+                                        actions: <Widget>[
+                                          ElevatedButton(
+                                            onPressed: () {
+                                              Navigator.of(context).pop();
+                                            },
+                                            child: Text('Cancel'),
+                                          ),
+                                          ElevatedButton(
+                                            onPressed: () {
+                                              // Trigger callback function with entered text
+                                              setState(() {
+                                                StepsTarget=int.parse(_defaultStepsController.text);
+                                              });
+                                              setState(() {
+                                                _defaultStepsController.text=StepsTarget.toString();
+                                              });
+                                              Navigator.of(context).pop();
+                                            },
+                                            child: Text('OK'),
+                                          ),
+                                        ],
+                                      );
+                                    });
                                   },
-                                  child: Text(
-                                    StepsTarget.toString(),
-                                    style: TextStyle(
-                                      fontSize: 46.sp,
-                                      fontFamily: 'Teko',
-                                      fontWeight: FontWeight.w600,
-                                      letterSpacing: 1.5,
-                                      color: Colors
-                                          .white, // Set the color to white since it will be masked by the gradient
+                                  child: ShaderMask(
+                                    shaderCallback: (Rect bounds) {
+                                      return LinearGradient(
+                                        colors:
+                                        Theme1, // Replace these colors with your desired gradient colors
+                                        begin: Alignment.center,
+                                        end: Alignment.bottomRight,
+                                      ).createShader(bounds);
+                                    },
+                                    child: Text(
+                                      StepsTarget.toString(),
+                                      style: TextStyle(
+                                        fontSize: 40.sp,
+                                        fontFamily: 'Work Sans',
+                                        fontWeight: FontWeight.w600,
+                                        letterSpacing: 1.5,
+                                        color: Colors
+                                            .white, // Set the color to white since it will be masked by the gradient
+                                      ),
                                     ),
                                   ),
                                 ),
@@ -923,6 +985,9 @@ class _UserNameScreenState extends State<UserNameScreen> {
                                       setState(() {
                                         StepsTarget = StepsTarget + 100;
                                       });
+                                      setState(() {
+                                        _defaultStepsController.text=StepsTarget.toString();
+                                      });
                                       await SharedPref().setStepsTarget(StepsTarget);
                                     },
                                     icon: ImageIcon(AssetImage(
@@ -930,7 +995,7 @@ class _UserNameScreenState extends State<UserNameScreen> {
                               ],
                             ),
                             SizedBox(
-                              height: 58,
+                              height: 20,
                             ),
                             Row(
                               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
@@ -998,7 +1063,7 @@ class _UserNameScreenState extends State<UserNameScreen> {
                       effect: SwapEffect(
                         type: SwapType.yRotation,
                         activeDotColor:
-                            Color(0xffE23993), // Color of the active dot
+                        Theme1[0], // Color of the active dot
                         dotHeight: 10, // Height of the dots
                         dotWidth: 10, // Width of the dots
                         spacing: 8.0,

@@ -107,9 +107,9 @@ class _IntroScreenState extends State<IntroScreen> {
 
   Widget Whichtext() {
     if(page==3){
-      return Text("Ask Permision");
+      return Text("Give Permision");
     }else if(page==3 && Notification==false && Activitysensor==false ){
-      return  Text("Ask Permision");
+      return  Text("Give Permision");
     }else if(page==3 && Activitysensor==true){
       return Text("Welcome");
     }else{
@@ -857,13 +857,14 @@ class _IntroScreenState extends State<IntroScreen> {
                      Padding(
                        padding:  EdgeInsets.only(top: 56,left: 29),
                        child: Row(
-                         mainAxisAlignment: MainAxisAlignment.start,
+mainAxisAlignment: MainAxisAlignment.center,
                          children: [
+
                            Text(
                              'Permissions',
                              style: TextStyle(
                                color: Colors.white,
-                               fontSize: 34.sp,
+                               fontSize: 54.sp,
                                fontFamily: 'Teko',
                                fontWeight: FontWeight.w400,
                                height: 0,
@@ -891,38 +892,38 @@ class _IntroScreenState extends State<IntroScreen> {
                                ),
                              ),
                            ),
-                           Align(
-                             alignment: Alignment.centerRight,
-                             child:
-                             Container(
-                               width: 18,
-                               height: 18,
-                               decoration:
-                               Notification==true?ShapeDecoration(
-                                 gradient: LinearGradient(
-                                   begin: Alignment(1.00, -0.00),
-                                   end: Alignment(-1, 0),
-                                   colors: [Color(0xFFFC8010), Color(0xFFDF30A4), Color(0xFFCF03F9)],
-                                 ),
-                                 shape: OvalBorder(
-                                   side: BorderSide(
-                                     width: 1,
-                                     strokeAlign: BorderSide.strokeAlignOutside,
-                                     color: Colors.white,
-                                   ),
-                                 ),
-                               ):ShapeDecoration(
-                                 shape: OvalBorder(
-                                   side: BorderSide(
-                                     width: 1,
-                                     strokeAlign: BorderSide.strokeAlignOutside,
-                                     color: Colors.white,
-                                   ),
-                                 ),
-                               ),
-                               child: Notification?Icon(Icons.check,color: Colors.white,size: 15,):Container(),
-                             ),
-                           )
+                           // Align(
+                           //   alignment: Alignment.centerRight,
+                           //   child:
+                           //   Container(
+                           //     width: 18,
+                           //     height: 18,
+                           //     decoration:
+                           //     Notification==true?ShapeDecoration(
+                           //       gradient: LinearGradient(
+                           //         begin: Alignment(1.00, -0.00),
+                           //         end: Alignment(-1, 0),
+                           //         colors: [Color(0xFFFC8010), Color(0xFFDF30A4), Color(0xFFCF03F9)],
+                           //       ),
+                           //       shape: OvalBorder(
+                           //         side: BorderSide(
+                           //           width: 1,
+                           //           strokeAlign: BorderSide.strokeAlignOutside,
+                           //           color: Colors.white,
+                           //         ),
+                           //       ),
+                           //     ):ShapeDecoration(
+                           //       shape: OvalBorder(
+                           //         side: BorderSide(
+                           //           width: 1,
+                           //           strokeAlign: BorderSide.strokeAlignOutside,
+                           //           color: Colors.white,
+                           //         ),
+                           //       ),
+                           //     ),
+                           //     child: Notification?Icon(Icons.check,color: Colors.white,size: 15,):Container(),
+                           //   ),
+                           // )
                          ],
                        ),
                      ),
@@ -946,52 +947,42 @@ class _IntroScreenState extends State<IntroScreen> {
                                    ),
                                  ),
                                ),
-                               Align(
-                                 alignment: Alignment.centerRight,
-                                 child:
-                                 Container(
-                                   width: 18,
-                                   height: 18,
-                                   decoration:
-                                   Activitysensor?ShapeDecoration(
-                                     gradient: LinearGradient(
-                                       begin: Alignment(1.00, -0.00),
-                                       end: Alignment(-1, 0),
-                                       colors: [Color(0xFFFC8010), Color(0xFFDF30A4), Color(0xFFCF03F9)],
-                                     ),
-                                     shape: OvalBorder(
-                                       side: BorderSide(
-                                         width: 1,
-                                         strokeAlign: BorderSide.strokeAlignOutside,
-                                         color: Colors.white,
-                                       ),
-                                     ),
-                                   ):ShapeDecoration(
-                                     shape: OvalBorder(
-                                       side: BorderSide(
-                                         width: 1,
-                                         strokeAlign: BorderSide.strokeAlignOutside,
-                                         color: Colors.white,
-                                       ),
-                                     ),
-                                   ),
-                                   child: Activitysensor?Center(child: Icon(Icons.check,color: Colors.white,size: 15,)):Container(),
-
-                                 ),
-                               )
+                               // Align(
+                               //   alignment: Alignment.centerRight,
+                               //   child:
+                               //   Container(
+                               //     width: 18,
+                               //     height: 18,
+                               //     decoration:
+                               //     Activitysensor?ShapeDecoration(
+                               //       gradient: LinearGradient(
+                               //         begin: Alignment(1.00, -0.00),
+                               //         end: Alignment(-1, 0),
+                               //         colors: [Color(0xFFFC8010), Color(0xFFDF30A4), Color(0xFFCF03F9)],
+                               //       ),
+                               //       shape: OvalBorder(
+                               //         side: BorderSide(
+                               //           width: 1,
+                               //           strokeAlign: BorderSide.strokeAlignOutside,
+                               //           color: Colors.white,
+                               //         ),
+                               //       ),
+                               //     ):ShapeDecoration(
+                               //       shape: OvalBorder(
+                               //         side: BorderSide(
+                               //           width: 1,
+                               //           strokeAlign: BorderSide.strokeAlignOutside,
+                               //           color: Colors.white,
+                               //         ),
+                               //       ),
+                               //     ),
+                               //     child: Activitysensor?Center(child: Icon(Icons.check,color: Colors.white,size: 15,)):Container(),
+                               //
+                               //   ),
+                               // )
                              ],
                            ),
-                           Align(
-                               alignment: Alignment.centerLeft,
-                               child: Visibility(visible:Activitysensor==false,child: Text("Required Go To App Settings and Allow",
-                                 style: TextStyle(
-                                   color: Colors.red,
-                                   fontSize: 10.sp,
-                                   fontFamily: 'Work Sans',
-                                   fontWeight: FontWeight.w400,
-                                   height: 0,
-                                 ),
-                               ),)),
+
                          ],
                        ),
                      ),
@@ -1001,12 +992,12 @@ class _IntroScreenState extends State<IntroScreen> {
                 ),
 
               ),
-              SizedBox(height: 35,),
+              SizedBox(height: 65,),
               SmoothPageIndicator(
                   controller: _controller, count: 4,
                   effect: SwapEffect(
                     type: SwapType.yRotation,
-                    activeDotColor: Color(0xffE23993),   // Color of the active dot
+                    activeDotColor: whichTheme()[0],   // Color of the active dot
                     dotHeight: 10,                // Height of the dots
                     dotWidth: 10,                 // Width of the dots
                     spacing: 8.0,
@@ -1016,7 +1007,7 @@ class _IntroScreenState extends State<IntroScreen> {
                   )
 
               ),
-              SizedBox(height: 20,),
+              SizedBox(height: 30,),
 
               GradientButton(
                 colors: whichTheme(),

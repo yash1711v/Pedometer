@@ -108,106 +108,47 @@ int value=0;
           child: Scaffold(
             backgroundColor: Colors.transparent,
             resizeToAvoidBottomInset: false,
-            body: Padding(
-              padding:  EdgeInsets.only(top: 150),
-              child: SingleChildScrollView(
+            body: SingleChildScrollView(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  SizedBox(height: 150,),
+                  Text.rich(TextSpan(
+                    children: [
+                                TextSpan(
+                                  text: 'CREATE\n',
+                                  style: TextStyle(
+                                    color: Color(0xFFF3F3F3),
+                                    fontSize: 74.sp,
+                                    fontFamily: 'Teko',
+                                    fontWeight: FontWeight.w600,
+                                    height: 0,
+                                    letterSpacing: 2.96.sp,
 
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  children: [
-                    Text.rich(TextSpan(
-                      children: [
-                                  TextSpan(
-                                    text: 'CREATE\n',
-                                    style: TextStyle(
-                                      color: Color(0xFFF3F3F3),
-                                      fontSize: 74.sp,
-                                      fontFamily: 'Teko',
-                                      fontWeight: FontWeight.w600,
-                                      height: 0,
-                                      letterSpacing: 2.96.sp,
-
-                                    ),
                                   ),
-                        TextSpan(
-                          text: 'ACCOUNT',
-                          style: TextStyle(
-                            color: Color(0xFFF3F3F3),
-                            fontSize: 74,
-                            fontFamily: 'Teko',
-                            fontWeight: FontWeight.w600,
-                            height: 0,
-                            letterSpacing: 1.48,
-                          ),
-                        ),
-                      ]
-
-                    ),
-                    textAlign: TextAlign.center,),
-                  SizedBox(height: 35,),
-                    Padding(
-                      padding:  EdgeInsets.only(left: 35.0),
-                      child: Align(
-                        alignment: Alignment.centerLeft,
-                        child: Text(
-                          "Email",
-                          textAlign: TextAlign.center,
-                          style: TextStyle(
-                            color: Colors.white,
-                            fontSize: 18.sp,
-                            fontFamily: 'Inter',
-                            fontWeight: FontWeight.w400,
-                            height: 0,
-                            letterSpacing: 0.90,
-                          ),
+                                ),
+                      TextSpan(
+                        text: 'ACCOUNT',
+                        style: TextStyle(
+                          color: Color(0xFFF3F3F3),
+                          fontSize: 74,
+                          fontFamily: 'Teko',
+                          fontWeight: FontWeight.w600,
+                          height: 0,
+                          letterSpacing: 1.48,
                         ),
                       ),
-                    ),
-                    SizedBox(
-                      height: 10.h,
-                    ),
-                    SizedBox(
-                      width: 378.w,
-                      height: 60.h,
-                      child: TextField(
+                    ]
 
-                        controller: _EmailController,
-                        obscureText: false,
-                        focusNode: _emailNode,
-                        style: TextStyle(color: Colors.white),
-                        decoration: InputDecoration(
-
-                          enabledBorder: OutlineInputBorder(
-                            borderSide: BorderSide(
-                                width: 2.w,
-                                color: Colors.white), //<-- SEE HERE
-                            borderRadius: BorderRadius.circular(10.0.r),
-                          ),
-                          focusedBorder: OutlineInputBorder(
-                            borderSide: BorderSide(
-                                width: 2.sp,
-                                color: Colors.white), //<-- SEE HERE
-                            borderRadius: BorderRadius.circular(10.0.r),
-                          ),
-                        ),
-                        keyboardType: TextInputType.emailAddress,
-                        onChanged: (value) {
-                          setState(() {
-                            _email = value;
-                          });
-                        },
-
-                      ),
-                    ),
-                    SizedBox(
-                      height: 25.h,
-                    ),
+                  ),
+                  textAlign: TextAlign.center,),
+                SizedBox(height: 35,),
                   Padding(
                     padding:  EdgeInsets.only(left: 35.0),
                     child: Align(
-                     alignment: Alignment.centerLeft,
+                      alignment: Alignment.centerLeft,
                       child: Text(
-                        "Password",
+                        "Email",
                         textAlign: TextAlign.center,
                         style: TextStyle(
                           color: Colors.white,
@@ -218,159 +159,139 @@ int value=0;
                           letterSpacing: 0.90,
                         ),
                       ),
-                    ),),
-                    SizedBox(
-                      height: 10.h,
                     ),
-                    SizedBox(
-                      width: 378.w,
-                      height: 60.h,
-                      child: TextField(
-                        controller: _PassWordController,
-                        obscureText: _isVisible,
-                        readOnly: !_validateEmail(_email) ? true : false,
-                        focusNode: _passwordNode,
-                        style: TextStyle(color: Colors.white),
-                        onChanged: (value) {
-                          password = value;
-                        },
-                        decoration: InputDecoration(
-                          suffixIcon: IconButton(
-                            onPressed: () {
-                              setState(() {
-                                _isVisible = !_isVisible;
-                              });
-                            },
-                            icon: Icon(_isVisible
-                                ? Icons.visibility
-                                : Icons.visibility_off,
+                  ),
+                  SizedBox(
+                    height: 10.h,
+                  ),
+                  SizedBox(
+                    width: 378.w,
+                    height: 60.h,
+                    child: TextField(
+                      controller: _EmailController,
+                      obscureText: false,
+                      focusNode: _emailNode,
+                      cursorHeight: 25,
+                      style: TextStyle(color: Colors.white,
+                        height: 1,
+                        fontSize: 21,),
+                      decoration: InputDecoration(
 
-                            color: Colors.white,
-                            ),
-                            padding: EdgeInsets.fromLTRB(
-                                20, 0, 15, 0),
-                          ),
-                          enabledBorder: OutlineInputBorder(
-                            borderSide: BorderSide(
-                                width: 2.w,
-                                color: Colors.white), //<-- SEE HERE
-                            borderRadius: BorderRadius.circular(10.r),
-                          ),
-                          focusedBorder: OutlineInputBorder(
-                            borderSide: BorderSide(
-                                width: 2.w,
-                                color: Colors.white), //<-- SEE HERE
-                            borderRadius: BorderRadius.circular(10.r),
-                          ),
+                        enabledBorder: OutlineInputBorder(
+                          borderSide: BorderSide(
+                              width: 2.w,
+                              color: Colors.white), //<-- SEE HERE
+                          borderRadius: BorderRadius.circular(10.0.r),
+                        ),
+                        focusedBorder: OutlineInputBorder(
+                          borderSide: BorderSide(
+                              width: 2.sp,
+                              color: Colors.white), //<-- SEE HERE
+                          borderRadius: BorderRadius.circular(10.0.r),
                         ),
                       ),
-                    ),
-                    SizedBox(
-                      height: 5.h,
-                    ),
-                  Padding(
-                    padding:  EdgeInsets.only(left: 35.0),
-                    child: Align(
-                      alignment: Alignment.centerLeft,
-                      child: Text("Your password must contain 8 letters",
-                      style:TextStyle(
-                        color: Colors.grey,
-                        fontSize: 12.sp,
-                        fontFamily: 'Work Sans',
-                        fontWeight: FontWeight.w400,
-                        height: 0,
-                      ),),
-                    ),),
-                    SizedBox(
-                      height: 25.h,
-                    ),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        SizedBox(
-                            width: 375.w,
-                          height: 60.h,
-                          child:
-                          GradientButton(
-                            colors: Theme,
-                            width: 329,
-                            height: 56,
-                            radius: 10,
-                            gradientDirection: GradientDirection.leftToRight,
-                            textStyle: TextStyle(color: Colors.white),
-                            text: Text("Sign up"),
-                            onPressed: _validateEmail(_email) &&
-                                password.length>=8
-                                ? () async {
-                              showDialog(
-                                context: context,
-                                builder: (BuildContext context) {
-                                  return Container(
-                                    width: 1000,
-                                    height: 1000,
-                                    child: Lottie.asset('lib/assests/Images/New_loading_foot_step.json',
+                      keyboardType: TextInputType.emailAddress,
+                      onChanged: (value) {
+                        setState(() {
+                          _email = value;
+                        });
+                      },
 
-                                      //   fit: BoxFit.fitHeight
-                                    ),
-                                  );
-                                },
-                              );
-                              clicked("signup $_email");
-                              String deviceid=await getDeviceUID();
-
-                              SharedPref().setDeviceid(deviceid);
-                              _authServices.SignUp(_email,password,context);
-                              Future.delayed(Duration(seconds: 1),(){Navigator.pop(context);});
-
-                            }
-                                : () => {
-                              ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                                content: Container(
-                                  child:
-                                  Text('Enter Valid Email and Password',
-                                    style: TextStyle(
-                                      color: Colors.white,
-                                      fontSize: 16,
-                                      fontFamily: 'Inter',
-                                      fontWeight: FontWeight.w400,
-                                      height: 0,
-                                    ),
-                                  ),
-                                ),
-                                behavior: SnackBarBehavior.floating,
-                                backgroundColor: Color(0xFF2D2D2D),
-                              )),
-                            },
-                          ),
-
-                        ),
-                      ],
                     ),
-                    SizedBox(
-                      height: 10.h,
-                    ),
-
-                  Align(
-                    alignment: Alignment.center,
+                  ),
+                  SizedBox(
+                    height: 25.h,
+                  ),
+                Padding(
+                  padding:  EdgeInsets.only(left: 35.0),
+                  child: Align(
+                   alignment: Alignment.centerLeft,
                     child: Text(
-                      " or ",
-                      style:TextStyle(
+                      "Password",
+                      textAlign: TextAlign.center,
+                      style: TextStyle(
                         color: Colors.white,
                         fontSize: 18.sp,
-                        fontFamily: 'Nunito',
+                        fontFamily: 'Inter',
                         fontWeight: FontWeight.w400,
                         height: 0,
-                        letterSpacing: 0.54,
+                        letterSpacing: 0.90,
+                      ),
+                    ),
+                  ),),
+                  SizedBox(
+                    height: 10.h,
+                  ),
+                  SizedBox(
+                    width: 378.w,
+                    height: 60.h,
+                    child: TextField(
+                      controller: _PassWordController,
+                      obscureText: _isVisible,
+                      readOnly: !_validateEmail(_email) ? true : false,
+                      focusNode: _passwordNode,
+                      cursorHeight: 25,
+                      style: TextStyle(color: Colors.white,
+                        height: 1,
+                        fontSize: 21,),
+                      onChanged: (value) {
+                        password = value;
+                      },
+                      decoration: InputDecoration(
+                        suffixIcon: IconButton(
+                          onPressed: () {
+                            setState(() {
+                              _isVisible = !_isVisible;
+                            });
+                          },
+                          icon: Icon(_isVisible
+                              ? Icons.visibility
+                              : Icons.visibility_off,
+
+                          color: Colors.white,
+                          ),
+                          padding: EdgeInsets.fromLTRB(
+                              20, 0, 15, 0),
+                        ),
+                        enabledBorder: OutlineInputBorder(
+                          borderSide: BorderSide(
+                              width: 2.w,
+                              color: Colors.white), //<-- SEE HERE
+                          borderRadius: BorderRadius.circular(10.r),
+                        ),
+                        focusedBorder: OutlineInputBorder(
+                          borderSide: BorderSide(
+                              width: 2.w,
+                              color: Colors.white), //<-- SEE HERE
+                          borderRadius: BorderRadius.circular(10.r),
+                        ),
                       ),
                     ),
                   ),
-
-                    SizedBox(
-                      height: 10.h,
-                    ),
-                    Center(
-                      child: SizedBox(
-                        width: 375.w,
+                  SizedBox(
+                    height: 5.h,
+                  ),
+                Padding(
+                  padding:  EdgeInsets.only(left: 35.0),
+                  child: Align(
+                    alignment: Alignment.centerLeft,
+                    child: Text("Your password must contain 8 letters",
+                    style:TextStyle(
+                      color: Colors.grey,
+                      fontSize: 12.sp,
+                      fontFamily: 'Work Sans',
+                      fontWeight: FontWeight.w400,
+                      height: 0,
+                    ),),
+                  ),),
+                  SizedBox(
+                    height: 25.h,
+                  ),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      SizedBox(
+                          width: 375.w,
                         height: 60.h,
                         child:
                         GradientButton(
@@ -380,95 +301,176 @@ int value=0;
                           radius: 10,
                           gradientDirection: GradientDirection.leftToRight,
                           textStyle: TextStyle(color: Colors.white),
-                          text: Row(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                            Image.asset("lib/assests/NewImages/googleLogoImage.png",scale: 5,),
-                            SizedBox(width: 10,),
-                            Text("SignUp With Google")],),
-                          onPressed: () async {
+                          text: Text("Sign up"),
+                          onPressed: _validateEmail(_email) &&
+                              password.length>=8
+                              ? () async {
+                            showDialog(
+                              context: context,
+                              builder: (BuildContext context) {
+                                return Container(
+                                  width: 1000,
+                                  height: 1000,
+                                  child: Lottie.asset('lib/assests/Images/New_loading_foot_step.json',
+
+                                    //   fit: BoxFit.fitHeight
+                                  ),
+                                );
+                              },
+                            );
+                            clicked("signup $_email");
                             String deviceid=await getDeviceUID();
-                            print("UID: "+deviceid);
+
                             SharedPref().setDeviceid(deviceid);
-                            _authServices.signInWithGoogle(context,deviceid);
+                            _authServices.SignUp(_email,password,context);
+                            Future.delayed(Duration(seconds: 1),(){Navigator.pop(context);});
+
+                          }
+                              : () => {
+                            ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                              content: Container(
+                                child:
+                                Text('Enter Valid Email and Password',
+                                  style: TextStyle(
+                                    color: Colors.white,
+                                    fontSize: 16,
+                                    fontFamily: 'Inter',
+                                    fontWeight: FontWeight.w400,
+                                    height: 0,
+                                  ),
+                                ),
+                              ),
+                              behavior: SnackBarBehavior.floating,
+                              backgroundColor: Color(0xFF2D2D2D),
+                            )),
                           },
                         ),
 
                       ),
+                    ],
+                  ),
+                  SizedBox(
+                    height: 10.h,
+                  ),
+
+                Align(
+                  alignment: Alignment.center,
+                  child: Text(
+                    " or ",
+                    style:TextStyle(
+                      color: Colors.white,
+                      fontSize: 18.sp,
+                      fontFamily: 'Nunito',
+                      fontWeight: FontWeight.w400,
+                      height: 0,
+                      letterSpacing: 0.54,
                     ),
-                    SizedBox(
-                      height: 15.h,
+                  ),
+                ),
+
+                  SizedBox(
+                    height: 10.h,
+                  ),
+                  Center(
+                    child: SizedBox(
+                      width: 375.w,
+                      height: 60.h,
+                      child:
+                      GradientButton(
+                        colors: Theme,
+                        width: 329,
+                        height: 56,
+                        radius: 10,
+                        gradientDirection: GradientDirection.leftToRight,
+                        textStyle: TextStyle(color: Colors.white),
+                        text: Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                          Image.asset("lib/assests/NewImages/googleLogoImage.png",scale: 5,),
+                          SizedBox(width: 10,),
+                          Text("Sign up With Google")],),
+                        onPressed: () async {
+                          String deviceid=await getDeviceUID();
+                          print("UID: "+deviceid);
+                          SharedPref().setDeviceid(deviceid);
+                          _authServices.signInWithGoogle(context,deviceid);
+                        },
+                      ),
+
                     ),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        RichText(
-                          text: TextSpan(
-                              text: 'Already have an account?',
-                              style: const TextStyle(
-                                color: Colors.white,
-                                fontSize: 16,
-                                fontFamily: 'Work Sans',
-                                fontWeight: FontWeight.w400,
-                                height: 0,
-                                letterSpacing: 0.16,
-                              ),
-                              children: <TextSpan>[
-                                const TextSpan(text: " "),
-                                TextSpan(
-                                  text: 'Login',
-                                  style: const TextStyle(
-                                    color: Colors.blue,
-                                    decoration: TextDecoration.underline,
-                                  ),
-                                  recognizer: TapGestureRecognizer()
-                                    ..onTap = () {
-                                      Loginpage();
-                                    },
-                                ),
-                              ]),
-                        ),
-                      ],
-                    ),
-                    SizedBox(
-                      height: 5.h,
-                    ),
-                    Align(
-                      alignment: Alignment.bottomCenter,
-                      child: RichText(
-                        text: TextSpan(children: <TextSpan>[
-                          TextSpan(
-                            text: 'Skip',
+                  ),
+                  SizedBox(
+                    height: 25.h,
+                  ),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      RichText(
+                        text: TextSpan(
+                            text: 'Already have an account?',
                             style: const TextStyle(
                               color: Colors.white,
                               fontSize: 16,
                               fontFamily: 'Work Sans',
                               fontWeight: FontWeight.w400,
-                              decoration: TextDecoration.underline,
                               height: 0,
                               letterSpacing: 0.16,
                             ),
-                            recognizer: TapGestureRecognizer()
-                              ..onTap = () async {
-                                clicked("skip");
-                                String deviceid=await getDeviceUID();
-                                print("UID: "+deviceid);
-                                SharedPref().setDeviceid(deviceid);
-                                SharedPref().setStepsTarget(6000);
-                                SharedPref().setUsername("Guest");
-                                SharedPref().setEmail("Sign Up Now");
-                                SharedPref().setisguest(true);
-                                // await SharedPref().setTodaysSteps(0);
-                              // SharedPref().setIntroScreenInfo(false);
-                              //SharedPref().setisStart(false);
-                                Get.offAll(UserNameScreen());
-                              },
-                          ),
-                        ]),
+                            children: <TextSpan>[
+                              const TextSpan(text: " "),
+                              TextSpan(
+                                text: 'Login',
+                                style: const TextStyle(
+                                  color: Colors.blue,
+                                  decoration: TextDecoration.underline,
+                                ),
+                                recognizer: TapGestureRecognizer()
+                                  ..onTap = () {
+                                    Loginpage();
+                                  },
+                              ),
+                            ]),
                       ),
+                    ],
+                  ),
+                  SizedBox(
+                    height: 5.h,
+                  ),
+                  Align(
+                    alignment: Alignment.bottomCenter,
+                    child: RichText(
+                      text: TextSpan(children: <TextSpan>[
+                        TextSpan(
+                          text: 'Skip',
+                          style: const TextStyle(
+                            color: Colors.white,
+                            fontSize: 16,
+                            fontFamily: 'Work Sans',
+                            fontWeight: FontWeight.w400,
+                            decoration: TextDecoration.underline,
+                            height: 0,
+                            letterSpacing: 0.16,
+                          ),
+                          recognizer: TapGestureRecognizer()
+                            ..onTap = () async {
+                              clicked("skip");
+                              String deviceid=await getDeviceUID();
+                              print("UID: "+deviceid);
+                              SharedPref().setDeviceid(deviceid);
+                              SharedPref().setStepsTarget(6000);
+                              SharedPref().setUsername("Guest");
+                              SharedPref().setEmail("Sign Up Now");
+                              SharedPref().setisguest(true);
+                              // await SharedPref().setTodaysSteps(0);
+                            // SharedPref().setIntroScreenInfo(false);
+                            //SharedPref().setisStart(false);
+                              Get.offAll(UserNameScreen());
+                            },
+                        ),
+                      ]),
                     ),
-                  ],
-                ),
+                  ),
+                ],
               ),
             ),
           ),
