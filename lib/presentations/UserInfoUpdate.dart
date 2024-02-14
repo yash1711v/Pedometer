@@ -187,223 +187,473 @@ class _UserInfoUpdateState extends State<UserInfoUpdate> {
       backgroundColor: Colors.black,
       body:        Padding(
         padding:  EdgeInsets.symmetric(vertical: 50),
-        child: Column(
-          children: [
-
-            Padding(
-              padding:  EdgeInsets.only(left: 20),
-              child: Row(
-                children: [
-
-                  IconButton(onPressed: (){Get.back();}, icon: Icon(Icons.arrow_back_ios)),
-                ],
-              ),
-            ),
-            SizedBox(height: 25,),
-            Center(
-              child: Text(
-                "Body Mass Index",
-                style: TextStyle(
-                  color: Colors.white,
-                  fontSize: 40.sp,
-                  fontFamily: 'Teko',
-                  fontWeight: FontWeight.w400,
-                  height: 0,
-                ),
-              ),
-            ),
-            SizedBox(height: 15,),
-
-            Center(
-              child: Text(
-                "Gender",
-                style: TextStyle(
-                  color: Colors.white,
-                  fontSize: 26,
-                  fontFamily: 'Work Sans',
-                  fontWeight: FontWeight.w400,
-                  height: 0,
-                ),
-              ),
-            ),
-            SizedBox(height: 15,),
-
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-              children: [
-                Column(
+        child: SingleChildScrollView(
+          child: Column(
+            children: [
+          
+              Padding(
+                padding:  EdgeInsets.only(left: 20),
+                child: Row(
                   children: [
-                    SizedBox(
-                      height: 100,
-                      width: 100,
-                      child: OutlineGradientButton(
-                        onTap: () async {
-                          HapticFeedback.lightImpact();
-                          setState(() {
-                            Gender = 0;
-                          });
-                          await SharedPref().setGender("Male");
-                          if(Geust==false){
-                            _services.UpdateGender(UID, "Male");
-                          }
-                        },
-                        child: Image.asset(
-                          Gender == 0
-                              ? Images[0]
-                              : Imagesunselected[0],
-                          scale: 4,
+          
+                    IconButton(onPressed: (){Get.back();}, icon: Icon(Icons.arrow_back_ios)),
+                  ],
+                ),
+              ),
+              SizedBox(height: 25,),
+              Center(
+                child: Text(
+                  "Body Mass Index",
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontSize: 40.sp,
+                    fontFamily: 'Teko',
+                    fontWeight: FontWeight.w400,
+                    height: 0,
+                  ),
+                ),
+              ),
+              SizedBox(height: 15,),
+          
+              Center(
+                child: Text(
+                  "Gender",
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontSize: 26,
+                    fontFamily: 'Work Sans',
+                    fontWeight: FontWeight.w400,
+                    height: 0,
+                  ),
+                ),
+              ),
+              SizedBox(height: 15,),
+          
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                children: [
+                  Column(
+                    children: [
+                      SizedBox(
+                        height: 100,
+                        width: 100,
+                        child: OutlineGradientButton(
+                          onTap: () async {
+                            HapticFeedback.lightImpact();
+                            setState(() {
+                              Gender = 0;
+                            });
+                            await SharedPref().setGender("Male");
+                            if(Geust==false){
+                              _services.UpdateGender(UID, "Male");
+                            }
+                          },
+                          child: Image.asset(
+                            Gender == 0
+                                ? Images[0]
+                                : Imagesunselected[0],
+                            scale: 4,
+                          ),
+                          gradient: LinearGradient(
+                              colors: Gender == 0
+                                  ? Theme1
+                                  : [
+                                Colors.grey,
+                                Colors.grey,
+                              ]),
+                          strokeWidth: 4,
+                          elevation: 1,
+                          radius: Radius.circular(15),
                         ),
-                        gradient: LinearGradient(
+                      ),
+                      ShaderMask(
+                        shaderCallback: (Rect bounds) {
+                          return LinearGradient(
                             colors: Gender == 0
                                 ? Theme1
                                 : [
                               Colors.grey,
-                              Colors.grey,
-                            ]),
-                        strokeWidth: 4,
-                        elevation: 1,
-                        radius: Radius.circular(15),
-                      ),
-                    ),
-                    ShaderMask(
-                      shaderCallback: (Rect bounds) {
-                        return LinearGradient(
-                          colors: Gender == 0
-                              ? Theme1
-                              : [
-                            Colors.grey,
-                            Colors.grey
-                          ], // Replace these colors with your desired gradient colors
-                          begin: Alignment.center,
-                          end: Alignment.bottomRight,
-                        ).createShader(bounds);
-                      },
-                      child: Text(
-                        "Male",
-                        style: TextStyle(
-                          fontSize: 20,
-                          fontFamily: 'Work Sans',
-                          fontWeight: FontWeight.w600,
-                          letterSpacing: 1.5,
-                          color: Colors
-                              .white, // Set the color to white since it will be masked by the gradient
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-                Column(
-                  children: [
-                    SizedBox(
-                      height: 100,
-                      width: 100,
-                      child: OutlineGradientButton(
-                        onTap: () async {
-                          HapticFeedback.lightImpact();
-                          setState(() {
-                            Gender = 1;
-                          });
-                          await SharedPref().setGender("Female");
-                          if(Geust==false){
-                            _services.UpdateGender(UID, "Female");
-                          }
+                              Colors.grey
+                            ], // Replace these colors with your desired gradient colors
+                            begin: Alignment.center,
+                            end: Alignment.bottomRight,
+                          ).createShader(bounds);
                         },
-                        child: Image.asset(
-                          Gender == 1
-                              ? Images[1]
-                              : Imagesunselected[1],
-                          scale: 4,
+                        child: Text(
+                          "Male",
+                          style: TextStyle(
+                            fontSize: 20,
+                            fontFamily: 'Work Sans',
+                            fontWeight: FontWeight.w600,
+                            letterSpacing: 1.5,
+                            color: Colors
+                                .white, // Set the color to white since it will be masked by the gradient
+                          ),
                         ),
-                        gradient: LinearGradient(
+                      ),
+                    ],
+                  ),
+                  Column(
+                    children: [
+                      SizedBox(
+                        height: 100,
+                        width: 100,
+                        child: OutlineGradientButton(
+                          onTap: () async {
+                            HapticFeedback.lightImpact();
+                            setState(() {
+                              Gender = 1;
+                            });
+                            await SharedPref().setGender("Female");
+                            if(Geust==false){
+                              _services.UpdateGender(UID, "Female");
+                            }
+                          },
+                          child: Image.asset(
+                            Gender == 1
+                                ? Images[1]
+                                : Imagesunselected[1],
+                            scale: 4,
+                          ),
+                          gradient: LinearGradient(
+                              colors: Gender == 1
+                                  ? Theme1
+                                  : [
+                                Colors.grey,
+                                Colors.grey,
+                              ]),
+                          strokeWidth: 4,
+                          elevation: 1,
+                          radius: Radius.circular(15),
+                        ),
+                      ),
+                      ShaderMask(
+                        shaderCallback: (Rect bounds) {
+                          return LinearGradient(
                             colors: Gender == 1
                                 ? Theme1
                                 : [
                               Colors.grey,
-                              Colors.grey,
-                            ]),
-                        strokeWidth: 4,
-                        elevation: 1,
-                        radius: Radius.circular(15),
-                      ),
-                    ),
-                    ShaderMask(
-                      shaderCallback: (Rect bounds) {
-                        return LinearGradient(
-                          colors: Gender == 1
-                              ? Theme1
-                              : [
-                            Colors.grey,
-                            Colors.grey
-                          ], // Replace these colors with your desired gradient colors
-                          begin: Alignment.center,
-                          end: Alignment.bottomRight,
-                        ).createShader(bounds);
-                      },
-                      child: Text(
-                        "Female",
-                        style: TextStyle(
-                          fontSize: 20,
-                          fontFamily: 'Work Sans',
-                          fontWeight: FontWeight.w600,
-                          letterSpacing: 1.5,
-                          color: Colors
-                              .white, // Set the color to white since it will be masked by the gradient
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-                Column(
-                  children: [
-                    SizedBox(
-                      height: 100,
-                      width: 100,
-                      child: OutlineGradientButton(
-                        onTap: () async {
-                          HapticFeedback.lightImpact();
-                          setState(() {
-                            Gender = 2;
-                          });
-                          await SharedPref().setGender("Others");
-                          if(Geust==false){
-                            _services.UpdateGender(UID, "Others");
-                          }
+                              Colors.grey
+                            ], // Replace these colors with your desired gradient colors
+                            begin: Alignment.center,
+                            end: Alignment.bottomRight,
+                          ).createShader(bounds);
                         },
-                        child: Image.asset(
-                          Gender == 2
-                              ? Images[2]
-                              : Imagesunselected[2],
-                          scale: 4,
+                        child: Text(
+                          "Female",
+                          style: TextStyle(
+                            fontSize: 20,
+                            fontFamily: 'Work Sans',
+                            fontWeight: FontWeight.w600,
+                            letterSpacing: 1.5,
+                            color: Colors
+                                .white, // Set the color to white since it will be masked by the gradient
+                          ),
                         ),
-                        gradient: LinearGradient(
+                      ),
+                    ],
+                  ),
+                  Column(
+                    children: [
+                      SizedBox(
+                        height: 100,
+                        width: 100,
+                        child: OutlineGradientButton(
+                          onTap: () async {
+                            HapticFeedback.lightImpact();
+                            setState(() {
+                              Gender = 2;
+                            });
+                            await SharedPref().setGender("Others");
+                            if(Geust==false){
+                              _services.UpdateGender(UID, "Others");
+                            }
+                          },
+                          child: Image.asset(
+                            Gender == 2
+                                ? Images[2]
+                                : Imagesunselected[2],
+                            scale: 4,
+                          ),
+                          gradient: LinearGradient(
+                              colors: Gender == 2
+                                  ? Theme1
+                                  : [
+                                Colors.grey,
+                                Colors.grey,
+                              ]),
+                          strokeWidth: 4,
+                          elevation: 1,
+                          radius: Radius.circular(15),
+                        ),
+                      ),
+                      ShaderMask(
+                        shaderCallback: (Rect bounds) {
+                          return LinearGradient(
                             colors: Gender == 2
                                 ? Theme1
                                 : [
                               Colors.grey,
-                              Colors.grey,
-                            ]),
-                        strokeWidth: 4,
-                        elevation: 1,
-                        radius: Radius.circular(15),
+                              Colors.grey
+                            ], // Replace these colors with your desired gradient colors
+                            begin: Alignment.center,
+                            end: Alignment.bottomRight,
+                          ).createShader(bounds);
+                        },
+                        child: Text(
+                          "Others",
+                          style: TextStyle(
+                            fontSize: 20,
+                            fontFamily: 'Work Sans',
+                            fontWeight: FontWeight.w600,
+                            letterSpacing: 1.5,
+                            color: Colors
+                                .white, // Set the color to white since it will be masked by the gradient
+                          ),
+                        ),
                       ),
+                    ],
+                  ),
+                ],
+              ),
+              SizedBox(height: 20,),
+              Text(
+                'Height (in cm)',
+                style: TextStyle(
+                  color: Colors.white,
+                  fontSize: 16,
+                  fontFamily: 'Work Sans',
+                  fontWeight: FontWeight.w400,
+                  height: 0,
+                  letterSpacing: 0.80,
+                ),
+              ),
+              SizedBox(
+                height: 20,
+              ),
+              Container(
+                width: 328,
+                height: 90,
+                decoration: ShapeDecoration(
+                  shape: RoundedRectangleBorder(
+                    side: BorderSide(
+                        width: 1, color: Color(0xFF949494)),
+                    borderRadius: BorderRadius.circular(15),
+                  ),
+                ),
+                child: Padding(
+                  padding: EdgeInsets.symmetric(
+                      vertical: 10, horizontal: 8),
+                  child: WheelSlider.customWidget(
+                    totalCount: 10000,
+                    initValue: _cCurrentValue,
+                    isInfinite: true,
+                    scrollPhysics: const BouncingScrollPhysics(),
+                    customPointer: CustomSliderItem(
+                      color: Theme1[0],
                     ),
-                    ShaderMask(
+                    children: List.generate(
+                        10000,
+                            (index) => Center(
+                            child: Column(
+                              children: [
+                                SizedBox(
+                                  height: 25,
+                                ),
+                                Text(
+                                  index.toString(),
+                                  style: TextStyle(
+                                      color: _cCurrentValue == index
+                                          ? Theme1[0]
+                                          : Colors.grey,
+                                      fontSize: 20,
+                                    fontFamily: 'Work Sans',),
+                                ),
+                              ],
+                            ))),
+                    onValueChanged: (val) async {
+                      setState(()  {
+                        _cCurrentValue = val;
+                        Height = double.parse(val.toString());
+                      });
+                      await SharedPref().setHeight(int.parse(Height.toStringAsFixed(0)));
+                      if(Geust==false){
+                        _services.UpdateHeight(UID, int.parse(Height.toStringAsFixed(0)));
+                      }
+                      print(Height);
+                    },
+                    hapticFeedbackType:
+                    HapticFeedbackType.lightImpact,
+                    showPointer: true,
+                    itemSize: 80,
+                    horizontalListWidth: 100,
+                  ),
+                ),
+              ),
+              SizedBox(
+                height: 30,
+              ),
+              Text(
+                "Weight (in Kg)",
+                style: TextStyle(
+                  color: Colors.white,
+                  fontSize: 16,
+                  fontFamily: 'Work Sans',
+                  fontWeight: FontWeight.w400,
+                  height: 0,
+                  letterSpacing: 0.80,
+                ),
+              ),
+              SizedBox(
+                height: 10,
+              ),
+              Container(
+                width: 328,
+                height: 90,
+                decoration: ShapeDecoration(
+                  shape: RoundedRectangleBorder(
+                    side: BorderSide(
+                        width: 1, color: Color(0xFF949494)),
+                    borderRadius: BorderRadius.circular(15),
+                  ),
+                ),
+                child: Padding(
+                  padding: EdgeInsets.symmetric(
+                      vertical: 10, horizontal: 8),
+                  child: WheelSlider.customWidget(
+                    totalCount: 10000,
+                    initValue: _cCurrentValueWeight,
+                    isInfinite: true,
+                    scrollPhysics: const BouncingScrollPhysics(),
+                    customPointer: CustomSliderItem(
+                      color: Theme1[0],
+                    ),
+                    children: List.generate(
+                        10000,
+                            (index) => Center(
+                            child: Column(
+                              children: [
+                                SizedBox(
+                                  height: 25,
+                                ),
+                                Text(
+                                  index.toString(),
+                                  style: TextStyle(
+                                      color: _cCurrentValueWeight ==
+                                          index
+                                          ? Theme1[0]
+                                          : Colors.grey,
+                                      fontSize: 20,
+                                    fontFamily: 'Work Sans',),
+                                ),
+                              ],
+                            ))),
+                    onValueChanged: (val) async {
+                      setState(() {
+                        _cCurrentValueWeight = val;
+                        Weight = double.parse(val.toString());
+                      });
+                      await SharedPref().setWeight(int.parse(Weight.toStringAsFixed(0)));
+                      if(Geust==false){
+                        _services.UpdateWeight(UID, int.parse(Weight.toStringAsFixed(0)));
+                      }
+          
+                    },
+                    hapticFeedbackType:
+                    HapticFeedbackType.lightImpact,
+                    showPointer: true,
+                    itemSize: 80,
+                    horizontalListWidth: 100,
+                  ),
+                ),
+              ),
+              SizedBox(
+                height: 30,
+              ),
+              Text(
+                "Age",
+                style: TextStyle(
+                  color: Colors.white,
+                  fontSize: 16,
+                  fontFamily: 'Work Sans',
+                  fontWeight: FontWeight.w400,
+                  height: 0,
+                  letterSpacing: 0.80,
+                ),
+              ),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                children: [
+                  IconButton(
+                      onPressed: () async {
+                        HapticFeedback.lightImpact();
+          
+                        setState(() {
+                          if (Age > 0) {
+                            Age = Age - 1;
+          
+                          } else {
+                            Age = 0;
+                          }
+                        });
+                        await SharedPref().setAge(Age);
+                        if(Geust==false){
+                          _services.UpdateAge(UID, int.parse(Age.toStringAsFixed(0)));
+                        }
+                      },
+                      icon: ImageIcon(AssetImage(
+                          "lib/assests/NewImages/Subtraction.png"))),
+                  GestureDetector(
+                    onTap: (){
+                      showDialog(context: context, builder: (BuildContext context){
+                        return   AlertDialog(
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(10.0),
+                          ),
+                          backgroundColor: Colors.white,
+                          title: Text('Enter Your Age',style: TextStyle(color: Colors.black),),
+                          content: TextField(
+                            controller: ageController,
+                            focusNode: ageFocusNode,
+                            style:  TextStyle(color: Colors.black),
+          
+                          ),
+                          actions: <Widget>[
+                            ElevatedButton(
+                              onPressed: () {
+                                Navigator.of(context).pop();
+                              },
+                              child: Text('Cancel'),
+                            ),
+                            ElevatedButton(
+                              onPressed: () {
+                                // Trigger callback function with entered text
+                                setState(() {
+                                  Age=int.parse(ageController.text);
+                                });
+                                _services.UpdateAge(UID, int.parse(Age.toStringAsFixed(0)));
+                                Navigator.of(context).pop();
+                              },
+                              child: Text('OK'),
+                            ),
+                          ],
+                        );
+                      });
+                    },
+                    child: ShaderMask(
                       shaderCallback: (Rect bounds) {
                         return LinearGradient(
-                          colors: Gender == 2
-                              ? Theme1
-                              : [
-                            Colors.grey,
-                            Colors.grey
-                          ], // Replace these colors with your desired gradient colors
+                          colors:
+                          Theme1, // Replace these colors with your desired gradient colors
                           begin: Alignment.center,
                           end: Alignment.bottomRight,
                         ).createShader(bounds);
                       },
                       child: Text(
-                        "Others",
+                        Age.toString(),
                         style: TextStyle(
-                          fontSize: 20,
+                          fontSize: 46.sp,
                           fontFamily: 'Work Sans',
                           fontWeight: FontWeight.w600,
                           letterSpacing: 1.5,
@@ -412,235 +662,56 @@ class _UserInfoUpdateState extends State<UserInfoUpdate> {
                         ),
                       ),
                     ),
-                  ],
-                ),
-              ],
-            ),
-            SizedBox(height: 20,),
-            Text(
-              'Height (in cm)',
-              style: TextStyle(
-                color: Colors.white,
-                fontSize: 16,
-                fontFamily: 'Work Sans',
-                fontWeight: FontWeight.w400,
-                height: 0,
-                letterSpacing: 0.80,
-              ),
-            ),
-            SizedBox(
-              height: 20,
-            ),
-            Container(
-              width: 328,
-              height: 90,
-              decoration: ShapeDecoration(
-                shape: RoundedRectangleBorder(
-                  side: BorderSide(
-                      width: 1, color: Color(0xFF949494)),
-                  borderRadius: BorderRadius.circular(15),
-                ),
-              ),
-              child: Padding(
-                padding: EdgeInsets.symmetric(
-                    vertical: 10, horizontal: 8),
-                child: WheelSlider.customWidget(
-                  totalCount: 10000,
-                  initValue: _cCurrentValue,
-                  isInfinite: true,
-                  scrollPhysics: const BouncingScrollPhysics(),
-                  customPointer: CustomSliderItem(
-                    color: Theme1[0],
                   ),
-                  children: List.generate(
-                      10000,
-                          (index) => Center(
-                          child: Column(
-                            children: [
-                              SizedBox(
-                                height: 25,
-                              ),
-                              Text(
-                                index.toString(),
-                                style: TextStyle(
-                                    color: _cCurrentValue == index
-                                        ? Theme1[0]
-                                        : Colors.grey,
-                                    fontSize: 20,
-                                  fontFamily: 'Work Sans',),
-                              ),
-                            ],
-                          ))),
-                  onValueChanged: (val) async {
-                    setState(()  {
-                      _cCurrentValue = val;
-                      Height = double.parse(val.toString());
-                    });
-                    await SharedPref().setHeight(int.parse(Height.toStringAsFixed(0)));
-                    if(Geust==false){
-                      _services.UpdateHeight(UID, int.parse(Height.toStringAsFixed(0)));
-                    }
-                    print(Height);
-                  },
-                  hapticFeedbackType:
-                  HapticFeedbackType.lightImpact,
-                  showPointer: true,
-                  itemSize: 80,
-                  horizontalListWidth: 100,
-                ),
-              ),
-            ),
-            SizedBox(
-              height: 30,
-            ),
-            Text(
-              "Weight (in Kg)",
-              style: TextStyle(
-                color: Colors.white,
-                fontSize: 16,
-                fontFamily: 'Work Sans',
-                fontWeight: FontWeight.w400,
-                height: 0,
-                letterSpacing: 0.80,
-              ),
-            ),
-            SizedBox(
-              height: 10,
-            ),
-            Container(
-              width: 328,
-              height: 90,
-              decoration: ShapeDecoration(
-                shape: RoundedRectangleBorder(
-                  side: BorderSide(
-                      width: 1, color: Color(0xFF949494)),
-                  borderRadius: BorderRadius.circular(15),
-                ),
-              ),
-              child: Padding(
-                padding: EdgeInsets.symmetric(
-                    vertical: 10, horizontal: 8),
-                child: WheelSlider.customWidget(
-                  totalCount: 10000,
-                  initValue: _cCurrentValueWeight,
-                  isInfinite: true,
-                  scrollPhysics: const BouncingScrollPhysics(),
-                  customPointer: CustomSliderItem(
-                    color: Theme1[0],
-                  ),
-                  children: List.generate(
-                      10000,
-                          (index) => Center(
-                          child: Column(
-                            children: [
-                              SizedBox(
-                                height: 25,
-                              ),
-                              Text(
-                                index.toString(),
-                                style: TextStyle(
-                                    color: _cCurrentValueWeight ==
-                                        index
-                                        ? Theme1[0]
-                                        : Colors.grey,
-                                    fontSize: 20,
-                                  fontFamily: 'Work Sans',),
-                              ),
-                            ],
-                          ))),
-                  onValueChanged: (val) async {
-                    setState(() {
-                      _cCurrentValueWeight = val;
-                      Weight = double.parse(val.toString());
-                    });
-                    await SharedPref().setWeight(int.parse(Weight.toStringAsFixed(0)));
-                    if(Geust==false){
-                      _services.UpdateWeight(UID, int.parse(Weight.toStringAsFixed(0)));
-                    }
-
-                  },
-                  hapticFeedbackType:
-                  HapticFeedbackType.lightImpact,
-                  showPointer: true,
-                  itemSize: 80,
-                  horizontalListWidth: 100,
-                ),
-              ),
-            ),
-            SizedBox(
-              height: 30,
-            ),
-            Text(
-              "Age",
-              style: TextStyle(
-                color: Colors.white,
-                fontSize: 16,
-                fontFamily: 'Work Sans',
-                fontWeight: FontWeight.w400,
-                height: 0,
-                letterSpacing: 0.80,
-              ),
-            ),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-              children: [
-                IconButton(
-                    onPressed: () async {
-                      HapticFeedback.lightImpact();
-
-                      setState(() {
-                        if (Age > 0) {
-                          Age = Age - 1;
-
-                        } else {
-                          Age = 0;
+                  IconButton(
+                      onPressed: () async {
+                        HapticFeedback.lightImpact();
+                        setState(() {
+                          Age = Age + 1;
+                        });
+                        await SharedPref().setAge(Age);
+                        if(Geust==false){
+                          _services.UpdateAge(UID, int.parse(Age.toStringAsFixed(0)));
                         }
-                      });
-                      await SharedPref().setAge(Age);
-                      if(Geust==false){
-                        _services.UpdateAge(UID, int.parse(Age.toStringAsFixed(0)));
-                      }
-                    },
-                    icon: ImageIcon(AssetImage(
-                        "lib/assests/NewImages/Subtraction.png"))),
-                GestureDetector(
-                  onTap: (){
-                    showDialog(context: context, builder: (BuildContext context){
-                      return   AlertDialog(
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(10.0),
-                        ),
-                        backgroundColor: Colors.white,
-                        title: Text('Enter Your Age',style: TextStyle(color: Colors.black),),
-                        content: TextField(
-                          controller: ageController,
-                          focusNode: ageFocusNode,
-                          style:  TextStyle(color: Colors.black),
-
-                        ),
-                        actions: <Widget>[
-                          ElevatedButton(
-                            onPressed: () {
-                              Navigator.of(context).pop();
-                            },
-                            child: Text('Cancel'),
-                          ),
-                          ElevatedButton(
-                            onPressed: () {
-                              // Trigger callback function with entered text
-                              setState(() {
-                                Age=int.parse(ageController.text);
-                              });
-                              _services.UpdateAge(UID, int.parse(Age.toStringAsFixed(0)));
-                              Navigator.of(context).pop();
-                            },
-                            child: Text('OK'),
-                          ),
-                        ],
-                      );
-                    });
-                  },
-                  child: ShaderMask(
+                      },
+                      icon: ImageIcon(AssetImage(
+                          "lib/assests/NewImages/Addition.png"))),
+                ],
+              ),
+              SizedBox(
+                height: 15,
+              ),
+              Text(
+                "Your Activity Level",
+                style: TextStyle(
+                  color: Colors.white,
+                  fontSize: 16,
+                  fontFamily: 'Work Sans',
+                  fontWeight: FontWeight.w400,
+                  height: 0,
+                  letterSpacing: 0.80,
+                ),
+              ),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                children: [
+                  IconButton(
+                      onPressed: () async {
+                        HapticFeedback.lightImpact();
+          
+                        setState(() {
+                          if (ActivityIndex > 0) {
+                            ActivityIndex = ActivityIndex - 1;
+                          }
+                        });
+                        await SharedPref().setActivityLevel(ActivityLevelNumber[ActivityIndex]);
+                      },
+                      icon: Icon(
+                        Icons.arrow_left_rounded,
+                        size: 50,
+                        color: Colors.white,
+                      )),
+                  ShaderMask(
                     shaderCallback: (Rect bounds) {
                       return LinearGradient(
                         colors:
@@ -650,10 +721,10 @@ class _UserInfoUpdateState extends State<UserInfoUpdate> {
                       ).createShader(bounds);
                     },
                     child: Text(
-                      Age.toString(),
+                      ActivityLevel[ActivityIndex],
                       style: TextStyle(
                         fontSize: 46.sp,
-                        fontFamily: 'Work Sans',
+                        fontFamily: 'Teko',
                         fontWeight: FontWeight.w600,
                         letterSpacing: 1.5,
                         color: Colors
@@ -661,98 +732,29 @@ class _UserInfoUpdateState extends State<UserInfoUpdate> {
                       ),
                     ),
                   ),
-                ),
-                IconButton(
-                    onPressed: () async {
-                      HapticFeedback.lightImpact();
-                      setState(() {
-                        Age = Age + 1;
-                      });
-                      await SharedPref().setAge(Age);
-                      if(Geust==false){
-                        _services.UpdateAge(UID, int.parse(Age.toStringAsFixed(0)));
-                      }
-                    },
-                    icon: ImageIcon(AssetImage(
-                        "lib/assests/NewImages/Addition.png"))),
-              ],
-            ),
-            SizedBox(
-              height: 15,
-            ),
-            Text(
-              "Your Activity Level",
-              style: TextStyle(
-                color: Colors.white,
-                fontSize: 16,
-                fontFamily: 'Work Sans',
-                fontWeight: FontWeight.w400,
-                height: 0,
-                letterSpacing: 0.80,
-              ),
-            ),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-              children: [
-                IconButton(
-                    onPressed: () async {
-                      HapticFeedback.lightImpact();
-
-                      setState(() {
-                        if (ActivityIndex > 0) {
-                          ActivityIndex = ActivityIndex - 1;
+                  IconButton(
+                      onPressed: () async {
+                        HapticFeedback.lightImpact();
+          
+                        setState(() {
+                          if (ActivityIndex < 3)
+                            ActivityIndex = ActivityIndex + 1;
+                        });
+                        await SharedPref().setActivityLevel(ActivityLevelNumber[ActivityIndex]);
+                        if(Geust==false){
+                          _services.UpdateActivityLevel(UID, ActivityLevelNumber[ActivityIndex]);
                         }
-                      });
-                      await SharedPref().setActivityLevel(ActivityLevelNumber[ActivityIndex]);
-                    },
-                    icon: Icon(
-                      Icons.arrow_left_rounded,
-                      size: 50,
-                      color: Colors.white,
-                    )),
-                ShaderMask(
-                  shaderCallback: (Rect bounds) {
-                    return LinearGradient(
-                      colors:
-                      Theme1, // Replace these colors with your desired gradient colors
-                      begin: Alignment.center,
-                      end: Alignment.bottomRight,
-                    ).createShader(bounds);
-                  },
-                  child: Text(
-                    ActivityLevel[ActivityIndex],
-                    style: TextStyle(
-                      fontSize: 46.sp,
-                      fontFamily: 'Teko',
-                      fontWeight: FontWeight.w600,
-                      letterSpacing: 1.5,
-                      color: Colors
-                          .white, // Set the color to white since it will be masked by the gradient
-                    ),
-                  ),
-                ),
-                IconButton(
-                    onPressed: () async {
-                      HapticFeedback.lightImpact();
-
-                      setState(() {
-                        if (ActivityIndex < 3)
-                          ActivityIndex = ActivityIndex + 1;
-                      });
-                      await SharedPref().setActivityLevel(ActivityLevelNumber[ActivityIndex]);
-                      if(Geust==false){
-                        _services.UpdateActivityLevel(UID, ActivityLevelNumber[ActivityIndex]);
-                      }
-
-                    },
-                    icon: Icon(
-                      Icons.arrow_right_rounded,
-                      size: 50,
-                      color: Colors.white,
-                    )),
-              ],
-            )
-          ],
+          
+                      },
+                      icon: Icon(
+                        Icons.arrow_right_rounded,
+                        size: 50,
+                        color: Colors.white,
+                      )),
+                ],
+              )
+            ],
+          ),
         ),
       ),
       );

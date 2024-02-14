@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_gradient_button/flutter_gradient_button.dart';
@@ -1022,7 +1024,7 @@ mainAxisAlignment: MainAxisAlignment.center,
                   if(onLastPage){
                     PermissionStatus status1=await Permission.activityRecognition.request();
                     PermissionStatus status2=await Permission.notification.request();
-                    if(status1.isGranted || status2.isGranted){
+                    if(status1.isGranted || status2.isGranted && Platform.isAndroid){
                       print("Status Granted");
                       print("Status1 $status1");
                       print("Status2 $status2");
@@ -1057,6 +1059,9 @@ mainAxisAlignment: MainAxisAlignment.center,
 
                       }
 
+                    }else{
+                      await SharedPref().setisOnboarding(true);
+                      Get.to(()=>SignUpScreen());
                     }
 
 

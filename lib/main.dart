@@ -54,8 +54,10 @@ Future<void> main() async {
   const AndroidInitializationSettings initializationSettingsAndroid =
       AndroidInitializationSettings(
           'small_logo'); // Use your own app icon here.
+  final DarwinInitializationSettings drawingsettings=DarwinInitializationSettings();
+
   final InitializationSettings initializationSettings =
-      InitializationSettings(android: initializationSettingsAndroid);
+      InitializationSettings(android: initializationSettingsAndroid,iOS: drawingsettings);
   await flutterLocalNotificationsPlugin.initialize(initializationSettings);
   SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp]);
   // await  initializeService();
@@ -69,10 +71,10 @@ Future<void> main() async {
   tz.initializeTimeZones();
   tz.setLocalLocation(tz.getLocation('Asia/Kolkata'));
 
-      await AndroidAlarmManager.initialize();
+      // await AndroidAlarmManager.initialize();
   final int helloAlarmID = 200;
-  await AndroidAlarmManager.periodic(
-      const Duration(seconds: 3), helloAlarmID, printHello);
+  // await AndroidAlarmManager.periodic(
+  //     const Duration(seconds: 3), helloAlarmID, printHello);
 
 
   runApp(const MyApp());

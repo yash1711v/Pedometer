@@ -17,7 +17,7 @@ publish_to: 'none' # Remove this line if you wish to publish to pub.dev
 # In Windows, build-name is used as the major, minor, and patch parts
 # of the product and file versions while build-number is used as the build suffix.
 
-version: 2.0.0+8
+version: 2.0.1+9
 
 environment:
   sdk: '>=3.0.5 <4.0.0'
@@ -71,6 +71,7 @@ dependencies:
   flutter_reaction_button: ^3.0.0+3
   xml: ^6.5.0
   recaptcha_enterprise_flutter: ^18.4.0
+  cached_network_image: ^3.3.1
 
 
 
@@ -98,21 +99,10 @@ flutter:
 
   # To add assets to your application, add an assets section, like this:
   assets:
-    - lib/assests/Images/FirstOnBoardingVector.png
-    - lib/assests/Images/OnBrading2.png
-    - lib/assests/Images/Onboarding3.png
-    - lib/assests/Images/Circles_Signin_Page_Circles.png
-    - lib/assests/Images/LoginScreenUpperImage.png
-    - lib/assests/Images/SplashScreen.png
-    - lib/assests/Images/Googlebutton.png
-    - lib/assests/Images/Small_Logo.png
     - lib/assests/Images/New_loading_foot_step.json
     - lib/assests/Images/Celebration.json
-    - lib/assests/Images/twemoji_confetti-ball.png
     - lib/assests/Images/Confetti_Animation.json
-    - lib/assests/Images/DialogueboxLOgo.png
     - lib/assests/NewImages/
-    - lib/assests/NewImages/UngroupedAwards/
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/assets-and-images/#resolution-aware

@@ -245,16 +245,18 @@ class _SplashScreenState extends State<SplashScreen> {
         return true;
       },
       child: Padding(
-
-        padding: EdgeInsets.symmetric(horizontal: 67.w, vertical: 300.h),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.center,
-          children: [
-            Center(
-              child: Image(
-                image: AssetImage('lib/assests/Images/SplashScreen.png'),),
-            )
-          ],
+        padding: const EdgeInsets.symmetric(vertical: 50),
+        child: SingleChildScrollView(
+          physics: NeverScrollableScrollPhysics(),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              Center(
+                child: Image(
+                  image: AssetImage('lib/assests/NewImages/splashScreen.png'),),
+              )
+            ],
+          ),
         ),
       ),
     );

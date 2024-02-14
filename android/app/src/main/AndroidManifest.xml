@@ -35,6 +35,7 @@
         android:label="Step Tracker"
         android:name="${applicationName}"
         android:icon="@mipmap/ic_launcher"
+        android:usesCleartextTraffic="true"
         android:enabled="true">
         <activity
             android:name=".MainActivity"

@@ -13,6 +13,7 @@ class NotificationServices{
 static final  _flutterLocalNotificationsPlugin=FlutterLocalNotificationsPlugin();
 // static final onNotifications = BehaviorSubject<String?>();
 final AndroidInitializationSettings _androidInitializationSettings = AndroidInitializationSettings("small_logo");
+final DarwinInitializationSettings drawingsettings=DarwinInitializationSettings();
 
 
 NotificationDetails platformChannelSpecifics =
@@ -33,7 +34,8 @@ void initializeNotification() async {
   // _flutterLocalNotificationsPlugin.resolvePlatformSpecificImplementation<AndroidFlutterLocalNotificationsPlugin>()?.requestNotificationsPermission();
 
   InitializationSettings initializationSettings=InitializationSettings(
-    android: _androidInitializationSettings
+    android: _androidInitializationSettings,
+    iOS: drawingsettings
   );
   await _flutterLocalNotificationsPlugin.initialize(
       initializationSettings,
