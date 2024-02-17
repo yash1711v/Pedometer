@@ -790,7 +790,7 @@ List<String> WhichGraoh=['Day','Week','Month'];
                               startColor: Themee[0],
                               middle: Themee[1],
                               endColor: Themee[2], StepsCompleted: StepsCompleted, StepsTarget: StepsTarget, width: 25.0),
-                          child: Center(child: _pedestrianStatus=="stopped"?Image.asset("lib/assests/NewImages/Foot_Still.png"):Lottie.asset("lib/assests/NewImages/moving_Footsteps.json"),),
+                          child: Center(child: _pedestrianStatus=="stopped"?Image.asset("lib/assests/NewImages/Foot_Still.png",scale: 3,):Lottie.asset("lib/assests/NewImages/moving_Footsteps.json"),),
                         ),
 
                       )

@@ -643,7 +643,7 @@ class _ReportScreenState extends State<ReportScreen> {
    if(currentOption==0){
      if(currentlevel==1){
        setState(() {
-         Achievement="StepStarter";
+         Achievement="Step Starter";
          AchievedFor="1,000 steps";
          Ig="http://soundscape.boostproductivity.online/api/steptracker/v1/media/getSTImage?image_name=b1&image_type=awardsOnly";
 
@@ -652,7 +652,7 @@ class _ReportScreenState extends State<ReportScreen> {
      }
      else if(currentlevel==2){
        setState(() {
-         Achievement="StrideStar";
+         Achievement="Stride Star";
          AchievedFor="2,000 steps";
          Ig="http://soundscape.boostproductivity.online/api/steptracker/v1/media/getSTImage?image_name=b2&image_type=awardsOnly";
 
@@ -660,7 +660,7 @@ class _ReportScreenState extends State<ReportScreen> {
      }
      else if(currentlevel==3){
        setState(() {
-         Achievement="QuickQuota";
+         Achievement="Quick Quota";
          AchievedFor="3,000 steps";
          Ig="http://soundscape.boostproductivity.online/api/steptracker/v1/media/getSTImage?image_name=b3&image_type=awardsOnly";
 
@@ -668,7 +668,7 @@ class _ReportScreenState extends State<ReportScreen> {
      }
      else if(currentlevel==4){
        setState(() {
-         Achievement="WalkWarrior";
+         Achievement="Walk Warrior";
          AchievedFor="4,000 steps";
          Ig="http://soundscape.boostproductivity.online/api/steptracker/v1/media/getSTImage?image_name=b4&image_type=awardsOnly";
 
@@ -676,7 +676,7 @@ class _ReportScreenState extends State<ReportScreen> {
      }
      else if(currentlevel==5){
        setState(() {
-         Achievement="StrollChamp";
+         Achievement="Stroll Champ";
          AchievedFor="5,000 steps";
          Ig="http://soundscape.boostproductivity.online/api/steptracker/v1/media/getSTImage?image_name=b5&image_type=awardsOnly";
 
@@ -684,7 +684,7 @@ class _ReportScreenState extends State<ReportScreen> {
      }
      else if(currentlevel==6) {
        setState(() {
-         Achievement="PedometerPro";
+         Achievement="Pedometer Pro";
          AchievedFor="6,000 steps";
          Ig="http://soundscape.boostproductivity.online/api/steptracker/v1/media/getSTImage?image_name=b6&image_type=awardsOnly";
 
@@ -692,7 +692,7 @@ class _ReportScreenState extends State<ReportScreen> {
      }
      else if(currentlevel==7){
        setState(() {
-         Achievement="DailyDasher";
+         Achievement="Daily Dasher";
          AchievedFor="7,000 steps";
          Ig="http://soundscape.boostproductivity.online/api/steptracker/v1/media/getSTImage?image_name=b7&image_type=awardsOnly";
 
@@ -700,7 +700,7 @@ class _ReportScreenState extends State<ReportScreen> {
      }
      else if(currentlevel==8){
        setState(() {
-         Achievement="WalkWhiz";
+         Achievement="Walk Whiz";
          AchievedFor="8,000 steps";
          Ig="http://soundscape.boostproductivity.online/api/steptracker/v1/media/getSTImage?image_name=b8&image_type=awardsOnly";
 
@@ -708,7 +708,7 @@ class _ReportScreenState extends State<ReportScreen> {
      }
      else if(currentlevel==9){
        setState(() {
-         Achievement="StepSprinter";
+         Achievement="Step Sprinter";
          AchievedFor="9,000 steps";
          Ig="http://soundscape.boostproductivity.online/api/steptracker/v1/media/getSTImage?image_name=b9&image_type=awardsOnly";
 
@@ -716,7 +716,7 @@ class _ReportScreenState extends State<ReportScreen> {
      }
      else if(currentlevel==10){
        setState(() {
-         Achievement="TrekMaster";
+         Achievement="Trek Master";
          AchievedFor="10,000 steps";
          Ig="http://soundscape.boostproductivity.online/api/steptracker/v1/media/getSTImage?image_name=b10&image_type=awardsOnly";
 
@@ -724,7 +724,7 @@ class _ReportScreenState extends State<ReportScreen> {
      }
      else if(currentlevel==11){
        setState(() {
-         Achievement="StepHero";
+         Achievement="Step Hero";
          AchievedFor="12,000 steps)";
          Ig="http://soundscape.boostproductivity.online/api/steptracker/v1/media/getSTImage?image_name=b11&image_type=awardsOnly";
 
@@ -732,7 +732,7 @@ class _ReportScreenState extends State<ReportScreen> {
      }
      else if(currentlevel==12){
        setState(() {
-         Achievement="QuickQuotient";
+         Achievement="Quick Quotient";
          AchievedFor="15,000 steps";
          Ig="http://soundscape.boostproductivity.online/api/steptracker/v1/media/getSTImage?image_name=b12&image_type=awardsOnly";
 
@@ -740,7 +740,7 @@ class _ReportScreenState extends State<ReportScreen> {
      }
      else if(currentlevel==13){
        setState(() {
-         Achievement="StrideStrategist";
+         Achievement="Stride Strategist";
          AchievedFor="18,000 steps";
          Ig="http://soundscape.boostproductivity.online/api/steptracker/v1/media/getSTImage?image_name=b13&image_type=awardsOnly";
 
@@ -748,7 +748,7 @@ class _ReportScreenState extends State<ReportScreen> {
      }
      else if(currentlevel==14){
        setState(() {
-         Achievement="WalkVirtuoso";
+         Achievement="Walk Virtuoso";
          AchievedFor="20,000 steps";
          Ig="http://soundscape.boostproductivity.online/api/steptracker/v1/media/getSTImage?image_name=b14&image_type=awardsOnly";
 
@@ -756,7 +756,7 @@ class _ReportScreenState extends State<ReportScreen> {
      }
      else if(currentlevel==15){
        setState(() {
-         Achievement="StepSorcerer";
+         Achievement="Step Sorcerer";
          AchievedFor="25,000 steps";
          Ig="http://soundscape.boostproductivity.online/api/steptracker/v1/media/getSTImage?image_name=b15&image_type=awardsOnly";
 
@@ -764,7 +764,7 @@ class _ReportScreenState extends State<ReportScreen> {
      }
      else if(currentlevel==16){
        setState(() {
-         Achievement="SwiftStrider";
+         Achievement="Swift Strider";
          AchievedFor="30,000 steps";
          Ig="http://soundscape.boostproductivity.online/api/steptracker/v1/media/getSTImage?image_name=b16&image_type=awardsOnly";
 
@@ -772,7 +772,7 @@ class _ReportScreenState extends State<ReportScreen> {
      }
      else if(currentlevel==17){
        setState(() {
-         Achievement="StrollSavvy";
+         Achievement="Stroll Savvy";
          AchievedFor="35,000 steps";
          Ig="http://soundscape.boostproductivity.online/api/steptracker/v1/media/getSTImage?image_name=b17&image_type=awardsOnly";
 
@@ -780,7 +780,7 @@ class _ReportScreenState extends State<ReportScreen> {
      }
      else if(currentlevel==18){
        setState(() {
-         Achievement="StepVoyager";
+         Achievement="Step Voyager";
          AchievedFor="40,000 steps";
          Ig="http://soundscape.boostproductivity.online/api/steptracker/v1/media/getSTImage?image_name=b18&image_type=awardsOnly";
 
@@ -788,7 +788,7 @@ class _ReportScreenState extends State<ReportScreen> {
      }
      else if(currentlevel==19){
        setState(() {
-         Achievement="RapidRambler";
+         Achievement="Rapid Rambler";
          AchievedFor="45,000 steps";
          Ig="http://soundscape.boostproductivity.online/api/steptracker/v1/media/getSTImage?image_name=b19&image_type=awardsOnly";
 
@@ -796,7 +796,7 @@ class _ReportScreenState extends State<ReportScreen> {
      }
      else if(currentlevel==20){
        setState(() {
-         Achievement="StepLegend";
+         Achievement="Step Legend";
          AchievedFor="50,000 steps";
          Ig="http://soundscape.boostproductivity.online/api/steptracker/v1/media/getSTImage?image_name=b20&image_type=awardsOnly";
 
@@ -1485,14 +1485,21 @@ class _ReportScreenState extends State<ReportScreen> {
                         Positioned(
                           left: 17,
                           top: 57,
-                          child: Text(
-                            Achievement,
-                            style: TextStyle(
-                              color: Color(0xFFF3F3F3),
-                              fontSize: 48,
-                              fontFamily: 'Teko',
-                              fontWeight: FontWeight.w400,
-                              height: 0,
+                          child: Container(
+                            width: 150,
+                            child: FittedBox(
+                              fit: BoxFit.fitWidth,
+                              child: Text(
+
+                                Achievement,
+                                style: TextStyle(
+                                  color: Color(0xFFF3F3F3),
+                                  fontSize: 48,
+                                  fontFamily: 'Teko',
+                                  fontWeight: FontWeight.w400,
+                                  height: 0,
+                                ),
+                              ),
                             ),
                           ),
                         ),
