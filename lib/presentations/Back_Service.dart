@@ -168,24 +168,25 @@ Timer.periodic(Duration(seconds: 1), (timer) async {
 
 
   DatabaseReference databaseReference2 = FirebaseDatabase.instance.reference().child('users').child(Uid).child("StepsTarget");
-  int maxprogress=6000;
+  int maxprogress= await SharedPref().getStepsTarget();
 
 
   try {
-    databaseReference2.onValue.listen((event) {
-      print(event.snapshot.value.toString());
+    databaseReference2.onValue.listen((event) async {
+      // print(event.snapshot.value.toString());
       if(event.snapshot.value!=null){
    maxprogress=int.parse(event.snapshot.value.toString());}else{
-        maxprogress=6000;
+        maxprogress=await SharedPref().getStepsTarget();
       }
+     print("Max progress $maxprogress");
       flutterLocalNotificationsPlugin.show(
           888,
           "Step Tracking",
-          "Steps Completed:- ${Steps}  |  Steps Target:-  ${maxprogress}",
+          "Steps Completed:- ${Steps} | Steps Target :- ${maxprogress}",
           NotificationDetails(android:
           AndroidNotificationDetails(
               'Step Tracking',
-              'Steps Completed:- ${Steps}  |  Steps Target:-  ${Target}',
+              'Steps Completed:- ${Steps} | Steps Target :- ${maxprogress}',
               showProgress:true,
               channelShowBadge: false,
               color: Colors.black,
@@ -219,11 +220,11 @@ Timer.periodic(Duration(seconds: 1), (timer) async {
   flutterLocalNotificationsPlugin.show(
       888,
       "Step Tracking",
-      "Steps Completed:- ${Steps}  |  Steps Target:-  ${maxprogress}",
+      "Steps Completed:- ${Steps} | Steps Target :- ${maxprogress} ",
       NotificationDetails(android:
       AndroidNotificationDetails(
         'Step Tracking',
-        'Steps Completed:- ${Steps}  |  Steps Target:-  ${Target}',
+        'Steps Completed:- ${Steps} | Steps Target :- ${maxprogress}',
         showProgress:true,
         channelShowBadge: false,
         color: Colors.black,
@@ -251,6 +252,7 @@ Timer.periodic(Duration(minutes: 5), (timer) async {
   String Uid=await SharedPref().getUid();
   String deviceid=await SharedPref().getDeviceid();
   print("Uid:  "+  Uid);
+
   DatabaseReference databaseReference = FirebaseDatabase.instance.reference().child('users').child(Uid).child('Device_ID');
   try {
     databaseReference.onValue.listen((event) async {
@@ -261,7 +263,6 @@ Timer.periodic(Duration(minutes: 5), (timer) async {
         // print("Id is diffrent from current device");
         // print("on value change");
         service.stopSelf();
-        await SharedPref().clearAllPreferences();
       await SharedPref().setIntroScreenInfo(false);
       SharedPref().setStepsComingFromFirebase(0);
       SharedPref().setEmail("");

@@ -37,6 +37,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
   String password = '';
   String Error = "";
   bool _isVisible = true;
+  bool isguest=false;
   final FirebaseAuth _auth = FirebaseAuth.instance;
   bool isLoading=true;
   double deviceHeight(BuildContext context) =>
@@ -72,6 +73,7 @@ int value=0;
     }
   }
   whichTheme() async {
+    bool guest=await SharedPref().getisguest();
     List<Color> Th= await SharedPref().loadColorList();
     setState(() {
       Theme=Th;
@@ -93,6 +95,7 @@ int value=0;
           value=2;
         });
       }
+      isguest=guest;
     });
   }
   @override
@@ -322,7 +325,9 @@ int value=0;
                             String deviceid=await getDeviceUID();
 
                             SharedPref().setDeviceid(deviceid);
-                            _authServices.SignUp(_email,password,context);
+                            print(isguest);
+
+                            _authServices.SignUp(_email,password,context,isguest,deviceid);
                             Future.delayed(Duration(seconds: 1),(){Navigator.pop(context);});
 
                           }
@@ -393,7 +398,8 @@ int value=0;
                           String deviceid=await getDeviceUID();
                           print("UID: "+deviceid);
                           SharedPref().setDeviceid(deviceid);
-                          _authServices.signInWithGoogle(context,deviceid);
+                          print(isguest);
+                          _authServices.signInWithGoogle(context,deviceid,isguest);
                         },
                       ),
 

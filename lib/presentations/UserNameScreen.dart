@@ -39,6 +39,16 @@ class _UserNameScreenState extends State<UserNameScreen> {
   late final TextEditingController _defaultStepsController =
       TextEditingController();
   final FocusNode _defaultStepsNode = FocusNode();
+  List<String> Images=[
+    'lib/assests/NewImages/MaleTheme1.png',
+    'lib/assests/NewImages/FemaleTheme1.png',
+    'lib/assests/NewImages/OthersTheme1.png'
+  ];
+  List<String> imagesFoot=[
+    'lib/assests/NewImages/SetSettingpageTheme1.png',
+    'lib/assests/NewImages/StepSettingpageTheme2.png',
+    'lib/assests/NewImages/StepSettingpageTheme3.png'
+  ];
   String UserName = "Enter Your Name";
   String Email = '';
   String Password = '';
@@ -50,12 +60,13 @@ class _UserNameScreenState extends State<UserNameScreen> {
     Color(0xFFE032A1),
     Color(0xFFCF03F9)
   ];
+
   DatabaseServices services = DatabaseServices();
   Map<String, int?> map = {};
-  double Height = 0;
-  double Weight = 0;
-  int Age = 0;
-  int StepsTarget = 0;
+  double Height = 166;
+  double Weight = 58;
+  int Age = 25;
+  int StepsTarget = 6000;
   List<String> ActivityLevel = [
     'Sedentary',
     'Lightly Active',
@@ -64,11 +75,7 @@ class _UserNameScreenState extends State<UserNameScreen> {
   ];
   List<double> ActivityLevelNumber = [1.2, 1.375, 1.55, 1.725];
   int ActivityIndex = 0;
-  List<String> Images = [
-    'lib/assests/NewImages/MaleTheme1.png',
-    'lib/assests/NewImages/FemaleTheme1.png',
-    'lib/assests/NewImages/OthersTheme1.png'
-  ];
+
   List<String> Imagesunselected = [
     'lib/assests/NewImages/Male.png',
     'lib/assests/NewImages/Female.png',
@@ -84,7 +91,7 @@ class _UserNameScreenState extends State<UserNameScreen> {
       return 'other';
     }
   }
-
+int value=0;
   whichthemeImages() async {
     Images = await SharedPref().loadImageList();
   }
@@ -94,6 +101,20 @@ class _UserNameScreenState extends State<UserNameScreen> {
     setState(() {
       Theme1 = Theme;
     });
+    if(Theme1[0]==Color(0xFFF7722A)){
+      setState(() {
+        value=0;
+      });
+    }else if(Theme1[0]==Color(0xFF04EF77)){
+      setState(() {
+        value=1;
+      });
+    }else if(Theme1[0]==Color(0xFFFF00E2)){
+      setState(() {
+        value=2;
+      });
+    }
+    print("which theme image value $value & ${imagesFoot[value]}");
   }
 
   double inMiles = 0;
@@ -135,6 +156,29 @@ class _UserNameScreenState extends State<UserNameScreen> {
       services.sendStepsToFirebase(60);
     });
   }
+  String formatted2(double totalDistance, bool isMiles, String unit) {
+    if (totalDistance >= 1000) {
+      // If the total distance is 1 kilometer or more, return in kilometers
+      setState(() {
+        // totalDuration = Duration.zero; // or set it to the desired value
+        inMiles = isMiles ? totalDistance : totalDistance / 1609.34;
+      });
+      // SharedPref().saveDuration(totalDuration);
+      return "${isMiles ? totalDistance.toStringAsFixed(1) : (totalDistance / 1000).toStringAsFixed(1)}";
+    } else {
+      // If the total distance is less than 1 kilometer, return in meters
+      setState(() {
+        // totalDuration = Duration.zero; // or set it to the desired value
+        inMiles = isMiles ? totalDistance * 1609.34 : totalDistance;
+      });
+      // SharedPref().saveDuration(totalDuration);
+      setState(() {
+        time =
+        "${isMiles ? (totalDistance * 1609.34).toStringAsFixed(1) : totalDistance.toStringAsFixed(1)}";
+      });
+      return "${isMiles ? (totalDistance * 1609.34).toStringAsFixed(1) : totalDistance.toStringAsFixed(1)}";
+    }
+  }
 
   void initState() {
     setState(() {
@@ -149,7 +193,21 @@ class _UserNameScreenState extends State<UserNameScreen> {
     super.initState();
     gettingEmailAndPassword();
   }
-
+   String _errorText ="";
+  void _validateTextField(String value) {
+    if (int.tryParse(value) != null) {
+      int enteredValue = int.parse(value);
+      if (enteredValue < 2000) {
+        setState(() {
+          _errorText = 'Value must be 2000 or greater';
+        });
+        return;
+      }
+    }
+    setState(() {
+      _errorText = "";
+    });
+  }
   String formatTime(double timeInMinutes) {
     print(timeInMinutes.toStringAsFixed(0));
     if (timeInMinutes <= 1) {
@@ -183,25 +241,19 @@ class _UserNameScreenState extends State<UserNameScreen> {
   }) {
     print(distance);
     print(steps);
-    // Calculate step length
-    double stepLength = (height * 0.415) / steps;
-    print("stepslength $stepLength");
-    // Number of steps for 1 kilometer (adjust as needed)
-    double stepsPerKilometer = 1000 / stepLength;
-    print("stepsPerKilometer $stepsPerKilometer");
+    double walkingSpeed = 4.8;
 
-    // Calculate walking speed (kilometers per minute)
-    double walkingSpeed = stepsPerKilometer / distance;
-    if (!walkingSpeed.isFinite || walkingSpeed <= 0) {
-      return "0";
-    }
     print("walkingSpeed $walkingSpeed");
 
     // Calculate time to cover the distance (in minutes)
-    double timeInMinutes = distance / walkingSpeed;
-    print("timeInMinutes " + timeInMinutes.toStringAsFixed(3));
+    double timeInMinutes = (distance / walkingSpeed);
 
-    return formatTime(double.parse(timeInMinutes.toStringAsFixed(0)));
+    print("timeInHours " + timeInMinutes.toString());
+
+    print("time in minutes ${timeInMinutes*60}");
+    // print("timeInMinutes " + timeInMinutes.toStringAsFixed(3));
+
+    return formatTime(double.parse((timeInMinutes*60).toString()));
   }
 
   String calculateCaloriesBurned({
@@ -255,6 +307,7 @@ class _UserNameScreenState extends State<UserNameScreen> {
       totalDistance = stepsInKm * 1000;
       unit = " m";
     }
+    totalDistance=double.parse(formatted2(totalDistance, isMiles, unit));
     return totalDistance;
   }
 
@@ -894,7 +947,8 @@ class _UserNameScreenState extends State<UserNameScreen> {
                               height: 15,
                             ),
                             Image.asset(
-                              "lib/assests/NewImages/StepSettingPage.png",
+                              imagesFoot[value],
+                             // imagesFoot[value],
                               scale: 3,
                             ),
                             SizedBox(
@@ -908,7 +962,7 @@ class _UserNameScreenState extends State<UserNameScreen> {
                                       HapticFeedback.lightImpact();
 
                                       setState(() {
-                                        if (StepsTarget > 0) {
+                                        if (StepsTarget > 2000 ) {
                                           StepsTarget = StepsTarget - 50;
                                         } else {
                                           StepsTarget = 0;
@@ -917,7 +971,7 @@ class _UserNameScreenState extends State<UserNameScreen> {
                                       await SharedPref().setStepsTarget(StepsTarget);
                                     },
                                     icon: ImageIcon(AssetImage(
-                                        "lib/assests/NewImages/Subtraction.png"))),
+                                       "lib/assests/NewImages/Subtraction.png"))),
                                 GestureDetector(
                                   onTap: (){
                                     showDialog(context: context, builder: (BuildContext context){
@@ -928,10 +982,20 @@ class _UserNameScreenState extends State<UserNameScreen> {
                                         backgroundColor: Colors.white,
                                         title: Text('Enter Steps Target',style: TextStyle(color: Colors.black),),
                                         content: TextField(
+                                          keyboardType: TextInputType.number,
                                           controller: _defaultStepsController,
                                           focusNode: _defaultStepsNode,
-                                          style:  TextStyle(color: Colors.black),
+                                          style:  TextStyle(color: Colors.black,
 
+                                          ),
+                                          onChanged: (String value) {
+                                            _validateTextField(
+                                                value);
+                                          },
+                                          decoration: InputDecoration(
+                                            errorText: _errorText,
+                                            errorStyle: TextStyle(color:Colors.black)
+                                          ),
                                         ),
                                         actions: <Widget>[
                                           ElevatedButton(
@@ -941,16 +1005,33 @@ class _UserNameScreenState extends State<UserNameScreen> {
                                             child: Text('Cancel'),
                                           ),
                                           ElevatedButton(
-                                            onPressed: () {
+                                            onPressed: () async {
                                               // Trigger callback function with entered text
-                                              setState(() {
-                                                StepsTarget=int.parse(_defaultStepsController.text);
-                                              });
-                                              setState(() {
-                                                _defaultStepsController.text=StepsTarget.toString();
-                                              });
-                                              Navigator.of(context).pop();
-                                            },
+                                            if(int.parse(
+                                                _defaultStepsController
+                                                    .text)>=2000)  {
+                                                      setState(() {
+                                                        StepsTarget = int.parse(
+                                                            _defaultStepsController
+                                                                .text);
+                                                      });
+                                                      setState(() {
+                                                        _defaultStepsController
+                                                                .text =
+                                                            StepsTarget
+                                                                .toString();
+                                                      });
+                                                      await SharedPref().setStepsTarget(StepsTarget);
+                                                      Navigator.of(context)
+                                                          .pop();
+                                                    }else{
+                                                      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                                                        content: Text('Value Must be Greater than 2000 or equals to 2000'),
+                                                        backgroundColor: Colors.white,
+                                                        duration: Duration(seconds: 2),
+                                                      ));
+                                            }
+                                                  },
                                             child: Text('OK'),
                                           ),
                                         ],
@@ -1081,6 +1162,12 @@ class _UserNameScreenState extends State<UserNameScreen> {
                     textStyle: TextStyle(color: Colors.white),
                     text: onLastPage ? Text("Welcome") : Text("Next"),
                     onPressed: () async {
+                      SharedPref().setActivityLevel(ActivityLevelNumber[ActivityIndex]);
+                      SharedPref().setAge(Age);
+                      SharedPref().setStepsTarget(StepsTarget);
+                      SharedPref().setHeight(int.parse(Height.toStringAsFixed(0)));
+                      SharedPref().setWeight(int.parse(Weight.toStringAsFixed(0)));
+                      SharedPref().setGender(WhichGender(Gender));
                       print("Button clicked");
                       if (onLastPage) {
                         if(isGuest){

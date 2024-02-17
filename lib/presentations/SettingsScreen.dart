@@ -49,6 +49,11 @@ class _SettingsScreenState extends State<SettingsScreen> {
     });
     getUserData();
   }
+  List<String> Images=[
+    'lib/assests/NewImages/MaleTheme1.png',
+    'lib/assests/NewImages/FemaleTheme1.png',
+    'lib/assests/NewImages/OthersTheme1.png'
+  ];
   Reaction<String> initialSelectedReaction = Reaction<String>(
     value: 'like',
     icon:  Container(
@@ -118,7 +123,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
     String _uid = await SharedPref().getUid();
     String email = await SharedPref().getEmail();
     int stepTar=await SharedPref().getStepsTarget();
-    bool isguest=await SharedPref().getisguest();
+    bool isguest=await SharedPref().getisguest()??false;
     List<Color> theme=await SharedPref().loadColorList();
     homeControllwe.updateStepsTarget(stepTar);
     setState(() {
@@ -421,13 +426,19 @@ class _SettingsScreenState extends State<SettingsScreen> {
                       ),
                       SizedBox(width: 120),
                       GestureDetector(
-                        onTap: (){
+                        onTap: () {
                           setState(() {
                             Theme=Theme1;
                             value=1;
+
+                            Images.clear();
+                            Images.add('lib/assests/NewImages/MaleTheme1.png');
+                            Images.add('lib/assests/NewImages/FemaleTheme1.png');
+                            Images.add('lib/assests/NewImages/OthersTheme1.png');
                           });
                           SharedPref().saveColorList(Theme);
 
+                           SharedPref().saveImageList(Images);
                         },
                         child: Container(
                           // color: Colors.white,
@@ -457,9 +468,13 @@ class _SettingsScreenState extends State<SettingsScreen> {
                           setState(() {
                             Theme=Theme2;
                             value=2;
-
+                            Images.clear();
+                            Images.add('lib/assests/NewImages/MaleTheme2.png');
+                            Images.add('lib/assests/NewImages/FemaleTheme2.png');
+                            Images.add('lib/assests/NewImages/OthersTheme2.png');
                           });
                           SharedPref().saveColorList(Theme);
+                          SharedPref().saveImageList(Images);
 
                         },
                         child: Container(
@@ -489,8 +504,13 @@ class _SettingsScreenState extends State<SettingsScreen> {
                           setState(() {
                             Theme=Theme3;
                             value=3;
+                            Images.clear();
+                            Images.add('lib/assests/NewImages/MaleTheme3.png');
+                            Images.add('lib/assests/NewImages/FemaleTheme3.png');
+                            Images.add('lib/assests/NewImages/othersTheme3.png');
                           });
                           SharedPref().saveColorList(Theme);
+                           SharedPref().saveImageList(Images);
                         },
                         child: Container(
                           // color: Colors.white,
@@ -552,7 +572,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                      await SharedPref().setStepsTarget(6000),
                      SharedPref().setStepsComingFromFirebase(0),
                      await stopBackgroundService(),
-                     Get.to(()=>HomePage()),
+
                    },
                    child: Text(
                         'Reset',
@@ -565,7 +585,27 @@ class _SettingsScreenState extends State<SettingsScreen> {
                         ),
                       ),
                  ),
-                  SizedBox(height: 15.h,),
+                  Visibility(
+                      visible: isGuest==true,child: SizedBox(height: 25.h,)),
+                  Visibility(
+                      visible: isGuest==true,
+                      child: GestureDetector(
+                        onTap: (){
+                          setState(() {
+                            isGuest=false;
+                          });
+                          Get.to(()=>SignUpScreen());
+                        },
+                          child: Text("Login", style: TextStyle(
+                            color: Colors.white,
+                            fontSize: 22.sp,
+                            fontFamily: 'Work Sans',
+                            fontWeight: FontWeight.w400,
+                            height: 0,
+                          ),))),
+                  Visibility(
+                      visible: isGuest==false,child: SizedBox(height: 15.h,)),
+
                  Visibility(
                    visible: isGuest==false,
                    child: GestureDetector(
@@ -578,11 +618,10 @@ class _SettingsScreenState extends State<SettingsScreen> {
                       SharedPref().setEmail(""),
                       SharedPref().setPassword(""),
                       SharedPref().setUsername(""),
-                      SharedPref().setisguest(true),
+                      SharedPref().setisguest(false),
                      await SharedPref().setisStart(false),
                        await SharedPref().setTodaysSteps(0),
                        await SharedPref().setisMiles(false),
-                       await SharedPref().setStepsTarget(6000),
                        await stopBackgroundService(),
                        services.UpdateDeviceId(Uid," ").then((value) =>  Get.to(()=>SignUpScreen())),
                      },
@@ -610,7 +649,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
                         height: 0,
                       ),
                     ),
-                  )
+                  ),
+                  SizedBox(height: 100,)
                 ],
               ),
             ),

@@ -1,4 +1,3 @@
-
 import 'dart:convert';
 
 import 'package:firebase_database/firebase_database.dart';
@@ -11,69 +10,69 @@ import 'package:steptracking/presentations/MainScreen.dart';
 
 import '../SharedPrefrences/SharedPref.dart';
 import '../presentations/HomePage.dart';
+
 class DatabaseServices {
-      Future<void> writeToDatabase(
-          {required String Uid,
-      required String username,
-      required String Email,
-      required String gender,
-      required String Password,
-      required int defaultSteps,
-      required String DeviceId,
-      required int age ,
-      required int height ,
-      required int weight ,
-      required double activityLevel ,
-      required BuildContext context,
+  Future<void> writeToDatabase({
+    required String Uid,
+    required String username,
+    required String Email,
+    required String gender,
+    required String Password,
+    required int defaultSteps,
+    required String DeviceId,
+    required int age,
+    required int height,
+    required int weight,
+    required double activityLevel,
+    required BuildContext context,
+  }) async {
+    DatabaseReference databaseReference = FirebaseDatabase.instance.reference();
+    try {
+      databaseReference.child('users').child(Uid).set({
+        'username': username,
+        'email': Email,
+        'password': Password,
+        'StepsTarget': defaultSteps,
+        'Gender': gender,
+        'Age': age,
+        'Height': height,
+        'Weight': weight,
+        'ActivityLevel': activityLevel,
+        "Device_ID": DeviceId
+      }).then((value) {
+        // ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+        //   content: Container(
+        //     child: Text('Data Saved',
+        //       style: TextStyle(
+        //         color: Colors.white,
+        //         fontSize: 16.sp,
+        //         fontFamily: 'Inter',
+        //         fontWeight: FontWeight.w400,
+        //         height: 0,
+        //       ),
+        //
+        //     ),
+        //   ),
+        //   behavior: SnackBarBehavior.floating,
+        //   backgroundColor: Colors.black,
+        // ));
 
-          }) async {
-        DatabaseReference databaseReference = FirebaseDatabase.instance.reference();
-      try{
-        databaseReference.child('users').child(Uid).set({
-          'username': username,
-          'email': Email,
-          'password' : Password,
-          'StepsTarget' :  defaultSteps,
-          'Gender':gender,
-          'Age':age,
-          'Height':height,
-          'Weight':weight,
-          'ActivityLevel':activityLevel,
-          "Device_ID" : DeviceId
-         }).then((value) {
-
-          // ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-          //   content: Container(
-          //     child: Text('Data Saved',
-          //       style: TextStyle(
-          //         color: Colors.white,
-          //         fontSize: 16.sp,
-          //         fontFamily: 'Inter',
-          //         fontWeight: FontWeight.w400,
-          //         height: 0,
-          //       ),
-          //
-          //     ),
-          //   ),
-          //   behavior: SnackBarBehavior.floating,
-          //   backgroundColor: Colors.black,
-          // ));
-
-          SharedPref().setUsername(Email);
-            Get.to(()=>MainScreen(),
-                duration: const Duration(
-                    seconds:
-                    1),
-                transition: Transition.fadeIn
-            );
-        });
-      }catch(error){print(error);
-      }
-
+        SharedPref().setUsername(Email);
+        Get.to(() => MainScreen(),
+            duration: const Duration(seconds: 1),
+            transition: Transition.fadeIn);
+      });
+    } catch (error) {
+      print(error);
+    }
   }
 
   Future<void> getUserData(String uid) async {
-    DatabaseReference databaseReference = FirebaseDatabase.instance.reference().child('users').child(uid).child('username');
+    DatabaseReference databaseReference = FirebaseDatabase.instance
+        .reference()
+        .child('users')
+        .child(uid)
+        .child('username');
     try {
       databaseReference.onValue.listen((event) {
         print(event.snapshot.value.toString());
@@ -84,154 +83,152 @@ class DatabaseServices {
     }
   }
 
-      void Update(String Uid, int defaultSteps) {
-        DatabaseReference databaseReference = FirebaseDatabase.instance.reference();
-        try{
-          databaseReference.child('users').child(Uid).update({
-            'StepsTarget' :  defaultSteps
-          });
-        }catch(error){print(error);
+  void Update(String Uid, int defaultSteps) {
+    DatabaseReference databaseReference = FirebaseDatabase.instance.reference();
+    try {
+      databaseReference
+          .child('users')
+          .child(Uid)
+          .update({'StepsTarget': defaultSteps});
+    } catch (error) {
+      print(error);
+    }
+  }
+
+  void UpdateHeight(String Uid, int height) {
+    DatabaseReference databaseReference = FirebaseDatabase.instance.reference();
+    try {
+      databaseReference.child('users').child(Uid).update({'Height': height});
+    } catch (error) {
+      print(error);
+    }
+  }
+
+  void UpdateWeight(String Uid, int weight) {
+    DatabaseReference databaseReference = FirebaseDatabase.instance.reference();
+    try {
+      databaseReference.child('users').child(Uid).update({'Weight': weight});
+    } catch (error) {
+      print(error);
+    }
+  }
+
+  void UpdateActivityLevel(String Uid, double activityLevel) {
+    DatabaseReference databaseReference = FirebaseDatabase.instance.reference();
+    try {
+      databaseReference
+          .child('users')
+          .child(Uid)
+          .update({'ActivityLevel': activityLevel});
+    } catch (error) {
+      print(error);
+    }
+  }
+
+  void UpdateAge(String Uid, int age) {
+    DatabaseReference databaseReference = FirebaseDatabase.instance.reference();
+    try {
+      databaseReference.child('users').child(Uid).update({'Age': age});
+    } catch (error) {
+      print(error);
+    }
+  }
+
+  void UpdateGender(String Uid, String gender) {
+    DatabaseReference databaseReference = FirebaseDatabase.instance.reference();
+    try {
+      databaseReference.child('users').child(Uid).update({'Gender': gender});
+    } catch (error) {
+      print(error);
+    }
+  }
+
+  void UpdateEmail(String Uid, String Email) {
+    DatabaseReference databaseReference = FirebaseDatabase.instance.reference();
+    try {
+      databaseReference.child('users').child(Uid).update({
+        'username': Email,
+      });
+    } catch (error) {
+      print(error);
+    }
+  }
+
+  Future<void> UpdateDeviceId(String id, String DeviceId) async {
+    DatabaseReference databaseReference = FirebaseDatabase.instance.reference();
+    print("deviceid Coming to set" + DeviceId);
+    try {
+      databaseReference
+          .child('users')
+          .child(id)
+          .update({'Device_ID': DeviceId}).then((value) {
+        print("DevideID set successfully");
+      });
+    } catch (error) {
+      print(error);
+    }
+  }
+
+  void sendStepsToFirebase(int steps) async {
+    print("----------------------------------------------?jmbhjch");
+    DatabaseReference databaseReference = FirebaseDatabase.instance.reference();
+    String _uid = await SharedPref().getUid();
+    bool guest = await SharedPref().getisguest();
+    print("In store in firebase methof------>" + _uid);
+    final Map<String, dynamic> stepsData =
+        await SharedPref().getStepsData(); // Replace with your user ID
+    String stepsDataJson = json.encode(stepsData);
+    if (guest == false) {
+      databaseReference
+          .child('users')
+          .child(_uid)
+          .child('steps')
+          .once()
+          .then((DatabaseEvent event) {
+        if (event.snapshot.exists) {
+          databaseReference
+              .child('users')
+              .child(_uid)
+              // .child('steps')
+              .update({'steps': stepsDataJson});
+        } else {
+          databaseReference
+              .child('users')
+              .child(_uid)
+              .child('steps')
+              .set(stepsDataJson);
         }
+      });
+    }
+  }
 
-      }
+  Future<String?> getStepsData() async {
+    String _uid = await SharedPref().getUid();
+    String? stepsDataJson = "";
+    Map<String, dynamic> stepsData = {};
+    DatabaseReference databaseReference = FirebaseDatabase.instance
+        .reference()
+        .child('users')
+        .child(_uid)
+        .child('steps');
 
-
-      void UpdateHeight(String Uid, int height) {
-        DatabaseReference databaseReference = FirebaseDatabase.instance.reference();
-        try{
-          databaseReference.child('users').child(Uid).update({
-            'Height' :  height
+    try {
+      DatabaseEvent event = await databaseReference.once();
+      event.snapshot.value;
+      print(event.snapshot.value);
+      stepsDataJson = event.snapshot.value.toString();
+      stepsData = json.decode(stepsDataJson);
+      SharedPref().setStepsDataFromFirebase(stepsData).then((value) async => {
+            await SharedPref().getStepsData().then((value) {
+              print(
+                  "stepsData after getting from firebase and setting to the Shared Pref ${value}");
+            })
           });
-        }catch(error){print(error);
-        }
+    } catch (e) {
+      print('Error: $e');
+    }
+    print("stepsData  ${stepsDataJson}");
 
-      }
-
- void UpdateWeight(String Uid, int weight) {
-        DatabaseReference databaseReference = FirebaseDatabase.instance.reference();
-        try{
-          databaseReference.child('users').child(Uid).update({
-            'Weight' :  weight
-          });
-        }catch(error){print(error);
-        }
-
-      }
-      void UpdateActivityLevel(String Uid, double activityLevel) {
-        DatabaseReference databaseReference = FirebaseDatabase.instance.reference();
-        try{
-          databaseReference.child('users').child(Uid).update({
-            'ActivityLevel' :  activityLevel
-          });
-        }catch(error){print(error);
-        }
-
-      }
-      void UpdateAge(String Uid, int age) {
-        DatabaseReference databaseReference = FirebaseDatabase.instance.reference();
-        try{
-          databaseReference.child('users').child(Uid).update({
-            'Age' :  age
-          });
-        }catch(error){print(error);
-        }
-
-      }
-      void UpdateGender(String Uid, String gender) {
-        DatabaseReference databaseReference = FirebaseDatabase.instance.reference();
-        try{
-          databaseReference.child('users').child(Uid).update({
-            'Gender' :  gender
-          });
-        }catch(error){print(error);
-        }
-
-      }
-
-
-
-
-
-
-
-
-
-      void UpdateEmail(String Uid, String Email) {
-        DatabaseReference databaseReference = FirebaseDatabase.instance.reference();
-        try{
-          databaseReference.child('users').child(Uid).update({
-            'username' :  Email,
-          });
-        }catch(error){print(error);
-        }
-
-      }
-      Future<void> UpdateDeviceId(String id, String DeviceId) async {
-        DatabaseReference databaseReference = FirebaseDatabase.instance.reference();
-        print("deviceid Coming to set"+DeviceId);
-        try{
-          databaseReference.child('users').child(id).update({
-            'Device_ID' :  DeviceId
-          }).then((value) {
-            print("DevideID set successfully");
-          });
-        }catch(error){print(error);
-        }
-
-      }
-
-      void sendStepsToFirebase(int steps) async {
-        print("----------------------------------------------?jmbhjch");
-        DatabaseReference databaseReference = FirebaseDatabase.instance.reference();
-        String _uid = await SharedPref().getUid();
-        print("In store in firebase methof------>"+_uid);
-        final Map<String, dynamic> stepsData = await SharedPref().getStepsData();// Replace with your user ID
-        String stepsDataJson = json.encode(stepsData);
-         databaseReference
-            .child('users')
-            .child(_uid).child('steps').once().then((DatabaseEvent event) {
-              if(event.snapshot.exists){
-                databaseReference
-                    .child('users')
-                    .child(_uid)
-                // .child('steps')
-                    .update({'steps': stepsDataJson});
-              }else{
-                databaseReference
-                    .child('users')
-                    .child(_uid).child('steps').set(stepsDataJson);
-
-              }
-
-         });
-
-
-      }
-     Future<String?> getStepsData() async {
-        String _uid = await SharedPref().getUid();
-        String? stepsDataJson = "";
-        Map<String, dynamic> stepsData={};
-        DatabaseReference databaseReference = FirebaseDatabase.instance.reference().child('users').child(_uid).child('steps');
-
-        try {
-          DatabaseEvent event = await databaseReference.once();
-          event.snapshot.value;
-          print( event.snapshot.value);
-            stepsDataJson = event.snapshot.value.toString();
-              stepsData=json.decode(stepsDataJson);
-          SharedPref().setStepsDataFromFirebase(stepsData).then((value) async => {
-          await SharedPref().getStepsData().then((value) {
-            print("stepsData after getting from firebase and setting to the Shared Pref ${value}");
-
-          })
-          });
-        } catch (e) {
-          print('Error: $e');
-        }
-        print("stepsData  ${stepsDataJson}");
-
-        return stepsDataJson;
-
-      }
+    return stepsDataJson;
+  }
 }
-

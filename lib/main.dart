@@ -18,6 +18,7 @@ import 'package:steptracking/presentations/Back_Service.dart';
 import 'package:steptracking/presentations/HomeController.dart';
 import 'package:steptracking/presentations/HomePage.dart';
 import 'package:steptracking/presentations/NotificationServices.dart';
+import 'package:upgrader/upgrader.dart';
 import 'SharedPrefrences/SharedPref.dart';
 import 'appsflyer/appsflyerMethod.dart';
 import 'firebase_options.dart';
@@ -232,7 +233,15 @@ class _MyAppState extends State<MyApp> {
           useMaterial3: true
         ),
         debugShowCheckedModeBanner: false,
-        home: SplashScreen(),
+        home: UpgradeAlert(
+          showIgnore: false,
+            showLater: false,
+            shouldPopScope: () => false,
+            dialogStyle: UpgradeDialogStyle.cupertino,
+            upgrader: Upgrader(
+
+            ),
+            child: SplashScreen()),
       ),
     );
   }

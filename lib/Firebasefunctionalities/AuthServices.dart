@@ -96,7 +96,9 @@ class AuthServices {
 
     return 0;
   }
-  signInWithGoogle(BuildContext context,String DeviceID) async {
+  signInWithGoogle(BuildContext context,String DeviceID, bool isGuest) async {
+    DatabaseServices _services= DatabaseServices();
+
     print("lib / services / firebase_services.dart / signInWithGoogle() called");
 
           showDialog(
@@ -107,80 +109,121 @@ class AuthServices {
           );
 
     final GoogleSignInAccount? googleSignInAccount =
-    await GoogleSignIn().signIn().then((value) {
+    await GoogleSignIn().signIn().then((value) async {
       print("in then of google signin");
       int Steptarget=6000;
-      Future.delayed(Duration(seconds: 1), () async {
-        userObj = value!;
-        SharedPref().setUid(userObj.id.toString());
-        SharedPref().setUsername(userObj.displayName.toString());
-        SharedPref().setEmail(userObj.email);
-        final GoogleSignInAuthentication googleSignInAuthentication =
-        await userObj!.authentication;
-        final AuthCredential authCredential = GoogleAuthProvider.credential(
-            accessToken: googleSignInAuthentication.accessToken,
-            idToken: googleSignInAuthentication.idToken);
-        print("Auth Credentials------------------------------------->"+ authCredential.toString() );
-        await _auth.signInWithCredential(authCredential).then((value) {
-          SharedPref().setisguest(false);
-          Navigator.of(context).pop();
 
-          SharedPref().setisguest(false);
 
-          DateTime now = DateTime.now();
-          String formattedDate = "${now.year.toString().padLeft(4, '0')}-${now.month.toString().padLeft(2, '0')}-${now.day.toString().padLeft(2, '0')}";
-          print(formattedDate);
-          print("DeviceID------------------->"+DeviceID);
-            SharedPref().setischecking(false);
-          DatabaseReference usersRef = database.ref().child('users').child(userObj.id);
-                usersRef.once().then((DatabaseEvent event) async {
-                  if (event.snapshot.exists) {
-                    services.UpdateDeviceId(userObj.id,DeviceID);
-                    // The uid exists, perform your task here
-                    print("UID exists in the database. Performing task...");
-                    SharedPref().setUsername(event.snapshot.child("username").value.toString());
-                    SharedPref().setEmail(event.snapshot.child("email").value.toString());
-                    SharedPref().setPassword(event.snapshot.child("password").value.toString());
-                     Steptarget=int.parse(event.snapshot.child("StepsTarget").value.toString())!=null?int.parse(event.snapshot.child("StepsTarget").value.toString()):6000;
-                    SharedPref().setStepsTarget(Steptarget);
-print(int.parse(event.snapshot.child("StepsTarget").value.toString()));                    final now = DateTime.now();
-                    final year = (now.year).toString();
-                    final month = now.month<10?"0"+now.month.toString():now.month.toString(); // Use month number directly
-                    final date = (now.day).toString();
-                    final time = (DateFormat('hh a').format(now)).toString();
-                    int steps=0;
-                   await  getHourlyStepsForCurrentDate();
-                    // formattedDate
+        Future.delayed(Duration(seconds: 1), () async {
+          userObj = value!;
+          SharedPref().setUid(userObj.id.toString());
+          SharedPref().setUsername(userObj.displayName.toString());
+          SharedPref().setEmail(userObj.email);
+          final GoogleSignInAuthentication googleSignInAuthentication =
+              await userObj!.authentication;
+          final AuthCredential authCredential = GoogleAuthProvider.credential(
+              accessToken: googleSignInAuthentication.accessToken,
+              idToken: googleSignInAuthentication.idToken);
+          print("Auth Credentials------------------------------------->" +
+              authCredential.toString());
+          print("$isGuest");
+          await _auth.signInWithCredential(authCredential).then((value) async {
+             if(isGuest){
+               print("if true");
+               SharedPref().setDeviceid(DeviceID);
+               services.writeToDatabase(Uid: userObj.id, username: userObj.displayName.toString(), Email: userObj.email, gender: await SharedPref().getGender(), Password: "", defaultSteps: await SharedPref().getStepsTarget(), DeviceId: DeviceID, age: await SharedPref().getAge(), height: await SharedPref().getHeight(), weight: await SharedPref().getWeight(), activityLevel: await SharedPref().getActivityLevel(), context: context);
+               SharedPref().setisguest(false);
+               SharedPref().setUid(userObj.id.toString());
+               print("Uid ${userObj.id}");
+               // SharedPref().setUid(value.user!.uid);
+               services.sendStepsToFirebase(10);
+               Future.delayed(Duration(seconds: 1),() async {
+                 await getHourlyStepsForCurrentDate().then((value) {
+                   Future.delayed(Duration(seconds: 2),(){
+                     Get.to(()=>MainScreen());
+                   });
+                 });
 
-                    // Call your method here
+               });
+
+               String ud=await SharedPref().getUid();
+               print("Device id from the Shared Pref"+ud);
+             }else{
+               print("if false");
+               SharedPref().setisguest(false);
+               Navigator.of(context).pop();
+
+               SharedPref().setisguest(false);
+
+               DateTime now = DateTime.now();
+               String formattedDate =
+                   "${now.year.toString().padLeft(4, '0')}-${now.month.toString().padLeft(2, '0')}-${now.day.toString().padLeft(2, '0')}";
+               print(formattedDate);
+               print("DeviceID------------------->" + DeviceID);
+               SharedPref().setischecking(false);
+               DatabaseReference usersRef =
+               database.ref().child('users').child(userObj.id);
+               usersRef.once().then((DatabaseEvent event) async {
+                 if (event.snapshot.exists) {
+                   services.UpdateDeviceId(userObj.id, DeviceID);
+                   // The uid exists, perform your task here
+                   print("UID exists in the database. Performing task...");
+                   SharedPref().setUsername(
+                       event.snapshot.child("username").value.toString());
+                   SharedPref()
+                       .setEmail(event.snapshot.child("email").value.toString());
+                   SharedPref().setPassword(
+                       event.snapshot.child("password").value.toString());
+                   Steptarget = int.parse(event.snapshot
+                       .child("StepsTarget")
+                       .value
+                       .toString()) !=
+                       null && int.parse(event.snapshot
+                       .child("StepsTarget")
+                       .value
+                       .toString()) !=
+                       0
+                       ? int.parse(
+                       event.snapshot.child("StepsTarget").value.toString())
+                       : 6000;
+                   SharedPref().setStepsTarget(Steptarget);
+                   print(int.parse(
+                       event.snapshot.child("StepsTarget").value.toString()));
+                   await getHourlyStepsForCurrentDate();
+                   // formattedDate
+
+                   // Call your method here
                    // Get.to(()=>MainScreen());
-                  } else {
-                    // The uid does not exist
-                    print("UID does not exist in the database.");
-                    services.UpdateDeviceId(userObj.id,DeviceID);
-                    Get.offAll(()=>UserNameScreen());
-                  }
-                });
-        }).catchError((e){
-          Navigator.of(context).pop();
-          ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-            content: Container(
-              child: Text(e.toString(),
-                style: TextStyle(
-                  color: Colors.white,
-                  fontSize: 16.sp,
-                  fontFamily: 'Inter',
-                  fontWeight: FontWeight.w400,
-                  height: 0,
-                ),
+                 } else {
+                   // The uid does not exist
+                   print("UID does not exist in the database.");
+                   services.UpdateDeviceId(userObj.id, DeviceID);
+                   Get.offAll(() => UserNameScreen());
+                 }
+               });
+             }
 
+          }).catchError((e) {
+            Navigator.of(context).pop();
+            ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+              content: Container(
+                child: Text(
+                  e.toString(),
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontSize: 16.sp,
+                    fontFamily: 'Inter',
+                    fontWeight: FontWeight.w400,
+                    height: 0,
+                  ),
+                ),
               ),
-            ),
-            behavior: SnackBarBehavior.floating,
-            backgroundColor: Colors.black,
-          ));
+              behavior: SnackBarBehavior.floating,
+              backgroundColor: Colors.black,
+            ));
+          });
         });
-      });
+
     }).catchError((e){
       print("Error:   "+e.toString());
     });
@@ -204,37 +247,53 @@ print(int.parse(event.snapshot.child("StepsTarget").value.toString()));         
 
 
 
-  SignUp(email, password, BuildContext context) {
+  SignUp(email, password, BuildContext context,bool isGuest,String deviceid) {
+    DatabaseServices _services= DatabaseServices();
     _auth
         .createUserWithEmailAndPassword(email: email, password: password)
-        .then((value) {
+        .then((value) async {
       print("Account Created");
       print("Direct Value${value.user!.uid}");
-      SharedPref().setUid(value.user!.uid.toString());
-      SharedPref().setEmail(email);
-      SharedPref().setPassword(password);
-      SharedPref().setisguest(false);
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-        content: Container(
-          child: Text(
-            'Account Created',
-            style: TextStyle(
-              color: Colors.white,
-              fontSize: 16.sp,
-              fontFamily: 'Inter',
-              fontWeight: FontWeight.w400,
-              height: 0,
+      if(isGuest){
+        _services.writeToDatabase(Uid: value.user!.uid, username: email, Email: email, gender: await SharedPref().getGender(), Password: password, defaultSteps: await SharedPref().getStepsTarget(), DeviceId: deviceid, age: await SharedPref().getAge(), height: await SharedPref().getHeight(), weight: await SharedPref().getWeight(), activityLevel: await SharedPref().getActivityLevel(), context: context);
+        SharedPref().setUid(value.user!.uid);
+        SharedPref().setisguest(false);
+        services.sendStepsToFirebase(10);
+        Future.delayed(Duration(seconds: 1),() async {
+          await getHourlyStepsForCurrentDate().then((value) {
+            Future.delayed(Duration(seconds: 2),(){
+              Get.to(()=>MainScreen());
+            });
+          });
+
+        });
+      }else{
+        SharedPref().setUid(value.user!.uid.toString());
+        SharedPref().setEmail(email);
+        SharedPref().setPassword(password);
+        SharedPref().setisguest(false);
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+          content: Container(
+            child: Text(
+              'Account Created',
+              style: TextStyle(
+                color: Colors.white,
+                fontSize: 16.sp,
+                fontFamily: 'Inter',
+                fontWeight: FontWeight.w400,
+                height: 0,
+              ),
             ),
           ),
-        ),
-        behavior: SnackBarBehavior.floating,
-        backgroundColor: Color(0xFF2D2D2D),
-      ));
-      Get.offAll(
-        () => const UserNameScreen(),
-        duration: const Duration(milliseconds: 600),
-        // transition: Transition.fadeIn
-      );
+          behavior: SnackBarBehavior.floating,
+          backgroundColor: Color(0xFF2D2D2D),
+        ));
+        Get.offAll(
+              () => const UserNameScreen(),
+          duration: const Duration(milliseconds: 600),
+          // transition: Transition.fadeIn
+        );
+      }
 
     }).catchError((error) {
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(
@@ -253,40 +312,58 @@ print(int.parse(event.snapshot.child("StepsTarget").value.toString()));         
         behavior: SnackBarBehavior.floating,
         backgroundColor: Color(0xFF2D2D2D),
       ));
-      print("hello");
+
     });
   }
 
-  Login(email, password,String Deviceid,BuildContext context,)
+  Login(email, password,String Deviceid,BuildContext context,bool isGuest,String deviceid)
   {
-  print("Device id in log in state: "+ Deviceid);
-      _auth.signInWithEmailAndPassword(email: email, password: password)
-          .then((value) {
-        SharedPref().setUid(value.user!.uid.toString());
-        DateTime now = DateTime.now();
-        String formattedDate = "${now.year.toString().padLeft(4, '0')}-${now.month.toString().padLeft(2, '0')}-${now.day.toString().padLeft(2, '0')}";
-        print(formattedDate);
-        print("DeviceID------------------->"+Deviceid);
-        services.UpdateDeviceId(value.user!.uid.toString(), Deviceid);
-        SharedPref().setDeviceid(Deviceid);
-        DatabaseReference usersRef = database.ref().child('users').child(value.user!.uid.toString());
-        usersRef.once().then((DatabaseEvent event) async {
-          if (event.snapshot.exists) {
-            // The uid exists, perform your task here
-            print("UID exists in the database. Performing task...");
-            SharedPref().setUsername(event.snapshot.child("username").value.toString());
-            SharedPref().setEmail(event.snapshot.child("email").value.toString());
-            SharedPref().setPassword(event.snapshot.child("password").value.toString());
-            SharedPref().setStepsTarget(int.parse(event.snapshot.child("StepsTarget").value.toString()));
-            print(int.parse(event.snapshot.child("StepsTarget").value.toString()));                    final now = DateTime.now();
-            await  getHourlyStepsForCurrentDate();
-          } else {
-            // The uid does not exist
-            print("UID does not exist in the database.");
-            Get.offAll(()=>UserNameScreen());
-          }
+    DatabaseServices _services= DatabaseServices();
 
-        });
+    print("Device id in log in state: "+ Deviceid);
+      _auth.signInWithEmailAndPassword(email: email, password: password)
+          .then((value) async {
+        if(isGuest){
+          _services.writeToDatabase(Uid: value.user!.uid, username: email, Email: email, gender: await SharedPref().getGender(), Password: password, defaultSteps: await SharedPref().getStepsTarget(), DeviceId: deviceid, age: await SharedPref().getAge(), height: await SharedPref().getHeight(), weight: await SharedPref().getWeight(), activityLevel: await SharedPref().getActivityLevel(), context: context).then((value) {
+
+          });
+          SharedPref().setisguest(false);
+          SharedPref().setUid(value.user!.uid);
+          services.sendStepsToFirebase(10);
+          Future.delayed(Duration(seconds: 1),() async {
+            await getHourlyStepsForCurrentDate().then((value) {
+              Future.delayed(Duration(seconds: 2),(){
+                Get.to(()=>MainScreen());
+              });
+            });
+          });
+        }else{
+          SharedPref().setUid(value.user!.uid.toString());
+          DateTime now = DateTime.now();
+          String formattedDate = "${now.year.toString().padLeft(4, '0')}-${now.month.toString().padLeft(2, '0')}-${now.day.toString().padLeft(2, '0')}";
+          print(formattedDate);
+          print("DeviceID------------------->"+Deviceid);
+          services.UpdateDeviceId(value.user!.uid.toString(), Deviceid);
+          SharedPref().setDeviceid(Deviceid);
+          DatabaseReference usersRef = database.ref().child('users').child(value.user!.uid.toString());
+          usersRef.once().then((DatabaseEvent event) async {
+            if (event.snapshot.exists) {
+              // The uid exists, perform your task here
+              print("UID exists in the database. Performing task...");
+              SharedPref().setUsername(event.snapshot.child("username").value.toString());
+              SharedPref().setEmail(event.snapshot.child("email").value.toString());
+              SharedPref().setPassword(event.snapshot.child("password").value.toString());
+              SharedPref().setStepsTarget(int.parse(event.snapshot.child("StepsTarget").value.toString()));
+              print(int.parse(event.snapshot.child("StepsTarget").value.toString()));                    final now = DateTime.now();
+              await  getHourlyStepsForCurrentDate();
+            } else {
+              // The uid does not exist
+              print("UID does not exist in the database.");
+              Get.offAll(()=>UserNameScreen());
+            }
+
+          });
+        }
 
       }).catchError((e){
         print("Error"+e.toString());

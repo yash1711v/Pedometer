@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:steptracking/Firebasefunctionalities/DatabaseServices.dart';
 import 'package:wheel_slider/wheel_slider.dart';
 
 import '../SharedPrefrences/SharedPref.dart';
@@ -21,6 +23,8 @@ class _StepTargetUpdateScreenState extends State<StepTargetUpdateScreen> {
     Info();
   }
  HomeControllwe homeControllwe = Get.find<HomeControllwe>();
+ DatabaseServices _services=DatabaseServices();
+ String uid="";
  late final TextEditingController _defaultStepsController =
  TextEditingController();
  final FocusNode _defaultStepsNode = FocusNode();
@@ -33,7 +37,8 @@ class _StepTargetUpdateScreenState extends State<StepTargetUpdateScreen> {
    String  gender=await SharedPref().getGender();
    int stepsTarget=await SharedPref().getStepsTarget();
    int steps=await SharedPref().getTodaysSteps();
-
+   String id=await SharedPref().getUid();
+   bool miles=await SharedPref().getisMiles();
    whichTheme();
    setState(() {
      Height=double.parse(height.toString());
@@ -41,9 +46,11 @@ class _StepTargetUpdateScreenState extends State<StepTargetUpdateScreen> {
      Age=age;
      Activitylevel=activityLevel;
      Gender=gender;
+     isMiles=miles;
      StepsTarget=stepsTarget;
      currentSteps=steps;
      _defaultStepsController.text=StepsTarget.toString();
+     uid=id;
    });
 
    print("Height $Height");
@@ -52,14 +59,20 @@ class _StepTargetUpdateScreenState extends State<StepTargetUpdateScreen> {
    print("Activitylevel $Activitylevel");
    print("Gender $Gender");
   }
+ int value=0;
+ List<String> imagesFoot=[
+   'lib/assests/NewImages/SetSettingpageTheme1.png',
+   'lib/assests/NewImages/StepSettingpageTheme2.png',
+   'lib/assests/NewImages/StepSettingpageTheme3.png'
+ ];
   double Height = 0;
   double Activitylevel = 0;
   double Weight = 0;
   int Age = 0;
-  int StepsTarget = 0;
+  int StepsTarget = 6000;
   String time = "";
   double inMiles = 0;
-
+  bool isMiles=false;
   List<Color> Theme1 = [
     Color(0xFFF7722A),
     Color(0xFFE032A1),
@@ -70,6 +83,20 @@ class _StepTargetUpdateScreenState extends State<StepTargetUpdateScreen> {
     setState(() {
       Theme1 = Theme;
     });
+    if(Theme1[0]==Color(0xFFF7722A)){
+      setState(() {
+        value=0;
+      });
+    }else if(Theme1[0]==Color(0xFF04EF77)){
+      setState(() {
+        value=1;
+      });
+    }else if(Theme1[0]==Color(0xFFFF00E2)){
+      setState(() {
+        value=2;
+      });
+    }
+    print("which theme image value $value & ${imagesFoot[value]}");
   }
   double StepsToDistanceDouble(int steps, bool isMiles) {
     double stepsInKm = steps / 1312.33595801;
@@ -91,6 +118,7 @@ class _StepTargetUpdateScreenState extends State<StepTargetUpdateScreen> {
       totalDistance = stepsInKm * 1000;
       unit = " m";
     }
+    totalDistance=double.parse(formatted2(totalDistance, isMiles, unit));
     return totalDistance;
   }
   String Gender = "Male";
@@ -104,6 +132,19 @@ class _StepTargetUpdateScreenState extends State<StepTargetUpdateScreen> {
     }
   }
   String formatted(double totalDistance, bool isMiles, String unit) {
+
+    print("Distance is $totalDistance and $isMiles");
+    if (totalDistance >= 1000) {
+
+      // SharedPref().saveDuration(totalDuration);
+      return "${isMiles ? totalDistance.toStringAsFixed(0) + unit : (totalDistance / 1000).toStringAsFixed(1) + " Km"} ";
+    } else {
+      // If the total distance is less than 1 kilometer, return in meters
+
+      return "${isMiles ? (totalDistance).toStringAsFixed(1) + unit : totalDistance.toStringAsFixed(1)} ";
+    }
+  }
+  String formatted2(double totalDistance, bool isMiles, String unit) {
     if (totalDistance >= 1000) {
       // If the total distance is 1 kilometer or more, return in kilometers
       setState(() {
@@ -111,7 +152,7 @@ class _StepTargetUpdateScreenState extends State<StepTargetUpdateScreen> {
         inMiles = isMiles ? totalDistance : totalDistance / 1609.34;
       });
       // SharedPref().saveDuration(totalDuration);
-      return "${isMiles ? totalDistance.toStringAsFixed(1) + unit : (totalDistance / 1000).toStringAsFixed(1) + " Km"} ";
+      return "${isMiles ? totalDistance.toStringAsFixed(1) : (totalDistance / 1000).toStringAsFixed(1)}";
     } else {
       // If the total distance is less than 1 kilometer, return in meters
       setState(() {
@@ -121,9 +162,9 @@ class _StepTargetUpdateScreenState extends State<StepTargetUpdateScreen> {
       // SharedPref().saveDuration(totalDuration);
       setState(() {
         time =
-        "${isMiles ? (totalDistance * 1609.34).toStringAsFixed(1) + unit : totalDistance.toStringAsFixed(1)} ";
+        "${isMiles ? (totalDistance * 1609.34).toStringAsFixed(1) : totalDistance.toStringAsFixed(1)}";
       });
-      return "${isMiles ? (totalDistance * 1609.34).toStringAsFixed(1) + unit : totalDistance.toStringAsFixed(1)} ";
+      return "${isMiles ? (totalDistance * 1609.34).toStringAsFixed(1) : totalDistance.toStringAsFixed(1)}";
     }
   }
 
@@ -137,17 +178,32 @@ class _StepTargetUpdateScreenState extends State<StepTargetUpdateScreen> {
     String formattedTime =
         "${dateTime.hour.toString().padLeft(2, '0')}:${dateTime.minute.toString().padLeft(2, '0')}";
     List<String> timeParts = formattedTime.split(':');
-
+ totalDistance=stepsInKm;
     if (isMiles) {
       // Convert steps to miles
-      totalDistance = stepsInKm * 0.62137;
-      unit = " miles";
+      totalDistance = stepsInKm * 1093.61;
+      print("in isMiles---------------$totalDistance--------->");
+
+      if(totalDistance>1760.0){
+        print("in greater------------------------>");
+
+        totalDistance = totalDistance / 1760.0;
+        print("in yards------------------------>");
+        unit = " miles";
+      }else {
+        print("in less------------------------>");
+
+        unit= " yards";
+
+      }
     } else {
       // Convert steps to meters
       totalDistance = stepsInKm * 1000;
       unit = " m";
     }
-    return formatted(totalDistance, isMiles, unit);
+    print("in isMiles---------------$totalDistance--------->");
+
+    return formatted(double.parse(totalDistance.toStringAsFixed(0)), isMiles, unit);
   }
   String formatTime(double timeInMinutes) {
     print(timeInMinutes.toStringAsFixed(0));
@@ -173,33 +229,31 @@ class _StepTargetUpdateScreenState extends State<StepTargetUpdateScreen> {
       return '$years year${years != 1 ? 's' : ''}';
     }
   }
+
+
+
   String calculateTimeToCoverDistance({
     required double height,
     required int steps,
     required String gender,
     required double distance,
   }) {
-    print(distance);
+    print("Distance in time section "+distance.toString());
     print(steps);
-    // Calculate step length
-    double stepLength = (height * 0.415) / steps;
-    print("stepslength $stepLength");
-    // Number of steps for 1 kilometer (adjust as needed)
-    double stepsPerKilometer = 1000 / stepLength;
-    print("stepsPerKilometer $stepsPerKilometer");
 
     // Calculate walking speed (kilometers per minute)
-    double walkingSpeed = stepsPerKilometer / distance;
-    if (!walkingSpeed.isFinite || walkingSpeed <= 0) {
-      return "0";
-    }
+    double walkingSpeed = 4.8;
+
     print("walkingSpeed $walkingSpeed");
 
     // Calculate time to cover the distance (in minutes)
-    double timeInMinutes = distance / walkingSpeed;
-    print("timeInMinutes " + timeInMinutes.toStringAsFixed(3));
+    double timeInMinutes = (distance / walkingSpeed);
 
-    return formatTime(double.parse(timeInMinutes.toStringAsFixed(0)));
+    print("timeInHours " + timeInMinutes.toString());
+
+      print("time in minutes ${timeInMinutes*60}");
+
+    return formatTime(double.parse((timeInMinutes * 60).toStringAsFixed(2)));
   }
 
   String calculateCaloriesBurned({
@@ -232,6 +286,57 @@ class _StepTargetUpdateScreenState extends State<StepTargetUpdateScreen> {
 
     return caloriesBurned.toStringAsFixed(0) + " kcal";
   }
+ late String _errorText="";
+ void _validateTextField(String value) {
+   if (int.tryParse(value) != null) {
+     int enteredValue = int.parse(value);
+     if (enteredValue < 2000) {
+       setState(() {
+         _errorText = 'Value must be 2000 or greater';
+       });
+       return;
+     }
+   }
+   setState(() {
+     _errorText = "";
+   });
+ }
+
+
+ double calculateStrideLength(double heightInCm, String gender) {
+   // Example equation for estimating stride length
+   double strideLength;
+   if (gender == 'male') {
+     strideLength = 0.415 * heightInCm;
+   } else if (gender == 'female') {
+     strideLength = 0.413 * heightInCm;
+   } else {
+     // Default to average if gender is unknown
+     strideLength = 0.414 * heightInCm;
+   }
+   return strideLength;
+ }
+
+ double estimateMetabolicRate(double weightInKg, int age, String gender) {
+   // Example equation for estimating metabolic rate
+   double metabolicRate;
+   if (gender == 'male') {
+     metabolicRate = (10 * weightInKg) + (6.25 * Height) - (5 * age) + 5;
+   } else if (gender == 'female') {
+     metabolicRate = (10 * weightInKg) + (6.25 * Height) - (5 * age) - 161;
+   } else {
+     // Default to average if gender is unknown
+     metabolicRate = (10 * weightInKg) + (6.25 * Height) - (5 * age);
+   }
+   return metabolicRate;
+ }
+
+ double estimateTimeTaken(int totalSteps, double strideLength, double metabolicRate) {
+   // Estimate time taken based on steps, stride length, and metabolic rate
+   double totalTimeMinutes = (totalSteps * strideLength) / metabolicRate;
+   return totalTimeMinutes;
+ }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -268,7 +373,8 @@ class _StepTargetUpdateScreenState extends State<StepTargetUpdateScreen> {
               height: 15,
             ),
             Image.asset(
-              "lib/assests/NewImages/StepSettingPage.png",
+              imagesFoot[value],
+              // imagesFoot[value],
               scale: 3,
             ),
 
@@ -282,17 +388,22 @@ class _StepTargetUpdateScreenState extends State<StepTargetUpdateScreen> {
                     onPressed: () async {
                       HapticFeedback.lightImpact();
                       setState(() {
-                        if (StepsTarget > 0 && StepsTarget>currentSteps) {
+                        if (StepsTarget > 2000 && StepsTarget>currentSteps ) {
                           StepsTarget = StepsTarget - 50;
                         } else {
-                          StepsTarget = currentSteps;
+                          if(StepsTarget<currentSteps){
+                            StepsTarget=currentSteps;
+                          }
+                          else {
+                            StepsTarget = 2000;
+                          };
                         }
                       });
                       await SharedPref().setStepsTarget(StepsTarget);
                       setState(() {
                         _defaultStepsController.text=StepsTarget.toString();
                       });
-
+                      _services.Update(uid, StepsTarget);
                       homeControllwe.updateStepsTarget(StepsTarget);
 
                     },
@@ -310,8 +421,17 @@ class _StepTargetUpdateScreenState extends State<StepTargetUpdateScreen> {
                         content: TextField(
                           controller: _defaultStepsController,
                           focusNode: _defaultStepsNode,
-                          style:  TextStyle(color: Colors.black),
+                          style:  TextStyle(color: Colors.black,
 
+                          ),
+                          onChanged: (String value) {
+                            _validateTextField(
+                                value);
+                          },
+                          decoration: InputDecoration(
+                              errorText: _errorText,
+                              errorStyle: TextStyle(color:Colors.black)
+                          ),
                         ),
                         actions: <Widget>[
                           ElevatedButton(
@@ -323,12 +443,46 @@ class _StepTargetUpdateScreenState extends State<StepTargetUpdateScreen> {
                           ElevatedButton(
                             onPressed: () {
                               // Trigger callback function with entered text
-                              setState(() {
-                                StepsTarget=int.parse(_defaultStepsController.text);
-                              });
-                         SharedPref().setStepsTarget(StepsTarget);
-                              homeControllwe.updateStepsTarget(StepsTarget);
-                              Navigator.of(context).pop();
+                              if(int.parse(
+                                  _defaultStepsController
+                                      .text)>=2000 && int.parse(
+                                  _defaultStepsController
+                                      .text)>StepsTarget)  {
+                                setState(() {
+                                  StepsTarget = int.parse(
+                                      _defaultStepsController
+                                          .text);
+                                });
+                                setState(() {
+                                  _defaultStepsController
+                                      .text =
+                                      StepsTarget
+                                          .toString();
+                                });
+                                SharedPref().setStepsTarget(StepsTarget);
+                                _services.Update(uid, StepsTarget);
+                                homeControllwe.updateStepsTarget(StepsTarget);
+                                Navigator.of(context)
+                                    .pop();
+                              }else{
+                                if(int.parse(
+                                    _defaultStepsController
+                                        .text)<currentSteps){
+                                  StepsTarget=currentSteps;
+                                }
+                                else {
+                                  StepsTarget = 2000;
+                                };
+                                Navigator.of(context)
+                                    .pop();
+                                ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                                  content: Text('Value Must be Greater than current Steps or equals to 2000'),
+                                  backgroundColor: Colors.white,
+
+                                  duration: Duration(seconds: 2),
+                                ));
+
+                              }
                             },
                             child: Text('OK'),
                           ),
@@ -360,14 +514,16 @@ class _StepTargetUpdateScreenState extends State<StepTargetUpdateScreen> {
                 ),
                 IconButton(
                     onPressed: () async {
-                      HapticFeedbackType.lightImpact;
+                      HapticFeedback.lightImpact();
                       setState(() {
                         StepsTarget = StepsTarget + 100;
                       });
                       setState(() {
                         _defaultStepsController.text=StepsTarget.toString();
                       });
+
                       await SharedPref().setStepsTarget(StepsTarget);
+                      _services.Update(uid, StepsTarget);
                       homeControllwe.updateStepsTarget(StepsTarget);
                     },
                     icon: ImageIcon(AssetImage(
@@ -390,7 +546,7 @@ class _StepTargetUpdateScreenState extends State<StepTargetUpdateScreen> {
                       color: Colors.white,
                       size: 34,
                     ),
-                    Text(StepsToDistance(StepsTarget, false))
+                    Text(StepsToDistance(StepsTarget, isMiles))
                   ],
                 ),
                 Column(

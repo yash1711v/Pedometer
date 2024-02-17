@@ -209,7 +209,7 @@ Future<void> saveImageList(List<String> stringList) async {
         print("Steps Data --------------> $stepsData");
 
       }
-      // makeHourValuesPositive(stepsData[year]![month]![date]);
+      makeHourValuesPositive(stepsData[year]![month]![date]);
     }
 
     return stepsData;
@@ -320,16 +320,16 @@ Future<void> saveImageList(List<String> stringList) async {
   }
 
  setHeight(int height) async {
-    // print("setFirstrun");
+    print("height coming is $height");
     SharedPreferences pref = await SharedPreferences.getInstance();
     pref.setInt("Height", height);
     // print(username);
   }
 
   getHeight() async {
-    // print("getFirstrun called");
     SharedPreferences pref = await SharedPreferences.getInstance();
     int height = pref.getInt("Height")??162;
+    print("Height we giving $height");
     return height;
   }
 

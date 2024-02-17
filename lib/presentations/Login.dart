@@ -50,9 +50,12 @@ class _LoginState extends State<Login> {
   List<String> ImagesBg=["lib/assests/NewImages/LoginScreenBg.png","lib/assests/NewImages/LoginScreenBg2.png","lib/assests/NewImages/LoginScreenBg3.png"];
   int value=0;
   void initState() {
+    super.initState();
     whichTheme();
   }
   whichTheme() async {
+    bool guest=await SharedPref().getisguest();
+
     List<Color> Th= await SharedPref().loadColorList();
     setState(() {
       Theme=Th;
@@ -74,7 +77,9 @@ class _LoginState extends State<Login> {
           value=2;
         });
       }
+      isguest=guest;
     });
+
   }
   Future<String> getDeviceUID() async {
     DeviceInfoPlugin deviceInfo = DeviceInfoPlugin();
@@ -480,7 +485,8 @@ class _LoginState extends State<Login> {
                                   String deviceid=await getDeviceUID();
                                   print("UID: "+deviceid);
                                   SharedPref().setDeviceid(deviceid);
-                                  _authServices.Login(_email, password,deviceid,context);
+                                  print(isguest);
+                                  _authServices.Login(_email, password,deviceid,context,isguest,deviceid);
                                   Future.delayed(Duration(seconds: 1),(){Navigator.pop(context);});
                                 }
                                     : () => {
@@ -553,7 +559,7 @@ class _LoginState extends State<Login> {
                                 String deviceid=await getDeviceUID();
                                 print("UID: "+deviceid);
                                 SharedPref().setDeviceid(deviceid);
-                                _authServices.signInWithGoogle(context,deviceid);
+                                _authServices.signInWithGoogle(context,deviceid,isguest);
                               },
                             ),
 

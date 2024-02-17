@@ -56,7 +56,7 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
   int StepsCompleted = 0;
   late AnimationController _controller;
   late Animation<double> _animation;
-  String _pedestrianStatus = 'Stopped';
+  String _pedestrianStatus = 'stopped';
   double indicatorProgress = 0.0;
   bool isPause = false;
   bool isPermissionGauranted = false;
@@ -157,7 +157,7 @@ Future<void> getColors() async {
     AuthServices authServices2=AuthServices();
     String Firebaseid="";
     String deviceid=await SharedPref().getDeviceid();
-    // print("Uid:  "+  Uid);
+    print("Uid:  "+  Uid);
     DatabaseReference databaseReference = FirebaseDatabase.instance.reference().child('users').child(Uid).child('Device_ID');
     try {
       databaseReference.onValue.listen((event) async {
@@ -175,9 +175,10 @@ Future<void> getColors() async {
       }else{
         // print("Firebase Deviceid"+Firebaseid);
         // print("SharedPref Device ID:"+deviceid);
-        if(deviceid!=Firebaseid){
+        if(deviceid!=Firebaseid ){
+          print("----------------->Device id is not equals to firebase id  firbase id : $Firebaseid && Devicd if $deviceid Uid: $Uid");
           // print("in notEquals");
-          await SharedPref().clearAllPreferences();
+      //     // await SharedPref().clearAllPreferences();
       await SharedPref().setIntroScreenInfo(false);
       SharedPref().setStepsComingFromFirebase(0);
       SharedPref().setEmail("");
@@ -398,12 +399,13 @@ Future<void> getColors() async {
           onError: (error) => print('Error: $error'),
         );
         // Pedestrian Status Stream
-        // _pedestrianStatusSubscription =
-        //     Pedometer.pedestrianStatusStream.listen((PedestrianStatus event) {
-        //       setState(() {
-        //         _pedestrianStatus = event.status;
-        //       });
-        //     });
+        _pedestrianStatusSubscription =
+            Pedometer.pedestrianStatusStream.listen((PedestrianStatus event) {
+              setState(() {
+                _pedestrianStatus = event.status;
+              });
+              print("---------------------------Status------------------------------>$_pedestrianStatus");
+            });
         }else{
           // await Permission.activityRecognition.request();
           // await Permission.location.request();
@@ -470,25 +472,19 @@ Future<void> getColors() async {
   }) {
     print(distance);
     print(steps);
-    // Calculate step length
-    double stepLength = (Height * 0.415) / steps;
-    // print("stepslength $stepLength");
-    // Number of steps for 1 kilometer (adjust as needed)
-    double stepsPerKilometer = isMetric ? 1000 / stepLength : 1609.34 / stepLength;
-    // print("stepsPerKilometer $stepsPerKilometer");
+    double walkingSpeed = 4.8;
 
-    // Calculate walking speed (kilometers per minute)
-    double walkingSpeed = stepsPerKilometer / distance;
-    if (!walkingSpeed.isFinite || walkingSpeed <= 0) {
-      return "0";
-    }
     // print("walkingSpeed $walkingSpeed");
 
     // Calculate time to cover the distance (in minutes)
-    double timeInMinutes = distance / walkingSpeed;
+    double timeInMinutes = (distance / walkingSpeed);
+    //
+    // print("timeInHours " + timeInMinutes.toString());
+    //
+    // print("time in minutes ${timeInMinutes*60}");
     // print("timeInMinutes " + timeInMinutes.toStringAsFixed(3));
 
-    return formatTime(double.parse(timeInMinutes.toStringAsFixed(0)));
+    return formatTime(double.parse((timeInMinutes*60).toString()));
   }
   double calculateTimeToCoverDistanceInMinutes({
     required int steps,
@@ -498,24 +494,21 @@ Future<void> getColors() async {
     // print(distance);
     // print(steps);
     // Calculate step length
-    double stepLength = (Height * 0.415) / steps;
-    // print("stepslength $stepLength");
-    // Number of steps for 1 kilometer (adjust as needed)
-    double stepsPerKilometer = isMetric ? stepLength/1000   : stepLength/1609.34  ;
-    // print("stepsPerKilometer $stepsPerKilometer");
 
     // Calculate walking speed (kilometers per minute)
-    double walkingSpeed = stepsPerKilometer / distance;
-    if (!walkingSpeed.isFinite || walkingSpeed <= 0) {
-      return 0.0;
-    }
+    double walkingSpeed = 4.8;
+
     // print("walkingSpeed $walkingSpeed");
 
     // Calculate time to cover the distance (in minutes)
-    double timeInMinutes = distance / walkingSpeed;
+    double timeInMinutes = (distance / walkingSpeed);
+    //
+    // print("timeInHours " + timeInMinutes.toString());
+    //
+    // print("time in minutes ${timeInMinutes*60}");
     // print("timeInMinutes " + timeInMinutes.toStringAsFixed(3));
 
-    return timeInMinutes;
+    return timeInMinutes * 60 ;
   }
 
   String calculateCaloriesBurned({
@@ -550,6 +543,29 @@ Future<void> getColors() async {
 
     return totalCaloriesBurned.toStringAsFixed(0) + " kcal";
   }
+  String formatted2(double totalDistance, bool isMiles, String unit) {
+    if (totalDistance >= 1000) {
+      // If the total distance is 1 kilometer or more, return in kilometers
+      setState(() {
+        // totalDuration = Duration.zero; // or set it to the desired value
+        inMiles = isMiles ? totalDistance : totalDistance / 1609.34;
+      });
+      // SharedPref().saveDuration(totalDuration);
+      return "${isMiles ? totalDistance.toStringAsFixed(1) : (totalDistance / 1000).toStringAsFixed(1)}";
+    } else {
+      // If the total distance is less than 1 kilometer, return in meters
+      setState(() {
+        // totalDuration = Duration.zero; // or set it to the desired value
+        inMiles = isMiles ? totalDistance * 1609.34 : totalDistance;
+      });
+      // SharedPref().saveDuration(totalDuration);
+      setState(() {
+        time =
+        "${isMiles ? (totalDistance * 1609.34).toStringAsFixed(1) : totalDistance.toStringAsFixed(1)}";
+      });
+      return "${isMiles ? (totalDistance * 1609.34).toStringAsFixed(1) : totalDistance.toStringAsFixed(1)}";
+    }
+  }
 
   double StepsToDistanceDouble(int steps, bool isMiles) {
     double stepsInKm = steps / 1312.33595801;
@@ -571,30 +587,25 @@ Future<void> getColors() async {
       totalDistance = stepsInKm * 1000;
       unit = " m";
     }
+    if(unit==" m"){
+      totalDistance=totalDistance/1000;
+    }else if(unit==" mile"){
+      totalDistance=totalDistance/0.62137;
+    }
+    totalDistance=double.parse(formatted2(totalDistance, isMiles, unit));
+    // print("steps to distance in double -----> $totalDistance");
     return totalDistance;
   }
 
   String time = "";
   String formatted(double totalDistance, bool isMiles, String unit) {
+    // print("<--------------------------------------------uni $unit isMiles $isMiles --------------------->");
     if (totalDistance >= 1000) {
-      // If the total distance is 1 kilometer or more, return in kilometers
-      setState(() {
-        // totalDuration = Duration.zero; // or set it to the desired value
-        inMiles = isMiles ? totalDistance : totalDistance / 1609.34;
-      });
+
       // SharedPref().saveDuration(totalDuration);
       return "${isMiles ? totalDistance.toStringAsFixed(1) + unit : (totalDistance / 1000).toStringAsFixed(1) + " Km"} ";
     } else {
       // If the total distance is less than 1 kilometer, return in meters
-      setState(() {
-        // totalDuration = Duration.zero; // or set it to the desired value
-        inMiles = isMiles ? totalDistance * 1609.34 : totalDistance;
-      });
-      // SharedPref().saveDuration(totalDuration);
-      setState(() {
-        time =
-        "${isMiles ? (totalDistance * 1609.34).toStringAsFixed(1) + unit : totalDistance.toStringAsFixed(1)} ";
-      });
       return "${isMiles ? (totalDistance * 1609.34).toStringAsFixed(1) + unit : totalDistance.toStringAsFixed(1) + unit} ";
     }
   }
@@ -609,11 +620,17 @@ Future<void> getColors() async {
     String formattedTime =
         "${dateTime.hour.toString().padLeft(2, '0')}:${dateTime.minute.toString().padLeft(2, '0')}";
     List<String> timeParts = formattedTime.split(':');
-
+    totalDistance=stepsInKm;
     if (isMiles) {
       // Convert steps to miles
       totalDistance = stepsInKm * 0.62137;
-      unit = " miles";
+      if(totalDistance>1760.0){
+        // print("in yards------------------------>");
+        unit = " miles";
+      }else {
+        unit= " yards";
+
+      }
     } else {
       // Convert steps to meters
       totalDistance = stepsInKm * 1000;
@@ -773,7 +790,9 @@ List<String> WhichGraoh=['Day','Week','Month'];
                               startColor: Themee[0],
                               middle: Themee[1],
                               endColor: Themee[2], StepsCompleted: StepsCompleted, StepsTarget: StepsTarget, width: 25.0),
+                          child: Center(child: _pedestrianStatus=="stopped"?Image.asset("lib/assests/NewImages/Foot_Still.png"):Lottie.asset("lib/assests/NewImages/moving_Footsteps.json"),),
                         ),
+
                       )
                     ],
                   ),
@@ -886,7 +905,7 @@ List<String> WhichGraoh=['Day','Week','Month'];
                         ),
                         SizedBox(height: 10,),
                         Text(
-                          calculateTimeToCoverDistance(steps: StepsCompleted, distance: StepsToDistanceDouble(StepsCompleted,isMils), isMetric: isMils),
+                          calculateTimeToCoverDistance(steps: StepsCompleted, distance: StepsToDistanceDouble(StepsCompleted,false), isMetric: false),
                           style: TextStyle(
                             color: Color(0xFFF3F3F3),
                             fontSize: 24.sp,

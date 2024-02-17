@@ -22,8 +22,8 @@ class UserInfoUpdate extends StatefulWidget {
 }
 
 class _UserInfoUpdateState extends State<UserInfoUpdate> {
-  int _cCurrentValue = 160;
-  int _cCurrentValueWeight = 55;
+  late int _cCurrentValue ;
+  late int _cCurrentValueWeight ;
   late final TextEditingController ageController =
   TextEditingController();
   final FocusNode ageFocusNode = FocusNode();
@@ -113,6 +113,16 @@ class _UserInfoUpdateState extends State<UserInfoUpdate> {
     return deviceUID;
   }
   bool Geust=true;
+  getheight() async {
+    int height=await SharedPref().getHeight();
+    int weight=await SharedPref().getWeight();
+    setState(() {
+      Height=double.parse(height.toString());
+      Weight=double.parse(weight.toString());
+      _cCurrentValue=height;
+      _cCurrentValueWeight=weight;
+    });
+  }
   gettingEmailAndPassword() async {
     int height=await SharedPref().getHeight();
     int weight=await SharedPref().getWeight();
@@ -123,6 +133,7 @@ class _UserInfoUpdateState extends State<UserInfoUpdate> {
     String uid=await SharedPref().getUid();
     whichTheme();
     print(gender);
+    whichthemeImages();
     WhichGender(gender);
     setState(() {
       Geust=guest;
@@ -143,6 +154,10 @@ class _UserInfoUpdateState extends State<UserInfoUpdate> {
 
 
     });
+    print("Height $Height");
+    print("weight $Weight");
+    print("Age $Age");
+    print("Activity level $ActivityIndex");
   }
 
 
@@ -156,12 +171,14 @@ class _UserInfoUpdateState extends State<UserInfoUpdate> {
   }
 
   void initState() {
+    getheight();
     setState(() {
       Theme1 = [
         Color(0xFFF7722A),
         Color(0xFFE032A1),
         Color(0xFFCF03F9)
       ];
+
     });
     whichTheme();
     whichthemeImages();
@@ -477,9 +494,10 @@ class _UserInfoUpdateState extends State<UserInfoUpdate> {
                         _cCurrentValue = val;
                         Height = double.parse(val.toString());
                       });
-                      await SharedPref().setHeight(int.parse(Height.toStringAsFixed(0)));
+                      print(Height);
+                      await SharedPref().setHeight(int.parse(val.toStringAsFixed(0)));
                       if(Geust==false){
-                        _services.UpdateHeight(UID, int.parse(Height.toStringAsFixed(0)));
+                        _services.UpdateHeight(UID, int.parse(val.toStringAsFixed(0)));
                       }
                       print(Height);
                     },
@@ -554,9 +572,9 @@ class _UserInfoUpdateState extends State<UserInfoUpdate> {
                         _cCurrentValueWeight = val;
                         Weight = double.parse(val.toString());
                       });
-                      await SharedPref().setWeight(int.parse(Weight.toStringAsFixed(0)));
+                      await SharedPref().setWeight(int.parse(val.toStringAsFixed(0)));
                       if(Geust==false){
-                        _services.UpdateWeight(UID, int.parse(Weight.toStringAsFixed(0)));
+                        _services.UpdateWeight(UID, int.parse(val.toStringAsFixed(0)));
                       }
           
                     },
@@ -629,11 +647,21 @@ class _UserInfoUpdateState extends State<UserInfoUpdate> {
                             ElevatedButton(
                               onPressed: () {
                                 // Trigger callback function with entered text
-                                setState(() {
-                                  Age=int.parse(ageController.text);
-                                });
-                                _services.UpdateAge(UID, int.parse(Age.toStringAsFixed(0)));
-                                Navigator.of(context).pop();
+                                if(Age<150) {
+                                      setState(() {
+                                        Age = int.parse(ageController.text);
+                                      });
+                                      _services.UpdateAge(UID,
+                                          int.parse(Age.toStringAsFixed(0)));
+                                    }else{
+                                  setState(() {
+                                    Age = 150;
+                                  });
+                                  _services.UpdateAge(UID,
+                                      int.parse(Age.toStringAsFixed(0)));
+                                  ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("Age must be less than 150"),backgroundColor: Colors.white,));
+                                }
+                                    Navigator.of(context).pop();
                               },
                               child: Text('OK'),
                             ),
@@ -666,13 +694,26 @@ class _UserInfoUpdateState extends State<UserInfoUpdate> {
                   IconButton(
                       onPressed: () async {
                         HapticFeedback.lightImpact();
-                        setState(() {
-                          Age = Age + 1;
-                        });
-                        await SharedPref().setAge(Age);
-                        if(Geust==false){
-                          _services.UpdateAge(UID, int.parse(Age.toStringAsFixed(0)));
-                        }
+                       if(Age<150) {
+                          setState(() {
+                            Age = Age + 1;
+                          });
+                          await SharedPref().setAge(Age);
+                          if(Geust==false){
+                            _services.UpdateAge(UID, int.parse(Age.toStringAsFixed(0)));
+                          }
+                        }else{
+                         setState(() {
+                           Age = 150;
+                         });
+                         await SharedPref().setAge(Age);
+                         if(Geust==false){
+                           _services.UpdateAge(UID, int.parse(Age.toStringAsFixed(0)));
+                         }
+                         ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("Age must less than 150"),backgroundColor: Colors.white,));
+
+                       }
+
                       },
                       icon: ImageIcon(AssetImage(
                           "lib/assests/NewImages/Addition.png"))),
