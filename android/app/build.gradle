@@ -13,13 +13,13 @@ if (flutterRoot == null) {
 
 def flutterVersionCode = localProperties.getProperty('flutter.versionCode')
 if (flutterVersionCode == null) {
-    flutterVersionCode = '10'
+    flutterVersionCode = '11'
 }
 
 def flutterVersionName = localProperties.getProperty('flutter.versionName')
 if (flutterVersionName == null) {
 
-    flutterVersionName = '2.0.2'
+    flutterVersionName = '2.0.3'
 
 }
 
@@ -79,7 +79,7 @@ dependencies {
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
     implementation 'com.google.firebase:firebase-analytics-ktx'
     // own sdk
-    implementation files('libs/analyticstrackerV2_17.1.1.jar')
+    implementation files('libs/analyticstrackerV2_17.3.18.jar')
     implementation 'androidx.cardview:cardview:1.0.0'
     implementation 'com.google.android.recaptcha:recaptcha:18.4.0'
     implementation ('io.objectbox:objectbox-android:3.7.1') {
