@@ -115,7 +115,7 @@ class _IntroScreenState extends State<IntroScreen> {
     }else if(page==3 && Activitysensor==true){
       return Text("Welcome");
     }else{
-      return Text("Next");£₹
+      return Text("Next");
     }
   }
   @override
